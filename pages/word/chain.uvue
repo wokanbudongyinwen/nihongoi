@@ -1,0 +1,649 @@
+<template>
+  <view class="page">
+    <!-- 链路径（本次会话内存视图） -->
+    <scroll-view class="chain-bar" scroll-x="true" show-scrollbar="false" v-if="chainWords.length > 0">
+      <view class="chain-row">
+        <view class="chain-cell" v-for="(w, i) in chainWords" :key="w.id.toString() + '-' + i.toString()">
+          <text class="chain-word" :class="i == chainWords.length - 1 ? 'chain-word-on' : ''">{{ w.term }}</text>
+          <text class="chain-arrow" v-if="i < chainWords.length - 1">→</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 主单词卡 -->
+    <view class="neo-card main-card" v-if="hasMain">
+      <view class="main-row">
+        <text class="main-term">{{ mainWord.term }}</text>
+        <text class="speaker pressable-soft" hover-class="press-soft" @click="playMain">音</text>
+      </view>
+      <text class="main-reading" v-if="mainWord.reading != '' || accentText() != ''">{{ mainWord.reading }}{{ mainWord.reading != '' && accentText() != '' ? ' · ' : '' }}{{ accentText() }}</text>
+      <text class="main-meaning">{{ mainWord.meaning }}</text>
+      <view class="main-meta">
+        <text class="meta-text">已有自由关联 {{ customIds.length }} 个</text>
+        <text class="meta-btn pressable-soft" hover-class="press-soft" @click="toggleNoteInput">{{ noteInputting ? '收起' : '+ 笔记' }}</text>
+      </view>
+      <view class="note-form" v-if="noteInputting">
+        <input class="note-input" :value="noteInput" @input="onNoteInput" placeholder="给这个词记点什么…" />
+        <view class="neo-card-sm note-save pressable" hover-class="press" @click="doAddNote"><text class="note-save-text">保存</text></view>
+      </view>
+    </view>
+
+    <!-- 空态：无孤单词 -->
+    <view class="empty" v-if="!hasMain && loaded">
+      <text class="empty-icon">✓</text>
+      <text class="empty-title">没有孤单词了</text>
+      <text class="empty-text">激活计划里已学的词都建立了自由关联</text>
+      <view class="neo-card-sm done-btn pressable" hover-class="press" @click="goBack"><text class="done-btn-text">返回</text></view>
+    </view>
+
+    <!-- 选词区 -->
+    <view class="neo-card pick-section" v-if="hasMain">
+      <text class="pick-title">选择下一个关联词（可搜全词库）</text>
+      <input class="search" :value="keyword" @input="onSearch" placeholder="搜索表记 / 读音 / 罗马音 / 释义" />
+
+      <!-- 确认关联：主 ↔ 候选 -->
+      <view class="confirm-box" v-if="picked != null">
+        <view class="confirm-line">
+          <text class="confirm-a">{{ mainWord.term }}</text>
+          <text class="confirm-link">↔</text>
+          <text class="confirm-b">{{ pickedWordTerm() }}</text>
+        </view>
+        <input class="reason-input" :value="reason" @input="onReason" placeholder="关联理由（可选，如：同类动作 / 反义对比）" />
+        <view class="confirm-actions">
+          <view class="neo-card-sm confirm-btn ok pressable" hover-class="press" @click="doLink"><text class="confirm-btn-text">建立关联</text></view>
+          <view class="neo-card-sm confirm-btn pressable" hover-class="press" @click="cancelPick"><text class="confirm-btn-text-cancel">取消</text></view>
+        </view>
+      </view>
+
+      <!-- 候选列表 -->
+      <scroll-view class="cands" scroll-y="true" show-scrollbar="false">
+        <view class="cand" v-for="(w, i) in results" :key="w.id" @click="pickCand(w)">
+          <view class="cand-line">
+            <text class="cand-term">{{ w.term }}</text>
+            <text class="cand-tag" v-if="w.id == mainWord.id">当前主词</text>
+            <text class="cand-tag linked" v-else-if="isLinked(w.id)">已关联</text>
+          </view>
+          <text class="cand-reading" v-if="w.reading != ''">{{ w.reading }}</text>
+          <text class="cand-meaning">{{ w.meaning }}</text>
+        </view>
+        <view class="cands-empty" v-if="keyword.length > 0 && results.length == 0">
+          <text class="cands-empty-text">无匹配词条</text>
+        </view>
+        <view class="cands-hint" v-if="keyword.length == 0">
+          <text class="cands-empty-text">输入关键词搜索词库，选择后与主单词建立自由关联</text>
+        </view>
+        <view class="bottom-space"></view>
+      </scroll-view>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="bottom-bar" v-if="hasMain">
+      <view class="neo-card-sm bottom-btn skip pressable" hover-class="press" @click="doSkip"><text class="bottom-btn-text">跳过（换一个孤单词）</text></view>
+      <view class="neo-card-sm bottom-btn done pressable" hover-class="press" @click="goBack"><text class="bottom-btn-text-w">完成</text></view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Word, RELATION_CUSTOM } from '../../domain/types.uts'
+  import { accentsDisplay } from '../../domain/format.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { searchWords, getWordDetail, addCustomRelation, addNote, RelationDisplay } from '../../services/wordEditor.uts'
+  import { manualPlay } from '../../services/audio.uts'
+
+  const emptyWord: Word = {
+    id: 0,
+    term: '',
+    reading: '',
+    romaji: '',
+    accent: [] as Array<number>,
+    pos: '',
+    meaning: '',
+    verbType: '',
+    extraJson: '{}',
+    createdAt: 0,
+    updatedAt: 0
+  }
+
+  const mainWord = ref<Word>(emptyWord)
+  const hasMain = ref(false)
+  const loaded = ref(false)           // 起始词已尝试加载（区分空态与加载中）
+  const customIds = ref<Array<number>>([]) // 主单词已有的自由关联对端 id
+  const chainWords = ref<Array<Word>>([])
+  const keyword = ref('')
+  const results = ref<Array<Word>>([])
+  const picked = ref<Word | null>(null)
+  const pickedId = ref(0)             // 模板比对用（规避可空对象属性访问）
+  const reason = ref('')
+  const noteInputting = ref(false)
+  const noteInput = ref('')
+
+  let activePlanId = 0
+
+  const accentText = (): string => {
+    return accentsDisplay(mainWord.value.accent)
+  }
+
+  const pickedWordTerm = (): string => {
+    const p = picked.value
+    return p == null ? '' : p.term
+  }
+
+  const isLinked = (id: number): boolean => {
+    return customIds.value.indexOf(id) >= 0
+  }
+
+  // 加载主单词详情（刷新已有自由关联集合）
+  const loadMainDetail = async (w: Word) => {
+    mainWord.value = w
+    hasMain.value = true
+    const ids: Array<number> = []
+    try {
+      const d = await getWordDetail(w.id)
+      for (let i = 0; i < d.relations.length; i++) {
+        const r: RelationDisplay = d.relations[i]
+        if (r.relationType == RELATION_CUSTOM) {
+          ids.push(r.otherId)
+        }
+      }
+    } catch (e) {
+      console.error('加载主单词详情失败', e)
+    }
+    customIds.value = ids
+  }
+
+  // 起始 / 跳过：随机取一个孤单词，重开一条链
+  // （doSearch/cancelPick 须先声明——坑④：uts 要求先声明后引用）
+  const doSearch = async () => {
+    if (keyword.value.length == 0) {
+      results.value = [] as Array<Word>
+      return
+    }
+    try {
+      results.value = await searchWords(keyword.value, 20)
+    } catch (e) {
+      console.error('搜索失败', e)
+    }
+  }
+
+  const onSearch = (e: InputEvent) => {
+    keyword.value = e.detail.value
+    doSearch()
+  }
+
+  const cancelPick = () => {
+    picked.value = null
+    pickedId.value = 0
+    reason.value = ''
+  }
+
+  const pickStart = async () => {
+    if (activePlanId <= 0) {
+      uni.showToast({ title: '无激活计划', icon: 'none' })
+      loaded.value = true
+      return
+    }
+    try {
+      const w = await getPlanRepo().pickLonelyWord(activePlanId)
+      loaded.value = true
+      if (w == null) {
+        hasMain.value = false
+        return
+      }
+      chainWords.value = [w] as Array<Word>
+      keyword.value = ''
+      results.value = [] as Array<Word>
+      cancelPick()
+      noteInputting.value = false
+      await loadMainDetail(w)
+    } catch (e) {
+      loaded.value = true
+      console.error('挑孤单词失败', e)
+      uni.showToast({ title: '加载失败', icon: 'none' })
+    }
+  }
+
+  const start = async () => {
+    try {
+      const plan = await getPlanRepo().getActivePlan()
+      if (plan != null) {
+        activePlanId = plan.id
+      }
+    } catch (e) {
+      console.error('取激活计划失败', e)
+    }
+    await pickStart()
+  }
+
+  const pickCand = (w: Word) => {
+    if (w.id == mainWord.value.id) {
+      uni.showToast({ title: '不能关联自己', icon: 'none' })
+      return
+    }
+    picked.value = w
+    pickedId.value = w.id
+    reason.value = ''
+  }
+
+  const onReason = (e: InputEvent) => {
+    reason.value = e.detail.value
+  }
+
+  // 建立关联：即时落库；成功后所选词成为新的主单词，链继续
+  const doLink = async () => {
+    const p = picked.value
+    if (p == null) {
+      return
+    }
+    try {
+      const ok = await addCustomRelation(mainWord.value.id, p.id, reason.value)
+      if (!ok) {
+        uni.showToast({ title: '两词已存在关联，换一个吧', icon: 'none' })
+        return
+      }
+      const chain: Array<Word> = []
+      for (let i = 0; i < chainWords.value.length; i++) {
+        chain.push(chainWords.value[i])
+      }
+      chain.push(p)
+      chainWords.value = chain
+      keyword.value = ''
+      results.value = [] as Array<Word>
+      cancelPick()
+      await loadMainDetail(p)
+      uni.showToast({ title: '已关联，继续串联', icon: 'none' })
+    } catch (e) {
+      console.error('建立关联失败', e)
+      uni.showToast({ title: '建立失败', icon: 'none' })
+    }
+  }
+
+  const doSkip = () => {
+    pickStart()
+  }
+
+  // ---------- 笔记（即时落库） ----------
+
+  const toggleNoteInput = () => {
+    noteInputting.value = !noteInputting.value
+    if (noteInputting.value) {
+      noteInput.value = ''
+    }
+  }
+
+  const onNoteInput = (e: InputEvent) => {
+    noteInput.value = e.detail.value
+  }
+
+  const doAddNote = async () => {
+    if (noteInput.value.length == 0) {
+      uni.showToast({ title: '笔记不能为空', icon: 'none' })
+      return
+    }
+    try {
+      await addNote(mainWord.value.id, noteInput.value)
+      noteInputting.value = false
+      uni.showToast({ title: '笔记已保存', icon: 'success' })
+    } catch (e) {
+      console.error('笔记保存失败', e)
+      uni.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }
+
+  // ---------- 其他 ----------
+
+  const playMain = async () => {
+    const ok = await manualPlay(mainWord.value)
+    if (!ok) {
+      uni.showToast({ title: '暂无音频（下载失败或无网络）', icon: 'none' })
+    }
+  }
+
+  const goBack = () => {
+    uni.navigateBack()
+  }
+
+  onLoad(() => {
+    start()
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+  }
+
+  /* ---------- 链路径 ---------- */
+  .chain-bar {
+    background-color: $n-cream;
+    padding: 16rpx 24rpx;
+    border-bottom-width: 2rpx;
+    border-bottom-style: solid;
+    border-bottom-color: $n-ink;
+  }
+  .chain-row {
+    flex-direction: row;
+    align-items: center;
+  }
+  .chain-cell {
+    flex-direction: row;
+    align-items: center;
+  }
+  .chain-word {
+    font-size: $c-fs-sm;
+    color: $n-text2;
+  }
+  .chain-word-on {
+    color: $n-purple;
+    font-weight: bold;
+  }
+  .chain-arrow {
+    font-size: $c-fs-xs;
+    color: $n-text3;
+    margin: 0 12rpx;
+  }
+
+  /* ---------- 主单词卡 ---------- */
+  .main-card {
+    background-color: $n-purple;
+    padding: 32rpx;
+    margin: 24rpx;
+  }
+  .main-row {
+    flex-direction: row;
+    align-items: center;
+  }
+  .main-term {
+    flex: 1;
+    font-size: $c-fs-hero;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .speaker {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 999rpx;
+    background-color: $n-yellow;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    font-size: 26rpx;
+    font-weight: bold;
+    color: $n-ink;
+    text-align: center;
+    line-height: 64rpx;
+  }
+  .main-reading {
+    font-size: $c-fs-sm;
+    color: $n-ink;
+    font-weight: bold;
+    margin-top: 12rpx;
+  }
+  .main-meaning {
+    font-size: $c-fs-md;
+    color: $n-ink;
+    margin-top: 16rpx;
+  }
+  .main-meta {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 24rpx;
+  }
+  .meta-text {
+    flex: 1;
+    font-size: $c-fs-xs;
+    color: $n-ink;
+  }
+  .meta-btn {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 16rpx;
+    font-weight: bold;
+  }
+  .note-form {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20rpx;
+  }
+  .note-input {
+    flex: 1;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 14rpx 20rpx;
+    font-size: $c-fs-sm;
+  }
+  .note-save {
+    background-color: $n-yellow;
+    padding: 14rpx 32rpx;
+    margin-left: 16rpx;
+  }
+  .note-save-text {
+    color: $n-ink;
+    font-weight: bold;
+    font-size: $c-fs-xs;
+  }
+
+  /* ---------- 空态 ---------- */
+  .empty {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-icon {
+    width: 112rpx;
+    height: 112rpx;
+    border-radius: 999rpx;
+    background-color: $n-green;
+    border-width: 3rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    box-shadow: $n-shadow;
+    font-size: 64rpx;
+    color: $n-ink;
+    font-weight: bold;
+    text-align: center;
+    line-height: 112rpx;
+  }
+  .empty-title {
+    font-size: $c-fs-xl;
+    font-weight: bold;
+    color: $n-ink;
+    margin-top: 24rpx;
+  }
+  .empty-text {
+    font-size: $c-fs-sm;
+    color: $n-text2;
+    margin-top: 12rpx;
+  }
+  .done-btn {
+    margin-top: 64rpx;
+    background-color: $n-yellow;
+    padding: 22rpx 88rpx;
+  }
+  .done-btn-text {
+    color: $n-ink;
+    font-size: $c-fs-md;
+    font-weight: bold;
+  }
+
+  /* ---------- 选词区 ---------- */
+  .pick-section {
+    flex: 1;
+    background-color: $n-card;
+    padding: 32rpx;
+    margin: 0 24rpx;
+  }
+  .pick-title {
+    font-size: $c-fs-sm;
+    font-weight: bold;
+    color: $n-ink;
+    margin-bottom: 16rpx;
+  }
+  .search {
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 14rpx 20rpx;
+    font-size: $c-fs-sm;
+    margin-bottom: 16rpx;
+  }
+
+  .confirm-box {
+    background-color: $n-yellow;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r;
+    padding: 24rpx;
+    margin-bottom: 16rpx;
+  }
+  .confirm-line {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .confirm-a {
+    font-size: $c-fs-lg;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .confirm-link {
+    font-size: $c-fs-md;
+    color: $n-ink;
+    margin: 0 20rpx;
+  }
+  .confirm-b {
+    font-size: $c-fs-lg;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .reason-input {
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 14rpx 20rpx;
+    font-size: $c-fs-sm;
+    margin-top: 20rpx;
+  }
+  .confirm-actions {
+    flex-direction: row;
+    margin-top: 20rpx;
+  }
+  .confirm-btn {
+    flex: 1;
+    padding: 16rpx 0;
+    align-items: center;
+    margin-right: 16rpx;
+  }
+  .confirm-btn.ok {
+    background-color: $n-green;
+  }
+  .confirm-btn-text {
+    color: $n-ink;
+    font-size: $c-fs-sm;
+    font-weight: bold;
+  }
+  .confirm-btn-text-cancel {
+    color: $n-ink;
+    font-size: $c-fs-sm;
+  }
+
+  .cands {
+    flex: 1;
+  }
+  .cand {
+    border-bottom-width: 1rpx;
+    border-bottom-color: $n-cream;
+    padding: 20rpx 0;
+  }
+  .cand-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .cand-term {
+    font-size: $c-fs-md;
+    font-weight: bold;
+    color: $n-ink;
+    flex: 1;
+  }
+  .cand-tag {
+    font-size: 20rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-radius: 8rpx;
+    padding: 2rpx 12rpx;
+  }
+  .cand-tag.linked {
+    color: $n-ink;
+    background-color: $n-green;
+  }
+  .cand-reading {
+    font-size: $c-fs-xs;
+    color: $n-blue;
+    margin-top: 4rpx;
+  }
+  .cand-meaning {
+    font-size: $c-fs-xs;
+    color: $n-text2;
+    margin-top: 4rpx;
+  }
+  .cands-empty {
+    padding: 60rpx 0;
+    align-items: center;
+  }
+  .cands-hint {
+    padding: 60rpx 0;
+    align-items: center;
+  }
+  .cands-empty-text {
+    font-size: $c-fs-xs;
+    color: $n-text3;
+  }
+  .bottom-space {
+    height: 40rpx;
+  }
+
+  /* ---------- 底部操作 ---------- */
+  .bottom-bar {
+    flex-direction: row;
+    background-color: $n-bg;
+    padding: 20rpx 24rpx 40rpx;
+    margin-top: 24rpx;
+  }
+  .bottom-btn {
+    flex: 1;
+    padding: 20rpx 0;
+    align-items: center;
+  }
+  .bottom-btn.skip {
+    background-color: $n-cream;
+    margin-right: 16rpx;
+  }
+  .bottom-btn.done {
+    background-color: $n-yellow;
+  }
+  .bottom-btn-text {
+    color: $n-ink;
+    font-size: $c-fs-sm;
+  }
+  .bottom-btn-text-w {
+    color: $n-ink;
+    font-size: $c-fs-sm;
+    font-weight: bold;
+  }
+</style>

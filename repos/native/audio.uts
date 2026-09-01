@@ -1,0 +1,169 @@
+/**
+ * 真人音频：下载 / 存储 / 播放（仅 App-Android）
+ *
+ * 来源：LanguagePod101 词典音频接口（Yomichan/Anki 社区通用，真人录音）
+ *   https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=<表记>&kana=<读音>
+ * 存储：约定式关联，应用外部私有目录 audio/<wordId>.mp3（文件管理器可见，卸载即删，不进备份）
+ * 播放：MediaPlayer（短音频同步 prepare）
+ * 注意：网络请求必须离开主线程（Android NetworkOnMainThreadException）
+ */
+// #ifdef APP-ANDROID
+import File from 'java.io.File'
+import FileOutputStream from 'java.io.FileOutputStream'
+import InputStream from 'java.io.InputStream'
+import URL from 'java.net.URL'
+import HttpURLConnection from 'java.net.HttpURLConnection'
+import URLEncoder from 'java.net.URLEncoder'
+import MediaPlayer from 'android.media.MediaPlayer'
+// #endif
+
+// 音频目录（外部私有目录 /audio）
+export function audioDir(): string {
+  // #ifdef APP-ANDROID
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return ''
+  }
+  const ext = context.getExternalFilesDir(null)
+  if (ext == null) {
+    return ''
+  }
+  const dir = new File(ext.getAbsolutePath() + '/audio')
+  if (!dir.exists()) {
+    dir.mkdirs()
+  }
+  return dir.getAbsolutePath()
+  // #endif
+  // #ifndef APP-ANDROID
+  return ''
+  // #endif
+}
+
+export function audioPath(wordId: number): string {
+  const dir = audioDir()
+  if (dir.length == 0) {
+    return ''
+  }
+  return dir + '/' + wordId + '.mp3'
+}
+
+export function hasAudio(wordId: number): boolean {
+  // #ifdef APP-ANDROID
+  const p = audioPath(wordId)
+  if (p.length == 0) {
+    return false
+  }
+  return new File(p).exists()
+  // #endif
+  // #ifndef APP-ANDROID
+  return false
+  // #endif
+}
+
+// ---- 播放 ----
+
+// #ifdef APP-ANDROID
+let player: MediaPlayer | null = null
+// #endif
+
+export function stopAudio() {
+  // #ifdef APP-ANDROID
+  const cur = player
+  if (cur != null) {
+    try {
+      if (cur.isPlaying()) {
+        cur.stop()
+      }
+      cur.release()
+    } catch (e) {
+      // 忽略释放异常
+    }
+    player = null
+  }
+  // #endif
+}
+
+// 播放本地音频（无文件返回 false）
+export function playAudio(wordId: number): boolean {
+  // #ifdef APP-ANDROID
+  const p = audioPath(wordId)
+  if (p.length == 0 || !new File(p).exists()) {
+    return false
+  }
+  stopAudio()
+  try {
+    const mp = new MediaPlayer()
+    mp.setDataSource(p)
+    mp.prepare()
+    mp.start()
+    player = mp
+    return true
+  } catch (e) {
+    console.error('音频播放失败', e)
+    return false
+  }
+  // #endif
+  // #ifndef APP-ANDROID
+  return false
+  // #endif
+}
+
+// ---- 下载 ----
+
+// #ifdef APP-ANDROID
+// 阻塞式下载（须在 io 线程调用）：成功返回 true
+function downloadBlocking(wordId: number, term: string, reading: string): boolean {
+  try {
+    const kanji = URLEncoder.encode(term, 'UTF-8')
+    const kana = reading.length > 0 ? URLEncoder.encode(reading, 'UTF-8') : kanji
+    const url = new URL('https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=' + kanji + '&kana=' + kana)
+    const conn = url.openConnection() as HttpURLConnection
+    conn.setConnectTimeout(10000)
+    conn.setReadTimeout(15000)
+    const code = conn.getResponseCode()
+    if (code != 200) {
+      conn.disconnect()
+      return false
+    }
+    const type = conn.getContentType()
+    if (type.indexOf('audio') < 0) {
+      // 非音频响应（如错误页）
+      conn.disconnect()
+      return false
+    }
+    const input: InputStream = conn.getInputStream()
+    const output = new FileOutputStream(new File(audioPath(wordId)))
+    const buf = new ByteArray(8192)
+    let len = input.read(buf)
+    while (len > 0) {
+      output.write(buf, 0, len)
+      len = input.read(buf)
+    }
+    output.flush()
+    output.close()
+    input.close()
+    conn.disconnect()
+    return true
+  } catch (e) {
+    console.error('音频下载失败 wordId=' + wordId, e)
+    return false
+  }
+}
+// #endif
+
+// 异步下载（io 线程执行，主线程回调 resolve）
+export function downloadAudioAsync(wordId: number, term: string, reading: string): Promise<boolean> {
+  return new Promise<boolean>((resolve, _reject) => {
+    // #ifdef APP-ANDROID
+    UTSAndroid.getDispatcher('io').async(function (_: any | null) {
+      const ok = downloadBlocking(wordId, term, reading)
+      UTSAndroid.getDispatcher('main').async(function (_2: any | null) {
+        resolve(ok)
+      }, null)
+    }, null)
+    // #endif
+    // #ifndef APP-ANDROID
+    resolve(false)
+    // #endif
+  })
+}

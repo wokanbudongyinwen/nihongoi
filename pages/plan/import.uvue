@@ -1,0 +1,470 @@
+<template>
+  <view class="page">
+    <!-- 计划参数 -->
+    <view class="neo-card meta">
+      <view class="mode-row">
+        <text class="mode-chip" :class="appendMode ? '' : 'mode-on'" @click="setAppendMode(false)">新建计划</text>
+        <text class="mode-chip" :class="appendMode ? 'mode-on' : ''" @click="setAppendMode(true)">追加到已有计划</text>
+      </view>
+
+      <!-- 追加模式：选目标计划（词单按现有顺序往后接） -->
+      <view v-if="appendMode">
+        <view class="plan-chips" v-if="plans.length > 0">
+          <text class="plan-chip" :class="targetPlanId == p.id ? 'plan-chip-on' : ''"
+            v-for="(p, i) in plans" :key="p.id" @click="pickPlan(p.id)">{{ p.name }}</text>
+        </view>
+        <text class="pr-hint" v-if="plans.length == 0">暂无已有计划，请先新建</text>
+        <text class="pr-hint">新词将接在所选计划词单末尾；已在计划中的词自动跳过（学习状态保留），例句/笔记/关联仍会合并</text>
+      </view>
+
+      <!-- 新建模式：计划参数 -->
+      <view class="meta-row" v-if="!appendMode">
+        <text class="meta-label">计划名</text>
+        <input class="meta-input" :value="planName" @input="onNameInput" placeholder="导入计划" />
+      </view>
+      <view class="meta-row" v-if="!appendMode">
+        <text class="meta-label">新词/日</text>
+        <input class="meta-input num" type="number" :value="dailyNewText" @input="onDailyInput" />
+      </view>
+      <text class="pr-hint">档位：①一次即会（一次记得即掌握）②两次即会 ③常规 · 点行内档位标签可切换。命中旧词时，例句/笔记/自由关联按内容去重后追加合并（相同跳过，不覆盖旧数据）</text>
+    </view>
+
+    <!-- 逐条确认列表 -->
+    <scroll-view class="list" scroll-y="true" show-scrollbar="false">
+      <view class="neo-card-sm row" v-for="(vm, i) in rows" :key="vm.row.lineNo">
+        <view class="row-head">
+          <text class="row-no">{{ vm.row.lineNo }}</text>
+          <text class="row-term">{{ termText(vm.row) }}</text>
+          <text class="pr-chip" :class="prClass(vm.row.priority)" @click="cyclePriority(i)">{{ prText(vm.row.priority) }}</text>
+          <text class="tag" :class="tagClass(vm.row.matchType)">{{ tagText(vm.row.matchType) }}</text>
+        </view>
+        <text class="row-meaning" v-if="vm.row.meaning != ''">{{ vm.row.meaning }}</text>
+        <text class="row-extra" v-if="extrasText(vm.row) != ''">{{ extrasText(vm.row) }}</text>
+
+        <!-- 唯一命中：显示将被引用的词条 -->
+        <text class="hit" v-if="vm.row.matchType == MATCH_UNIQUE && vm.row.candidates.length > 0">→ {{ vm.row.candidates[0].term }}（{{ vm.row.candidates[0].reading }}）</text>
+
+        <!-- 多候选：点选 -->
+        <view class="cands" v-if="vm.row.matchType == MATCH_MULTI">
+          <view class="cand pressable-soft" hover-class="press-soft" :class="vm.chosenWordId == c.id ? 'cand-on' : ''"
+            v-for="(c, j) in vm.row.candidates" :key="c.id" @click="pick(i, c.id)">
+            <text class="cand-term">{{ c.term }}（{{ c.reading }}）</text>
+            <text class="cand-meaning">{{ c.meaning }}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty" v-if="rows.length == 0">
+        <text class="empty-text">无待确认词条</text>
+      </view>
+    </scroll-view>
+
+    <!-- 确认导入 -->
+    <view class="footer">
+      <view class="neo-card btn pressable" hover-class="press" @click="doConfirm">
+        <text class="btn-text">{{ appendMode ? '确认追加（' + rows.length + ' 词）' : '确认导入（' + rows.length + ' 词）' }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Plan } from '../../domain/types.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { ImportRow, RowChoice, MATCH_UNIQUE, MATCH_MULTI, MATCH_NEW,
+    getPendingImport, createPlanFromImport, appendToPlanFromImport } from '../../services/importer.uts'
+
+  type RowVM = {
+    row: ImportRow,
+    chosenWordId: number // MULTI 时的当前选择（默认第 1 个）
+  }
+
+  const planName = ref('')
+  const dailyNewText = ref('10')
+  const rows = ref<Array<RowVM>>([])
+  const confirming = ref(false)
+
+  // 导入模式：false 新建计划 / true 追加到已有计划（分课导入同一教材）
+  const appendMode = ref(false)
+  const plans = ref<Array<Plan>>([])
+  const targetPlanId = ref(0)
+
+  const setAppendMode = (v: boolean) => {
+    appendMode.value = v
+    if (v && plans.value.length > 0 && targetPlanId.value <= 0) {
+      targetPlanId.value = plans.value[0].id
+    }
+  }
+
+  const pickPlan = (id: number) => {
+    targetPlanId.value = id
+  }
+
+  const loadPlans = async () => {
+    try {
+      plans.value = await getPlanRepo().listPlans()
+    } catch (e) {
+      console.error('计划列表加载失败', e)
+    }
+  }
+
+  const onNameInput = (e: InputEvent) => {
+    planName.value = e.detail.value
+  }
+
+  const onDailyInput = (e: InputEvent) => {
+    dailyNewText.value = e.detail.value
+  }
+
+  const termText = (r: ImportRow): string => {
+    return r.reading.length > 0 ? r.term + '（' + r.reading + '）' : r.term
+  }
+
+  const tagText = (t: string): string => {
+    if (t == MATCH_UNIQUE) {
+      return '已匹配'
+    }
+    if (t == MATCH_MULTI) {
+      return '需选择'
+    }
+    return '将新建'
+  }
+
+  const tagClass = (t: string): string => {
+    if (t == MATCH_UNIQUE) {
+      return 'tag-unique'
+    }
+    if (t == MATCH_MULTI) {
+      return 'tag-multi'
+    }
+    return 'tag-new'
+  }
+
+  const pick = (rowIndex: number, wordId: number) => {
+    rows.value[rowIndex].chosenWordId = wordId
+  }
+
+  // 档位循环切换：1 → 2 → 3 → 1
+  const cyclePriority = (rowIndex: number) => {
+    const row = rows.value[rowIndex].row
+    row.priority = row.priority >= 3 ? 1 : row.priority + 1
+  }
+
+  const prText = (p: number): string => {
+    if (p == 1) {
+      return '①'
+    }
+    if (p == 2) {
+      return '②'
+    }
+    return '③'
+  }
+
+  const prClass = (p: number): string => {
+    if (p == 1) {
+      return 'pr-1'
+    }
+    if (p == 2) {
+      return 'pr-2'
+    }
+    return 'pr-3'
+  }
+
+  // 附加数据摘要：例句/笔记/关联计数（新词「写入」、命中词「合并」）
+  const extrasText = (r: ImportRow): string => {
+    const parts: Array<string> = []
+    if (r.sentences.length > 0) {
+      parts.push('例句 ' + r.sentences.length)
+    }
+    if (r.notes.length > 0) {
+      parts.push('笔记 ' + r.notes.length)
+    }
+    if (r.relations.length > 0) {
+      parts.push('关联 ' + r.relations.length)
+    }
+    if (parts.length == 0) {
+      return ''
+    }
+    let out = ''
+    for (let i = 0; i < parts.length; i++) {
+      if (i > 0) {
+        out += ' · '
+      }
+      out += parts[i]
+    }
+    return (r.matchType == MATCH_NEW ? '将写入：' : '合并追加：') + out
+  }
+
+  onLoad(() => {
+    loadPlans()
+    const pending = getPendingImport()
+    if (pending == null) {
+      return
+    }
+    planName.value = pending.planName
+    dailyNewText.value = pending.dailyNew.toString()
+    const list: Array<RowVM> = []
+    for (let i = 0; i < pending.rows.length; i++) {
+      const r = pending.rows[i]
+      const vm: RowVM = {
+        row: r,
+        chosenWordId: r.candidates.length > 0 ? r.candidates[0].id : -1
+      }
+      list.push(vm)
+    }
+    rows.value = list
+  })
+
+  const doConfirm = async () => {
+    if (confirming.value) {
+      return
+    }
+    const pending = getPendingImport()
+    if (pending == null) {
+      return
+    }
+    // 应用预览页修改的计划参数
+    pending.planName = planName.value
+    const dn = parseInt(dailyNewText.value)
+    if (!isNaN(dn) && dn > 0) {
+      pending.dailyNew = dn
+    }
+    const selections: Array<RowChoice> = []
+    for (let i = 0; i < rows.value.length; i++) {
+      const vm = rows.value[i]
+      const c: RowChoice = {
+        lineNo: vm.row.lineNo,
+        wordId: vm.row.matchType == MATCH_NEW ? -1 : vm.chosenWordId
+      }
+      selections.push(c)
+    }
+    confirming.value = true
+    try {
+      if (appendMode.value) {
+        if (targetPlanId.value <= 0) {
+          confirming.value = false
+          uni.showToast({ title: '请先选择要追加的计划', icon: 'none' })
+          return
+        }
+        await appendToPlanFromImport(pending, selections, targetPlanId.value)
+        uni.showToast({ title: '已追加 ' + rows.value.length + ' 词', icon: 'success' })
+      } else {
+        await createPlanFromImport(pending, selections)
+        uni.showToast({ title: '计划已创建', icon: 'success' })
+      }
+      setTimeout(() => {
+        uni.navigateBack()
+      }, 600)
+    } catch (e) {
+      confirming.value = false
+      console.error('导入失败', e)
+      uni.showToast({ title: appendMode.value ? '追加失败' : '创建失败', icon: 'none' })
+    }
+  }
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+  }
+  .meta {
+    padding: 24rpx;
+    margin: 24rpx 28rpx 0;
+  }
+  .mode-row {
+    flex-direction: row;
+    margin-bottom: 16rpx;
+  }
+  .mode-chip {
+    font-size: 26rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 10rpx 28rpx;
+    margin-right: 16rpx;
+  }
+  .mode-on {
+    color: $n-ink;
+    background-color: $n-yellow;
+    font-weight: bold;
+  }
+  .plan-chips {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 8rpx;
+  }
+  .plan-chip {
+    font-size: 24rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 8rpx 24rpx;
+    margin-right: 16rpx;
+    margin-bottom: 12rpx;
+  }
+  .plan-chip-on {
+    color: $n-ink;
+    background-color: $n-blue;
+    font-weight: bold;
+  }
+  .meta-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 12rpx 0;
+  }
+  .meta-label {
+    width: 140rpx;
+    font-size: 28rpx;
+    color: $n-text2;
+    font-weight: bold;
+  }
+  .meta-input {
+    flex: 1;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 12rpx 20rpx;
+    font-size: 28rpx;
+  }
+  .num {
+    width: 160rpx;
+  }
+  .pr-hint {
+    font-size: 22rpx;
+    color: $n-text2;
+    padding: 4rpx 0 8rpx;
+  }
+  .pr-chip {
+    font-size: 22rpx;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+    margin-right: 12rpx;
+  }
+  .pr-1 {
+    color: $n-ink;
+    background-color: $n-green;
+  }
+  .pr-2 {
+    color: $n-ink;
+    background-color: $n-yellow;
+  }
+  .pr-3 {
+    color: $n-ink;
+    background-color: $n-cream;
+  }
+  .list {
+    flex: 1;
+    padding: 24rpx 28rpx 40rpx;
+  }
+  .row {
+    padding: 24rpx;
+    margin: 0 4rpx 18rpx 0;
+  }
+  .row-head {
+    flex-direction: row;
+    align-items: center;
+  }
+  .row-no {
+    font-size: 22rpx;
+    color: $n-text3;
+    width: 48rpx;
+  }
+  .row-term {
+    flex: 1;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .row-meaning {
+    font-size: 26rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+    margin-left: 48rpx;
+  }
+  .row-extra {
+    font-size: 22rpx;
+    color: $n-green;
+    font-weight: bold;
+    margin-top: 6rpx;
+    margin-left: 48rpx;
+  }
+  .tag {
+    font-size: 22rpx;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+  }
+  .tag-unique {
+    color: $n-ink;
+    background-color: $n-green;
+  }
+  .tag-multi {
+    color: $n-ink;
+    background-color: $n-yellow;
+  }
+  .tag-new {
+    color: $n-ink;
+    background-color: $n-blue;
+  }
+  .hit {
+    font-size: 26rpx;
+    color: $n-green;
+    margin-top: 8rpx;
+    margin-left: 48rpx;
+  }
+  .cands {
+    margin-top: 12rpx;
+    margin-left: 48rpx;
+  }
+  .cand {
+    border-radius: $n-r-sm;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    padding: 16rpx;
+    margin-bottom: 12rpx;
+  }
+  .cand-on {
+    border-color: $n-ink;
+    background-color: $n-yellow;
+  }
+  .cand-term {
+    font-size: 28rpx;
+  }
+  .cand-meaning {
+    font-size: 24rpx;
+    color: $n-text2;
+    margin-top: 4rpx;
+  }
+  .empty {
+    padding: 80rpx 0;
+    align-items: center;
+  }
+  .empty-text {
+    font-size: 26rpx;
+    color: $n-text3;
+  }
+  .footer {
+    padding: 24rpx;
+    background-color: $n-bg;
+  }
+  .btn {
+    background-color: $n-yellow;
+    padding: 24rpx 0;
+    align-items: center;
+  }
+  .btn-text {
+    color: $n-ink;
+    font-size: 30rpx;
+    font-weight: bold;
+  }
+</style>

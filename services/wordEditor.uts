@@ -1,0 +1,153 @@
+/**
+ * WordEditorService：词卡编辑（任何场景可用的完整闭环）
+ * - 词条/例句/笔记/关联的 CRUD
+ * - 关联图 N 跳查询（词卡默认 1 跳双向，关联词下钻 2 跳）
+ * - 活用形 = conjugate() 派生 + extra_json override 合并
+ */
+import { Word, Sentence, Note, WordRelation, RELATION_CUSTOM } from '../domain/types.uts'
+import { conjugate, ConjugationForms } from '../domain/conjugation.uts'
+import { WordRepo } from '../repos/wordRepo.uts'
+import { getWordRepo } from '../repos/sqlite/wordRepoImpl.uts'
+
+// 派生活用形（合并 extra_json 中的不规则 override）
+export function getConjugation(w: Word): ConjugationForms {
+  const forms = conjugate(w.term, w.verbType)
+  // TODO: 解析 w.extraJson 中的 override 字段（如 {"te":"行って"}）覆盖对应形态
+  return forms
+}
+
+// 词库搜索（导入预览 / 添加关联 / 词库页共用）
+export async function searchWords(keyword: string, limit: number): Promise<Array<Word>> {
+  return await getWordRepo().search(keyword, limit)
+}
+
+// 词库分页浏览（词库页滚动加载）：返回一页词条
+export async function listWordPage(keyword: string, limit: number, offset: number): Promise<Array<Word>> {
+  return await getWordRepo().listPage(keyword, limit, offset)
+}
+
+// 词库总词数（可带关键词过滤）
+export async function countWords(keyword: string): Promise<number> {
+  return await getWordRepo().countWords(keyword)
+}
+
+// 词卡详情展示用：关联行 + 对端词条摘要（避免页面再做 N 次 getById）
+export type RelationDisplay = {
+  id: number,
+  relationType: string,
+  isSystem: boolean,
+  note: string,
+  otherId: number,
+  otherTerm: string,
+  otherReading: string
+}
+
+export type WordDetail = {
+  word: Word | null,
+  sentences: Array<Sentence>,
+  notes: Array<Note>,
+  relations: Array<RelationDisplay>
+}
+
+/**
+ * 词卡详情聚合查询：词条 + 例句 + 笔记 + 双向关联（含对端词条）。
+ * 悬空关联（对端词条已不存在）直接跳过。
+ */
+export async function getWordDetail(wordId: number): Promise<WordDetail> {
+  const repo: WordRepo = getWordRepo()
+  const word = await repo.getById(wordId)
+  const sentences = await repo.listSentences(wordId)
+  const notes = await repo.listNotes(wordId)
+  const rels = await repo.listRelations(wordId)
+
+  const cache = new Map<number, Word>()
+  const displays: Array<RelationDisplay> = []
+  for (let i = 0; i < rels.length; i++) {
+    const r = rels[i]
+    const otherId = r.fromWordId == wordId ? r.toWordId : r.fromWordId
+    let other: Word | null = cache.get(otherId)
+    if (other == null) {
+      other = await repo.getById(otherId)
+      if (other != null) {
+        cache.set(otherId, other)
+      }
+    }
+    if (other == null) {
+      continue
+    }
+    const d: RelationDisplay = {
+      id: r.id,
+      relationType: r.relationType,
+      isSystem: r.isSystem,
+      note: r.note,
+      otherId: otherId,
+      otherTerm: other.term,
+      otherReading: other.reading
+    }
+    displays.push(d)
+  }
+
+  const detail: WordDetail = {
+    word: word,
+    sentences: sentences,
+    notes: notes,
+    relations: displays
+  }
+  return detail
+}
+
+// ---------- 编辑写操作（词卡编辑闭环） ----------
+
+export async function saveWord(w: Word): Promise<boolean> {
+  return await getWordRepo().update(w)
+}
+
+export async function addSentence(wordId: number, text: string, translation: string): Promise<number> {
+  const s: Sentence = {
+    id: 0, wordId: wordId, text: text, translation: translation, remark: '', sort: 0, createdAt: Date.now()
+  }
+  return await getWordRepo().addSentence(s)
+}
+
+export async function saveSentence(s: Sentence): Promise<boolean> {
+  return await getWordRepo().updateSentence(s)
+}
+
+export async function deleteSentence(id: number): Promise<boolean> {
+  return await getWordRepo().deleteSentence(id)
+}
+
+export async function addNote(wordId: number, content: string): Promise<number> {
+  const now = Date.now()
+  const n: Note = { id: 0, wordId: wordId, content: content, createdAt: now, updatedAt: now }
+  return await getWordRepo().addNote(n)
+}
+
+export async function deleteNote(id: number): Promise<boolean> {
+  return await getWordRepo().deleteNote(id)
+}
+
+// 添加自由关联（custom，可带理由）；两词间已存在 custom 关联则不重复建
+export async function addCustomRelation(fromWordId: number, toWordId: number, note: string): Promise<boolean> {
+  if (fromWordId == toWordId) {
+    return false
+  }
+  const repo = getWordRepo()
+  const rels = await repo.listRelations(fromWordId)
+  for (let i = 0; i < rels.length; i++) {
+    const other = rels[i].fromWordId == fromWordId ? rels[i].toWordId : rels[i].fromWordId
+    if (other == toWordId && rels[i].relationType == RELATION_CUSTOM) {
+      return false
+    }
+  }
+  const r: WordRelation = {
+    id: 0, fromWordId: fromWordId, toWordId: toWordId,
+    relationType: RELATION_CUSTOM, isSystem: false, note: note, createdAt: Date.now()
+  }
+  const id = await repo.addRelation(r)
+  return id > 0
+}
+
+export async function removeRelation(id: number): Promise<boolean> {
+  return await getWordRepo().deleteRelation(id)
+}

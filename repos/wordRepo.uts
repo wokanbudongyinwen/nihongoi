@@ -1,0 +1,39 @@
+/**
+ * WordRepo：知识域数据访问接口（DAO）
+ * SQLite 实现：repos/sqlite/wordRepoImpl.uts（getWordRepo() 取实例）
+ */
+import { Word, Sentence, Note, WordRelation } from '../domain/types.uts'
+
+export interface WordRepo {
+  getById(id: number): Promise<Word | null>,
+  // 词库搜索：term 或 reading 前缀/包含匹配，词卡编辑与导入预览共用
+  search(keyword: string, limit: number): Promise<Array<Word>>,
+  // 分页浏览：空关键词=全库按 id 序；返回一页词条
+  listPage(keyword: string, limit: number, offset: number): Promise<Array<Word>>,
+  // 总词数（可带关键词过滤）
+  countWords(keyword: string): Promise<number>,
+  // 精确匹配（导入分层匹配用：term+reading 精确 → 仅 term → 仅 reading）
+  findByTerm(term: string): Promise<Array<Word>>,
+  findByReading(reading: string): Promise<Array<Word>>,
+  // 导入未命中时新建词条（缺失字段留空）
+  create(w: Word): Promise<number>,
+  update(w: Word): Promise<boolean>,
+
+  // 例句
+  listSentences(wordId: number): Promise<Array<Sentence>>,
+  addSentence(s: Sentence): Promise<number>,
+  updateSentence(s: Sentence): Promise<boolean>,
+  deleteSentence(id: number): Promise<boolean>,
+
+  // 笔记
+  listNotes(wordId: number): Promise<Array<Note>>,
+  addNote(n: Note): Promise<number>,
+  deleteNote(id: number): Promise<boolean>,
+
+  // 关联（双向查询：from=wordId OR to=wordId）
+  listRelations(wordId: number): Promise<Array<WordRelation>>,
+  // 关联词的关联（2 跳下钻）
+  listRelationsOfMany(wordIds: Array<number>): Promise<Array<WordRelation>>,
+  addRelation(r: WordRelation): Promise<number>,
+  deleteRelation(id: number): Promise<boolean>
+}

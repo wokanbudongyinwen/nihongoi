@@ -1,0 +1,190 @@
+/**
+ * 动词活用派生（纯函数，无 IO）
+ *
+ * 由辞书形 + 动词类型推导常用活用形，不落库。
+ * 不规则形态（如 行く→行って 已内置；其他特殊词）由词卡 extra_json 的
+ * override 提供，服务层在派生结果上做覆盖合并。
+ */
+import { VERB_GODAN, VERB_ICHIDAN, VERB_SURU, VERB_KURU } from './types.uts'
+
+export type ConjugationForms = {
+  masu: string,    // ます形
+  te: string,      // て形
+  ta: string,      // た形（过去）
+  nai: string,     // ない形（否定）
+  kanou: string,   // 可能形
+  ukemi: string,   // 被动形
+  shieki: string,  // 使役形
+  katei: string,   // 仮定形（ば形）
+  ikou: string     // 意向形（う/よう）
+}
+
+// 五十音行表（用于五段动词的段位换算）
+const KANA_ROWS: Array<string> = [
+  'あいうえお', 'かきくけこ', 'がぎぐげご', 'さしすせそ', 'たちつてと',
+  'なにぬねの', 'ばびぶべぼ', 'まみむめも', 'やゆよ', 'らりるれろ', 'わをん'
+]
+
+function findRow(ch: string): string {
+  for (let i = 0; i < KANA_ROWS.length; i++) {
+    if (KANA_ROWS[i].indexOf(ch) >= 0) {
+      return KANA_ROWS[i]
+    }
+  }
+  return ''
+}
+
+// 五段动词：词尾在う段，按行换段
+function conjugateGodan(term: string): ConjugationForms {
+  const last = term.charAt(term.length - 1)
+  const stem = term.substring(0, term.length - 1)
+
+  let a = '' // あ段
+  let i = '' // い段
+  let e = '' // え段
+  let o = '' // お段
+  if (last == 'う') {
+    // う 行特殊：あ段为わ
+    a = 'わ'
+    i = 'い'
+    e = 'え'
+    o = 'お'
+  } else {
+    const row = findRow(last)
+    a = row.charAt(0)
+    i = row.charAt(1)
+    e = row.charAt(3)
+    o = row.charAt(4)
+  }
+
+  // て形/た形按词尾变化（音便）
+  let te = ''
+  let ta = ''
+  if (last == 'く' && term.endsWith('行く')) {
+    te = stem + 'って'
+    ta = stem + 'った'
+  } else if (last == 'く') {
+    te = stem + 'いて'
+    ta = stem + 'いた'
+  } else if (last == 'ぐ') {
+    te = stem + 'いで'
+    ta = stem + 'いだ'
+  } else if (last == 'す') {
+    te = stem + 'して'
+    ta = stem + 'した'
+  } else if (last == 'つ' || last == 'る' || last == 'う') {
+    te = stem + 'って'
+    ta = stem + 'った'
+  } else {
+    // ぬ/ぶ/む
+    te = stem + 'んで'
+    ta = stem + 'んだ'
+  }
+
+  const f: ConjugationForms = {
+    masu: stem + i + 'ます',
+    te: te,
+    ta: ta,
+    nai: stem + a + 'ない',
+    kanou: stem + e + 'る',
+    ukemi: stem + a + 'れる',
+    shieki: stem + a + 'せる',
+    katei: stem + e + 'ば',
+    ikou: stem + o + 'う'
+  }
+  return f
+}
+
+// 一段动词：去る加各后缀
+function conjugateIchidan(term: string): ConjugationForms {
+  const stem = term.substring(0, term.length - 1)
+  const f: ConjugationForms = {
+    masu: stem + 'ます',
+    te: stem + 'て',
+    ta: stem + 'た',
+    nai: stem + 'ない',
+    kanou: stem + 'られる',
+    ukemi: stem + 'られる',
+    shieki: stem + 'させる',
+    katei: stem + 'れば',
+    ikou: stem + 'よう'
+  }
+  return f
+}
+
+// サ变动词（する / 勉強する 等复合 / 落胆する 等名词形）
+function conjugateSuru(term: string): ConjugationForms {
+  // term 以する结尾 → 词干去する；名词形（落胆 等）→ 词干即 term，各形补する
+  let stem = term
+  if (term.endsWith('する')) {
+    stem = term.substring(0, term.length - 2)
+  }
+  const f: ConjugationForms = {
+    masu: stem + 'します',
+    te: stem + 'して',
+    ta: stem + 'した',
+    nai: stem + 'しない',
+    kanou: stem + 'できる',
+    ukemi: stem + 'される',
+    shieki: stem + 'させる',
+    katei: stem + 'すれば',
+    ikou: stem + 'しよう'
+  }
+  return f
+}
+
+// カ变动词（くる / 来る）
+function conjugateKuru(term: string): ConjugationForms {
+  if (term == 'くる') {
+    const f: ConjugationForms = {
+      masu: 'きます',
+      te: 'きて',
+      ta: 'きた',
+      nai: 'こない',
+      kanou: 'こられる',
+      ukemi: 'こられる',
+      shieki: 'こさせる',
+      katei: 'くれば',
+      ikou: 'こよう'
+    }
+    return f
+  }
+  // 来る：汉字吸收读音变化，前缀 + 后缀即可
+  const stem = term.substring(0, term.length - 1)
+  const f: ConjugationForms = {
+    masu: stem + 'ます',
+    te: stem + 'て',
+    ta: stem + 'た',
+    nai: stem + 'ない',
+    kanou: stem + 'られる',
+    ukemi: stem + 'られる',
+    shieki: stem + 'させる',
+    katei: stem + 'れば',
+    ikou: stem + 'よう'
+  }
+  return f
+}
+
+/**
+ * 入口：由辞书形 + 动词类型派生活用形全集。
+ * 非动词（verbType 为空或未知）返回原形填充的全字段。
+ */
+export function conjugate(term: string, verbType: string): ConjugationForms {
+  if (verbType == VERB_GODAN) {
+    return conjugateGodan(term)
+  }
+  if (verbType == VERB_ICHIDAN) {
+    return conjugateIchidan(term)
+  }
+  if (verbType == VERB_SURU) {
+    return conjugateSuru(term)
+  }
+  if (verbType == VERB_KURU) {
+    return conjugateKuru(term)
+  }
+  const f: ConjugationForms = {
+    masu: term, te: term, ta: term, nai: term, kanou: term,
+    ukemi: term, shieki: term, katei: term, ikou: term
+  }
+  return f
+}

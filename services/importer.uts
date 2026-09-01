@@ -1,0 +1,459 @@
+/**
+ * ImportService：计划词表 JSON 导入
+ *
+ * 流程：选文件 → 解析 → 分层匹配 → 预览确认 → 建计划
+ * 匹配分层：① term+reading 精确 → ② 仅 term → ③ 仅 reading 兜底 → ④ 未命中新建
+ * 文件行序 = plan_item.sort（背词顺序）
+ *
+ * 导入 JSON 格式（字段可选，仅 term 必填）：
+ * {
+ *   "planName": "N5 核心动词",
+ *   "dailyNew": 10,
+ *   "words": [
+ *     { "term": "開ける", "reading": "あける", "meaning": "打开", "pos": "动词·他动词", "priority": 1,
+ *       "sentences": [ { "text": "窓を開ける。", "translation": "打开窗户。" } ],
+ *       "notes": [ "和 閉める 反义对比" ],
+ *       "relations": [ { "term": "閉める", "reading": "しめる", "note": "反义对比" } ] }
+ *   ]
+ * }
+ * priority：单词档位 1/2/3（1 一次即会 / 2 两次即会 / 3 常规，缺省 3），预览页可逐行调整
+ * sentences/notes/relations：附加数据，**只追加不覆盖**——
+ *   - 命中旧词：与已有例句（按 text）/笔记（按 content）比对，相同跳过、不同追加；词条本体字段不动
+ *   - 将新建词条：直接写入
+ *   - relations 目标词按同规则匹配（精确→仅 term 首个→仅 reading 唯一），未命中则新建目标词条再建 custom 关联
+ */
+import { Word, Plan } from '../domain/types.uts'
+import { WordRepo } from '../repos/wordRepo.uts'
+import { getWordRepo } from '../repos/sqlite/wordRepoImpl.uts'
+import { getPlanRepo } from '../repos/sqlite/planRepoImpl.uts'
+import { getWordDetail, addSentence, addNote, addCustomRelation } from './wordEditor.uts'
+
+export const MATCH_UNIQUE = 'unique'    // 唯一命中，直接引用
+export const MATCH_MULTI = 'multi'      // 多候选，预览页让用户选
+export const MATCH_NEW = 'new'          // 未命中，将新建词条
+
+export type ImportSentence = {
+  text: string,
+  translation: string
+}
+
+export type ImportRelation = {
+  term: string,
+  reading: string,
+  note: string,
+  matchedId: number // 目标词已匹配的 id；-1 = 未命中（建计划时新建目标词条）
+}
+
+export type ImportRow = {
+  lineNo: number,
+  term: string,
+  reading: string,
+  romaji: string,
+  meaning: string,
+  pos: string,
+  priority: number,       // 档位 1/2/3（预览页可调整）
+  sentences: Array<ImportSentence>, // 例句（追加合并）
+  notes: Array<string>,           // 笔记（追加合并）
+  relations: Array<ImportRelation>, // 自由关联（追加，目标解析于解析期）
+  matchType: string,      // MATCH_* 常量
+  candidates: Array<Word> // UNIQUE 时为命中的那 1 个，MULTI 时为候选
+}
+
+export type ImportParseResult = {
+  planName: string,
+  dailyNew: number,
+  rows: Array<ImportRow>
+}
+
+// 预览页确认结果：wordId 为 -1 表示按行数据新建词条
+export type RowChoice = {
+  lineNo: number,
+  wordId: number
+}
+
+// 页面间传递解析结果（模块级暂存，避免 eventChannel 兼容性问题）
+let pending: ImportParseResult | null = null
+
+export function setPendingImport(r: ImportParseResult) {
+  pending = r
+}
+
+export function getPendingImport(): ImportParseResult | null {
+  return pending
+}
+
+export function clearPendingImport() {
+  pending = null
+}
+
+function str(v: string | null): string {
+  return v == null ? '' : v
+}
+
+function filterByReading(list: Array<Word>, reading: string): Array<Word> {
+  const out: Array<Word> = []
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].reading == reading) {
+      out.push(list[i])
+    }
+  }
+  return out
+}
+
+// 行附加数据包（例句/笔记/自由关联）
+export type ImportExtras = {
+  sentences: Array<ImportSentence>,
+  notes: Array<string>,
+  relations: Array<ImportRelation>
+}
+
+// 解析附加数据：例句 / 笔记 / 自由关联（关联目标当场匹配，matchedId=-1 表示未命中）
+async function parseExtras(repo: WordRepo, item: UTSJSONObject): Promise<ImportExtras> {
+  const sentences: Array<ImportSentence> = []
+  const senArr = item.getArray('sentences')
+  if (senArr != null) {
+    for (let i = 0; i < senArr.length; i++) {
+      const s = senArr[i] as UTSJSONObject
+      const text = str(s.getString('text'))
+      if (text.length == 0) {
+        continue
+      }
+      const sen: ImportSentence = { text: text, translation: str(s.getString('translation')) }
+      sentences.push(sen)
+    }
+  }
+  const notes: Array<string> = []
+  const noteArr = item.getArray('notes')
+  if (noteArr != null) {
+    for (let i = 0; i < noteArr.length; i++) {
+      const c = noteArr[i].toString()
+      if (c.length > 0) {
+        notes.push(c)
+      }
+    }
+  }
+  const relations: Array<ImportRelation> = []
+  const relArr = item.getArray('relations')
+  if (relArr != null) {
+    for (let i = 0; i < relArr.length; i++) {
+      const r = relArr[i] as UTSJSONObject
+      const term = str(r.getString('term'))
+      if (term.length == 0) {
+        continue
+      }
+      const reading = str(r.getString('reading'))
+      const rel: ImportRelation = { term: term, reading: reading, note: str(r.getString('note')), matchedId: -1 }
+      rel.matchedId = await resolveRelationTarget(repo, term, reading)
+      relations.push(rel)
+    }
+  }
+  // 注意：uts 对象字面量必须显式标注类型，否则被推断为 UTSJSONObject，跨类型返回时运行时 ClassCastException
+  const out: ImportExtras = { sentences: sentences, notes: notes, relations: relations }
+  return out
+}
+
+// 关联目标匹配（无交互场景，不做多候选选择）：精确→仅 term 首个→仅 reading 唯一；否则 -1 新建
+async function resolveRelationTarget(repo: WordRepo, term: string, reading: string): Promise<number> {
+  const byTerm = await repo.findByTerm(term)
+  if (byTerm.length > 0) {
+    if (reading.length > 0) {
+      const exact = filterByReading(byTerm, reading)
+      if (exact.length > 0) {
+        return exact[0].id
+      }
+    }
+    return byTerm[0].id
+  }
+  if (reading.length > 0) {
+    const byReading = await repo.findByReading(reading)
+    if (byReading.length == 1) {
+      return byReading[0].id
+    }
+  }
+  return -1
+}
+
+/**
+ * 解析 JSON 并对每行做分层匹配（异步：逐行查库）。
+ * term 为空的行直接跳过。
+ */
+export async function parseAndMatch(text: string): Promise<ImportParseResult> {
+  const result: ImportParseResult = { planName: '', dailyNew: 10, rows: [] as Array<ImportRow> }
+  const parsed = JSON.parse(text)
+  if (parsed == null) {
+    throw new Error('JSON 解析失败')
+  }
+  const obj = parsed as UTSJSONObject
+  result.planName = str(obj.getString('planName'))
+  const dn = obj.getNumber('dailyNew')
+  if (dn != null && dn > 0) {
+    result.dailyNew = dn
+  }
+
+  const wordsArr = obj.getArray('words')
+  if (wordsArr == null) {
+    throw new Error('JSON 缺少 words 数组')
+  }
+  const repo: WordRepo = getWordRepo()
+  let lineNo = 0
+  for (let i = 0; i < wordsArr.length; i++) {
+    lineNo = i + 1
+    const item = wordsArr[i] as UTSJSONObject
+    const term = str(item.getString('term'))
+    if (term.length == 0) {
+      continue // 仅 term 必填，缺 term 的行跳过
+    }
+    const reading = str(item.getString('reading'))
+    const romaji = str(item.getString('romaji'))
+    const meaning = str(item.getString('meaning'))
+    const pos = str(item.getString('pos'))
+    // 档位：仅认 1/2，其余（含缺省）按 3 常规
+    const prNum = item.getNumber('priority')
+    let priority = 3
+    if (prNum != null && (prNum == 1 || prNum == 2)) {
+      priority = prNum
+    }
+
+    // 分层匹配
+    let matchType = MATCH_NEW
+    let candidates: Array<Word> = [] as Array<Word>
+    const byTerm = await repo.findByTerm(term)
+    let resolved = false
+    if (reading.length > 0 && byTerm.length > 0) {
+      // ① term+reading 精确
+      const exact = filterByReading(byTerm, reading)
+      if (exact.length == 1) {
+        matchType = MATCH_UNIQUE
+        candidates.push(exact[0])
+        resolved = true
+      } else if (exact.length > 1) {
+        matchType = MATCH_MULTI
+        candidates = exact
+        resolved = true
+      }
+    }
+    if (!resolved && byTerm.length == 1) {
+      // ② 仅 term 唯一命中
+      matchType = MATCH_UNIQUE
+      candidates.push(byTerm[0])
+      resolved = true
+    } else if (!resolved && byTerm.length > 1) {
+      // ② 仅 term 多命中
+      matchType = MATCH_MULTI
+      candidates = byTerm
+      resolved = true
+    }
+    if (!resolved && reading.length > 0) {
+      // ③ 仅 reading 兜底
+      const byReading = await repo.findByReading(reading)
+      if (byReading.length == 1) {
+        matchType = MATCH_UNIQUE
+        candidates.push(byReading[0])
+        resolved = true
+      } else if (byReading.length > 1) {
+        matchType = MATCH_MULTI
+        candidates = byReading
+        resolved = true
+      }
+    }
+    // ④ 仍未命中 → MATCH_NEW（candidates 空）
+
+    const extras = await parseExtras(repo, item)
+    const row: ImportRow = {
+      lineNo: lineNo,
+      term: term,
+      reading: reading,
+      romaji: romaji,
+      meaning: meaning,
+      pos: pos,
+      priority: priority,
+      sentences: extras.sentences,
+      notes: extras.notes,
+      relations: extras.relations,
+      matchType: matchType,
+      candidates: candidates
+    }
+    result.rows.push(row)
+  }
+  return result
+}
+
+// 未命中的关联目标词 → 新建词条（同批多个相同目标用缓存去重）
+async function ensureTargetWord(rel: ImportRelation, cache: Map<string, number>): Promise<number> {
+  const key = rel.term + '|' + rel.reading
+  const hit = cache.get(key)
+  if (hit != null) {
+    return hit
+  }
+  const now = Date.now()
+  const w: Word = {
+    id: 0,
+    term: rel.term,
+    reading: rel.reading,
+    romaji: '',
+    accent: [] as Array<number>,
+    pos: '',
+    meaning: '',
+    verbType: '',
+    extraJson: '{}',
+    createdAt: now,
+    updatedAt: now
+  }
+  const newId = await getWordRepo().create(w)
+  if (newId > 0) {
+    cache.set(key, newId)
+  }
+  return newId
+}
+
+/**
+ * 行附加数据落库（追加式合并）：
+ * - merge=true（命中旧词）：例句按 text、笔记按 content 与旧数据比对，相同跳过、不同追加；词条本体不动
+ * - merge=false（新建词条）：直接追加
+ * - 自由关联：目标词已匹配/新建后建 custom 关系（两词已存在该关联则跳过，note 不覆盖）
+ */
+async function applyRowExtras(wordId: number, row: ImportRow, merge: boolean, targetCache: Map<string, number>): Promise<void> {
+  if (row.sentences.length == 0 && row.notes.length == 0 && row.relations.length == 0) {
+    return
+  }
+  if (merge) {
+    const oldTexts = new Map<string, boolean>()
+    const oldNotes = new Map<string, boolean>()
+    const d = await getWordDetail(wordId)
+    for (let i = 0; i < d.sentences.length; i++) {
+      oldTexts.set(d.sentences[i].text, true)
+    }
+    for (let i = 0; i < d.notes.length; i++) {
+      oldNotes.set(d.notes[i].content, true)
+    }
+    for (let i = 0; i < row.sentences.length; i++) {
+      const sen = row.sentences[i]
+      if (!oldTexts.has(sen.text)) {
+        await addSentence(wordId, sen.text, sen.translation)
+      }
+    }
+    for (let i = 0; i < row.notes.length; i++) {
+      if (!oldNotes.has(row.notes[i])) {
+        await addNote(wordId, row.notes[i])
+      }
+    }
+  } else {
+    for (let i = 0; i < row.sentences.length; i++) {
+      await addSentence(wordId, row.sentences[i].text, row.sentences[i].translation)
+    }
+    for (let i = 0; i < row.notes.length; i++) {
+      await addNote(wordId, row.notes[i])
+    }
+  }
+  for (let i = 0; i < row.relations.length; i++) {
+    const rel = row.relations[i]
+    let targetId = rel.matchedId
+    if (targetId <= 0) {
+      targetId = await ensureTargetWord(rel, targetCache)
+    }
+    if (targetId > 0 && targetId != wordId) {
+      await addCustomRelation(wordId, targetId, rel.note) // 已存在返回 false，忽略
+    }
+  }
+}
+
+// 词选定结果：与文件行序对齐的 wordId/档位列表
+export type ResolvedSelection = {
+  ids: Array<number>,
+  priorities: Array<number>
+}
+
+/**
+ * 预览确认后的词选定与附加数据落库（新建计划/追加到已有计划共用）：
+ * wordId>0 直接引用（附加数据追加合并）；-1 按行数据新建词条（附加数据直接写入）。
+ */
+async function resolveSelections(result: ImportParseResult, selections: Array<RowChoice>): Promise<ResolvedSelection> {
+  const wordRepo = getWordRepo()
+  const orderedIds: Array<number> = []
+  const orderedPriorities: Array<number> = []
+  // 未命中关联目标的新建缓存（term|reading → id），避免同批重复建目标词
+  const targetCache = new Map<string, number>()
+  for (let i = 0; i < result.rows.length; i++) {
+    const row = result.rows[i]
+    let choice: RowChoice | null = null
+    for (let j = 0; j < selections.length; j++) {
+      if (selections[j].lineNo == row.lineNo) {
+        choice = selections[j]
+        break
+      }
+    }
+    if (choice == null) {
+      continue
+    }
+    if (choice.wordId > 0) {
+      orderedIds.push(choice.wordId)
+      orderedPriorities.push(row.priority)
+      // 命中旧词：附加数据与旧数据去重合并（本体不覆盖）
+      await applyRowExtras(choice.wordId, row, true, targetCache)
+      continue
+    }
+    const now = Date.now()
+    const w: Word = {
+      id: 0,
+      term: row.term,
+      reading: row.reading,
+      romaji: row.romaji,
+      accent: [] as Array<number>,
+      pos: row.pos,
+      meaning: row.meaning,
+      verbType: '',
+      extraJson: '{}',
+      createdAt: now,
+      updatedAt: now
+    }
+    const newId = await wordRepo.create(w)
+    orderedIds.push(newId)
+    orderedPriorities.push(row.priority)
+    // 新建词条：附加数据直接写入
+    await applyRowExtras(newId, row, false, targetCache)
+  }
+  const out: ResolvedSelection = { ids: orderedIds, priorities: orderedPriorities }
+  return out
+}
+
+/**
+ * 预览确认后建新计划：按文件行序生成 plan_item。
+ * 若当前无激活计划，自动激活新建的计划（便于立刻开始背词）。
+ * 返回新计划 id。
+ */
+export async function createPlanFromImport(result: ImportParseResult, selections: Array<RowChoice>): Promise<number> {
+  const resolved = await resolveSelections(result, selections)
+  const plan: Plan = {
+    id: 0,
+    name: result.planName.length > 0 ? result.planName : '导入计划',
+    isActive: false,
+    dailyNew: result.dailyNew > 0 ? result.dailyNew : 10,
+    dailyReviewCap: 200,
+    cycleJson: '[1,2,4]',
+    createdAt: Date.now()
+  }
+  const planRepo = getPlanRepo()
+  const planId = await planRepo.createPlan(plan, resolved.ids, resolved.priorities)
+  const active = await planRepo.getActivePlan()
+  if (active == null) {
+    await planRepo.activatePlan(planId)
+  }
+  clearPendingImport()
+  return planId
+}
+
+/**
+ * 预览确认后追加到已有计划（分课导入同一教材计划的场景）：
+ * sort 接续现有最大值；已在计划中的词由 INSERT OR IGNORE 跳过（保留其学习状态与档位），
+ * 但附加数据（例句/笔记/关联）仍会去重合并。不改计划的参数与激活状态。
+ * 返回目标计划 id。
+ */
+export async function appendToPlanFromImport(result: ImportParseResult, selections: Array<RowChoice>, planId: number): Promise<number> {
+  const resolved = await resolveSelections(result, selections)
+  const ok = await getPlanRepo().appendPlanItems(planId, resolved.ids, resolved.priorities)
+  if (!ok) {
+    throw new Error('追加词单失败')
+  }
+  clearPendingImport()
+  return planId
+}

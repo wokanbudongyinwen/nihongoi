@@ -1,0 +1,406 @@
+<template>
+  <view class="page">
+    <!-- 头部：日期 + 计划胶囊 + 问候 -->
+    <view class="neo-card hero">
+      <view class="hero-top">
+        <text class="hero-date">{{ todayText() }}</text>
+        <view class="plan-chip" v-if="planName != ''">
+          <text class="plan-chip-text">{{ planName }}</text>
+        </view>
+      </view>
+      <text class="hero-hello">{{ helloText() }}</text>
+    </view>
+
+    <!-- 三色进度总览（已掌握/学习中/未学） -->
+    <view class="neo-card panel" v-if="planName != '' && totalCount > 0">
+      <view class="bar">
+        <view class="bar-ok" :style="'width:' + masterPct() + '%'"></view>
+        <view class="bar-learning" :style="'width:' + learningPct() + '%'"></view>
+        <view class="bar-rest"></view>
+      </view>
+      <view class="legend">
+        <view class="legend-item">
+          <view class="dot dot-ok"></view>
+          <text class="legend-text">已掌握 {{ masteredCount }}</text>
+        </view>
+        <view class="legend-item">
+          <view class="dot dot-learning"></view>
+          <text class="legend-text">学习中 {{ learningCount }}</text>
+        </view>
+        <view class="legend-item">
+          <view class="dot dot-rest"></view>
+          <text class="legend-text">未学 {{ restCount() }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 两大入口 -->
+    <view class="entries">
+      <view class="neo-card entry entry-review pressable" hover-class="press" @click="goStudy('review')">
+        <text class="entry-title">复习</text>
+        <text class="entry-num">{{ dueCount }}</text>
+        <text class="entry-unit">个到期</text>
+      </view>
+      <view class="neo-card entry entry-new pressable" hover-class="press" @click="goStudy('new')">
+        <text class="entry-title">学新词</text>
+        <text class="entry-num">{{ todayNewCount }}</text>
+        <text class="entry-unit">今日已学</text>
+      </view>
+    </view>
+
+    <!-- 统计条 -->
+    <view class="neo-card panel" v-if="planName != ''">
+      <view class="stats-row">
+        <view class="stat">
+          <text class="stat-num num-blue">{{ learningCount }}</text>
+          <text class="stat-label">在学</text>
+        </view>
+        <view class="stat">
+          <text class="stat-num num-green">{{ learnedCount }}</text>
+          <text class="stat-label">已学</text>
+        </view>
+        <view class="stat">
+          <text class="stat-num num-red">{{ todayReviewCount }}</text>
+          <text class="stat-label">今日复习</text>
+        </view>
+        <view class="stat">
+          <text class="stat-num">{{ totalCount }}</text>
+          <text class="stat-label">总词数</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他入口 -->
+    <view class="nav-row">
+      <view class="neo-card-sm nav nav-purple pressable" hover-class="press" @click="go('/pages/word/chain')">
+        <text class="nav-icon">链</text>
+        <text class="nav-text">链式记忆</text>
+      </view>
+      <view class="neo-card-sm nav nav-blue pressable" hover-class="press" @click="go('/pages/plan/list')">
+        <text class="nav-icon">计</text>
+        <text class="nav-text">计划</text>
+      </view>
+      <view class="neo-card-sm nav nav-green pressable" hover-class="press" @click="go('/pages/library/library')">
+        <text class="nav-icon">あ</text>
+        <text class="nav-text">词库</text>
+      </view>
+      <view class="neo-card-sm nav pressable" hover-class="press" @click="go('/pages/settings/settings')">
+        <text class="nav-icon">设</text>
+        <text class="nav-text">设置</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { buildTodaySummary } from '../../services/today.uts'
+  import { awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
+
+  const planName = ref('')
+  const dueCount = ref(0)
+  const learningCount = ref(0)
+  const learnedCount = ref(0)
+  const masteredCount = ref(0)
+  const totalCount = ref(0)
+  const todayNewCount = ref(0)
+  const todayReviewCount = ref(0)
+
+  // ---------- 展示辅助（模板只能调本地函数） ----------
+
+  const WEEKS: Array<string> = ['日', '一', '二', '三', '四', '五', '六']
+
+  const todayText = (): string => {
+    const d = new Date()
+    const week = WEEKS[d.getDay()]
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日 · 周' + week
+  }
+
+  const helloText = (): string => {
+    const h = new Date().getHours()
+    if (h < 6) {
+      return '夜深了，注意休息'
+    }
+    if (h < 11) {
+      return '早上好，开始今天的学习吧'
+    }
+    if (h < 14) {
+      return '中午好，抽空背几个词'
+    }
+    if (h < 18) {
+      return '下午好，继续加油'
+    }
+    return '晚上好，温故而知新'
+  }
+
+  const restCount = (): number => {
+    const rest = totalCount.value - learnedCount.value
+    return rest > 0 ? rest : 0
+  }
+
+  const masterPct = (): number => {
+    if (totalCount.value == 0) {
+      return 0
+    }
+    return masteredCount.value * 100 / totalCount.value
+  }
+
+  const learningPct = (): number => {
+    if (totalCount.value == 0) {
+      return 0
+    }
+    return learningCount.value * 100 / totalCount.value
+  }
+
+  // ---------- 数据 ----------
+
+  const load = async () => {
+    try {
+      // 冷启动期先等数据库初始化完成（onLaunch 的 initDatabase 是异步的）
+      const ok = await awaitDatabase()
+      if (!ok) {
+        return
+      }
+      const s = await buildTodaySummary()
+      planName.value = s.planName
+      dueCount.value = s.dueCount
+      learningCount.value = s.learningCount
+      learnedCount.value = s.learnedCount
+      masteredCount.value = s.masteredCount
+      totalCount.value = s.totalCount
+      todayNewCount.value = s.todayNewCount
+      todayReviewCount.value = s.todayReviewCount
+    } catch (e) {
+      console.error('今日任务加载失败', e)
+    }
+  }
+
+  onLoad(() => {
+    load()
+  })
+
+  // 从背词会话返回后刷新统计
+  onShow(() => {
+    load()
+  })
+
+  const goStudy = (mode: string) => {
+    uni.navigateTo({ url: '/pages/study/study?mode=' + mode })
+  }
+  const go = (url: string) => {
+    uni.navigateTo({ url: url })
+  }
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  /* ===== Neo 风格（Neubrutalism：黑边 + 硬投影 + 高饱和色块 + 按压动画） ===== */
+
+  .page {
+    flex: 1;
+    padding: 32rpx 32rpx 48rpx;
+    background-color: $n-bg;
+  }
+
+  /* ---------- 头部：黄色 hero 块（neo-card 打底，覆盖黄底） ---------- */
+  .hero {
+    background-color: $n-yellow;
+    padding: 36rpx 32rpx;
+    margin-bottom: 28rpx;
+  }
+  .hero-top {
+    flex-direction: row;
+    align-items: center;
+  }
+  .hero-date {
+    flex: 1;
+    font-size: $c-fs-sm;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .plan-chip {
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 20rpx;
+  }
+  .plan-chip-text {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .hero-hello {
+    font-size: $c-fs-xl;
+    font-weight: bold;
+    color: $n-ink;
+    margin-top: 16rpx;
+  }
+
+  /* ---------- 三色进度条：白底黑边外壳（neo-card 打底） ---------- */
+  .panel {
+    padding: 32rpx;
+    margin-bottom: 28rpx;
+  }
+  .bar {
+    flex-direction: row;
+    align-items: stretch;
+    height: 24rpx;
+    border-radius: 999rpx;
+    overflow: hidden;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+  }
+  .bar-ok {
+    height: 24rpx;
+    background-color: $n-green;
+  }
+  .bar-learning {
+    height: 24rpx;
+    background-color: $n-blue;
+  }
+  .bar-rest {
+    flex: 1;
+    height: 24rpx;
+    background-color: $n-cream;
+  }
+  .legend {
+    flex-direction: row;
+    margin-top: 20rpx;
+  }
+  .legend-item {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 32rpx;
+  }
+  .dot {
+    width: 16rpx;
+    height: 16rpx;
+    border-radius: 999rpx;
+    margin-right: 8rpx;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+  }
+  .dot-ok {
+    background-color: $n-green;
+  }
+  .dot-learning {
+    background-color: $n-blue;
+  }
+  .dot-rest {
+    background-color: $n-cream;
+  }
+  .legend-text {
+    font-size: $c-fs-xs;
+    color: $n-text2;
+    font-weight: bold;
+  }
+
+  /* ---------- 两大入口：红（复习）/ 黄（学新词），neo-card 打底覆盖色 ---------- */
+  .entries {
+    flex-direction: row;
+    margin-bottom: 28rpx;
+  }
+  .entry {
+    flex: 1;
+    padding: 36rpx 0;
+    align-items: center;
+  }
+  .entry-review {
+    background-color: $n-red;
+  }
+  .entry-new {
+    background-color: $n-yellow;
+    margin-left: 24rpx;
+  }
+  .entry-title {
+    font-size: $c-fs-md;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .entry-num {
+    font-size: 72rpx;
+    font-weight: bold;
+    color: $n-ink;
+    margin-top: 8rpx;
+  }
+  .entry-unit {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    opacity: 0.75;
+    font-weight: bold;
+  }
+
+  /* ---------- 统计条：彩色数字 ---------- */
+  .stats-row {
+    flex-direction: row;
+  }
+  .stat {
+    flex: 1;
+    align-items: center;
+  }
+  .stat-num {
+    font-size: $c-fs-xl;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .num-blue {
+    color: $n-blue;
+  }
+  .num-green {
+    color: $n-green;
+  }
+  .num-red {
+    color: $n-red;
+  }
+  .stat-label {
+    font-size: $c-fs-xs;
+    color: $n-text3;
+    margin-top: 8rpx;
+    font-weight: bold;
+  }
+
+  /* ---------- 底部入口：四色块（neo-card-sm 打底覆盖色） ---------- */
+  .nav-row {
+    flex-direction: row;
+  }
+  .nav {
+    flex: 1;
+    padding: 24rpx 0;
+    align-items: center;
+    margin-right: 16rpx;
+  }
+  .nav-purple {
+    background-color: $n-purple;
+  }
+  .nav-blue {
+    background-color: $n-blue;
+  }
+  .nav-green {
+    background-color: $n-green;
+  }
+  .nav-icon {
+    width: 54rpx;
+    height: 54rpx;
+    border-radius: 999rpx;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    font-size: 32rpx;
+    color: $n-ink;
+    font-weight: bold;
+    text-align: center;
+    line-height: 54rpx;
+  }
+  .nav-text {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    font-weight: bold;
+    margin-top: 8rpx;
+  }
+</style>

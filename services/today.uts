@@ -1,0 +1,114 @@
+/**
+ * TodayService：组装今日总览
+ * - 复习入口：全局到期词（跨计划并集），同词多计划到期合并为一条
+ * - 学习成果统计（激活计划范围）：在学/已学/已掌握/总词数/今日已学/今日复习
+ */
+import { Word } from '../domain/types.uts'
+import { getPlanRepo } from '../repos/sqlite/planRepoImpl.uts'
+import { getStateRepo } from '../repos/sqlite/stateRepoImpl.uts'
+import { getWordRepo } from '../repos/sqlite/wordRepoImpl.uts'
+
+export type TodaySummary = {
+  planName: string,     // 激活计划名，无激活计划时为空
+  dueCount: number,     // 当前到期复习词数（合并后，复习入口提示）
+  learningCount: number,  // 在学（learning + reviewing）
+  learnedCount: number,   // 已学（status != new）
+  masteredCount: number,  // 已掌握（备用：进度条）
+  totalCount: number,     // 计划总词数（备用：进度条）
+  todayNewCount: number,  // 今日已学新词数
+  todayReviewCount: number // 今日已复习词数（去重）
+}
+
+export type ReviewQueueItem = {
+  word: Word,
+  dueStateCount: number // 该词在几个计划中到期（合并展示依据）
+}
+
+// 今日零点时间戳（本地时区）
+function startOfToday(): number {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
+export async function buildTodaySummary(): Promise<TodaySummary> {
+  const s: TodaySummary = {
+    planName: '', dueCount: 0,
+    learningCount: 0, learnedCount: 0, masteredCount: 0, totalCount: 0,
+    todayNewCount: 0, todayReviewCount: 0
+  }
+  const planRepo = getPlanRepo()
+  const plan = await planRepo.getActivePlan()
+  if (plan != null) {
+    s.planName = plan.name
+    const dayStart = startOfToday()
+    s.todayNewCount = await planRepo.countTodayFirstReviewed(plan.id, dayStart)
+    s.todayReviewCount = await planRepo.countTodayReviewed(plan.id, dayStart)
+    // 状态分布（word_state 仅含学过的词；未建行 = 未学）
+    const byStatus = await getStateRepo().countByStatus(plan.id)
+    const learning = byStatus.get('learning')
+    const reviewing = byStatus.get('reviewing')
+    const mastered = byStatus.get('mastered')
+    const m = mastered == null ? 0 : mastered
+    const lr = (learning == null ? 0 : learning) + (reviewing == null ? 0 : reviewing)
+    s.masteredCount = m
+    s.learningCount = lr
+    s.learnedCount = lr + m
+    const items = await planRepo.listPlanItems(plan.id)
+    s.totalCount = items.length
+  }
+  // 到期词数按 wordId 去重（跨计划并集）
+  const dueStates = await getStateRepo().listDueStates(Date.now(), 1000000)
+  const seen = new Map<number, boolean>()
+  let count = 0
+  for (let i = 0; i < dueStates.length; i++) {
+    const wid = dueStates[i].wordId
+    if (!seen.has(wid)) {
+      seen.set(wid, true)
+      count++
+    }
+  }
+  s.dueCount = count
+  return s
+}
+
+// 取新词队列：下一批 dailyNew 个（不做每日次数限制，学完一批可立即再取下一批）
+export async function pickNewWordQueue(): Promise<Array<Word>> {
+  const planRepo = getPlanRepo()
+  const plan = await planRepo.getActivePlan()
+  if (plan == null) {
+    return [] as Array<Word>
+  }
+  return await planRepo.pickTodayNewWords(plan.id, plan.dailyNew)
+}
+
+export async function buildReviewQueue(cap: number): Promise<Array<ReviewQueueItem>> {
+  const stateRepo = getStateRepo()
+  const dueStates = await stateRepo.listDueStates(Date.now(), cap * 3)
+  // 按 wordId 合并（保持到期先后顺序），取前 cap 个词
+  const counts = new Map<number, number>()
+  const order: Array<number> = []
+  for (let i = 0; i < dueStates.length; i++) {
+    const wid = dueStates[i].wordId
+    const prev = counts.get(wid)
+    if (prev == null) {
+      order.push(wid)
+      counts.set(wid, 1)
+    } else {
+      counts.set(wid, prev + 1)
+    }
+  }
+  const repo = getWordRepo()
+  const items: Array<ReviewQueueItem> = []
+  for (let i = 0; i < order.length && items.length < cap; i++) {
+    const wid = order[i]
+    const w = await repo.getById(wid)
+    if (w == null) {
+      continue
+    }
+    const c = counts.get(wid)
+    const item: ReviewQueueItem = { word: w, dueStateCount: c == null ? 1 : c }
+    items.push(item)
+  }
+  return items
+}

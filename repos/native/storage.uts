@@ -1,0 +1,21 @@
+/**
+ * 本地 KV 存储封装（会话草稿等）
+ * uni.setStorageSync/getStorageSync 属 uni-app x API，按分层约定收敛在 repos 层。
+ */
+
+export function setStoredString(key: string, value: string) {
+  uni.setStorageSync(key, value)
+}
+
+// 无值返回 ''
+export function getStoredString(key: string): string {
+  const v = uni.getStorageSync(key)
+  if (v == null) {
+    return ''
+  }
+  return v as string
+}
+
+export function removeStored(key: string) {
+  uni.removeStorageSync(key)
+}

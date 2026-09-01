@@ -1,0 +1,14 @@
+{
+  "planName": "测试计划·动词入门",
+  "dailyNew": 5,
+  "words": [
+    { "term": "食べる", "reading": "たべる" },
+    { "term": "行く", "reading": "いく" },
+    { "term": "開ける" },
+    { "term": "食ベル", "reading": "たべる" },
+    { "term": "飲む", "reading": "のむ", "meaning": "喝；饮", "pos": "动词·他动词" },
+    { "term": "読む", "reading": "よむ", "meaning": "读；阅读", "pos": "动词·他动词" },
+    { "term": "書く", "reading": "かく", "meaning": "写；书写", "pos": "动词·他动词" },
+    { "term": "話す", "reading": "はなす", "meaning": "说；讲", "pos": "动词·他动词" }
+  ]
+}

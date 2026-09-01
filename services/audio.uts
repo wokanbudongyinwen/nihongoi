@@ -1,0 +1,46 @@
+/**
+ * AudioService：真人朗读（下载缓存 + 播放策略）
+ *
+ * 自动播：背词会话展示词时，已有缓存则立即播；无缓存则后台静默下载（本次不播，下次生效）
+ * 手动播：详情页/背词页喇叭，无缓存时等待下载完成后播放
+ * 批量预取：计划详情「预下载本计划音频」
+ */
+import { Word } from '../domain/types.uts'
+import { hasAudio, playAudio, downloadAudioAsync } from '../repos/native/audio.uts'
+
+// 自动播：有缓存就播，没有就后台下载（不打扰）
+export function autoPlayForWord(w: Word) {
+  if (hasAudio(w.id)) {
+    playAudio(w.id)
+    return
+  }
+  downloadAudioAsync(w.id, w.term, w.reading).then((_ok: boolean) => {
+    // 首次下载成功也不追播（词已翻过），下次出现即有缓存
+  })
+}
+
+// 手动播：无缓存时下载完再播；返回是否最终有声音
+export async function manualPlay(w: Word): Promise<boolean> {
+  if (hasAudio(w.id)) {
+    return playAudio(w.id)
+  }
+  const ok = await downloadAudioAsync(w.id, w.term, w.reading)
+  if (ok) {
+    return playAudio(w.id)
+  }
+  return false
+}
+
+// 批量预取：跳过已有缓存，逐词下载；onProgress(已处理数, 总数, 本词成功)
+export async function prefetchAudio(words: Array<Word>, onProgress: (done: number, total: number, ok: boolean) => void): Promise<void> {
+  let done = 0
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i]
+    let ok = true
+    if (!hasAudio(w.id)) {
+      ok = await downloadAudioAsync(w.id, w.term, w.reading)
+    }
+    done++
+    onProgress(done, words.length, ok)
+  }
+}

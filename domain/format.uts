@@ -1,0 +1,27 @@
+/**
+ * 展示格式化（纯函数，无 IO）
+ */
+
+// 音调核带圈数字（0=平板 ⓪，1-20 ①-⑳；日本语辞书标准表记）
+const ACCENT_GLYPHS: Array<string> = [
+  '⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨',
+  '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳'
+]
+
+// 音调核数字 → 带圈数字（超范围或非整数回退为原数字）
+export function accentGlyph(n: number): string {
+  const rounded = Math.round(n)
+  if (n < 0 || n > 20 || n != rounded) {
+    return n.toString()
+  }
+  return ACCENT_GLYPHS[rounded]
+}
+
+// 音调核数组 → 展示串（如 ⓪③）
+export function accentsDisplay(arr: Array<number>): string {
+  let out = ''
+  for (let i = 0; i < arr.length; i++) {
+    out += accentGlyph(arr[i])
+  }
+  return out
+}

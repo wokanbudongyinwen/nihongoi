@@ -1,0 +1,164 @@
+/**
+ * 首启底库复制（仅 App-Android）
+ *
+ * 资源在运行期的位置因运行方式而异（据 uni-app x 编译器文档）：
+ *  - dev 标准基座运行：HBuilderX 把 www 资源同步到设备文件系统，
+ *    用官方 API UTSAndroid.getResourcePath('/static/...') 解析出原生路径
+ *  - 正式打包：APK assets/apps/<appid>/www/static/... 固定结构
+ * 依次尝试：①文件系统复制 ②APK assets 定径复制 ③assets 全树定位兜底。
+ *
+ * 目标位置 context.getDatabasePath(dbName)，与 meibao-Sqlite 不传 path 时
+ * 的默认库位置一致；已存在则跳过（词库升级走 INSERT OR IGNORE 合并，另行实现）。
+ */
+// #ifdef APP-ANDROID
+import Context from 'android.content.Context'
+import File from 'java.io.File'
+import FileInputStream from 'java.io.FileInputStream'
+import FileOutputStream from 'java.io.FileOutputStream'
+// #endif
+
+// #ifdef APP-ANDROID
+// 在 APK assets 树中递归查找文件名，返回完整 asset 路径（找不到返回 ''）
+// 注意：java String[] 互操作——无 .length（用 .size）、可空需判、下标须为 Int
+function findAssetPath(context: Context, from: string, fileName: string): string {
+  const names = context.getAssets().list(from)
+  if (names == null) {
+    return ''
+  }
+  const count: Int = names.size
+  for (let i: Int = 0; i < count; i++) {
+    const name: string = names[i]
+    const sub = from.length == 0 ? name : from + '/' + name
+    if (name == fileName) {
+      return sub
+    }
+    const found = findAssetPath(context, sub, fileName)
+    if (found.length > 0) {
+      return found
+    }
+  }
+  return ''
+}
+
+// 直接尝试打开某 asset 路径（存在则瞬时打开即关）
+function openableAsset(context: Context, path: string): boolean {
+  try {
+    const s = context.getAssets().open(path)
+    s.close()
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+// 目录直系子项拼接（诊断用），空目录返回 '(empty)'
+function joinNames(context: Context, dir: string): string {
+  const names = context.getAssets().list(dir)
+  if (names == null) {
+    return '(null)'
+  }
+  let out = ''
+  const count: Int = names.size
+  for (let i: Int = 0; i < count; i++) {
+    if (out.length > 0) {
+      out += ','
+    }
+    out += names[i]
+  }
+  if (out.length == 0) {
+    return '(empty)'
+  }
+  return out
+}
+
+// 从设备文件系统真实路径复制
+function copyFile(src: string, target: File): boolean {
+  const input = new FileInputStream(new File(src))
+  const output = new FileOutputStream(target)
+  const buf = new ByteArray(8192)
+  let len = input.read(buf)
+  while (len > 0) {
+    output.write(buf, 0, len)
+    len = input.read(buf)
+  }
+  output.flush()
+  output.close()
+  input.close()
+  return true
+}
+
+// 从 APK assets 复制
+function copyAsset(context: Context, assetPath: string, target: File): boolean {
+  const input = context.getAssets().open(assetPath)
+  const output = new FileOutputStream(target)
+  const buf = new ByteArray(8192)
+  let len = input.read(buf)
+  while (len > 0) {
+    output.write(buf, 0, len)
+    len = input.read(buf)
+  }
+  output.flush()
+  output.close()
+  input.close()
+  return true
+}
+// #endif
+
+/**
+ * dbName：应用数据目录中的库名（meibao 默认库位置）
+ * relPath：底库在项目内的相对路径（如 'static/assets/base.db'）
+ */
+export function ensureAppDatabase(dbName: string, relPath: string): boolean {
+  // #ifdef APP-ANDROID
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return false
+  }
+  const target = context.getDatabasePath(dbName)
+  if (target.exists()) {
+    return true
+  }
+  const parent = target.getParentFile()
+  if (parent != null && parent.exists() == false) {
+    parent.mkdirs()
+  }
+
+  // ① dev 基座：官方 API 解析设备文件系统上的运行期路径
+  const nativePath = UTSAndroid.getResourcePath('/' + relPath)
+  if (nativePath.length > 0) {
+    const f = new File(nativePath)
+    if (f.exists() && f.isFile()) {
+      console.log('底库资源定位（文件系统）：' + nativePath)
+      copyFile(nativePath, target)
+      return true
+    }
+  }
+
+  // ② 正式包结构：apps/<appid>/www/<relPath>
+  const inApk = 'apps/' + UTSAndroid.getAppId() + '/www/' + relPath
+  if (openableAsset(context, inApk)) {
+    console.log('底库资源定位（APK assets）：' + inApk)
+    copyAsset(context, inApk, target)
+    return true
+  }
+
+  // ③ 兜底：assets 全树按文件名定位
+  const fileName = relPath.substring(relPath.lastIndexOf('/') + 1)
+  const found = findAssetPath(context, '', fileName)
+  if (found.length > 0) {
+    console.log('底库资源定位（assets 搜索）：' + found)
+    copyAsset(context, found, target)
+    return true
+  }
+
+  // 诊断：根目录 + uni-static / apps 的子内容
+  const diag = 'getResourcePath=' + nativePath +
+    ' | 根:' + joinNames(context, '') +
+    ' | uni-static:' + joinNames(context, 'uni-static') +
+    ' | apps:' + joinNames(context, 'apps')
+  throw new Error('底库资源未找到 ' + relPath + ' [' + diag + ']')
+  // #endif
+  // #ifndef APP-ANDROID
+  return false
+  // #endif
+}

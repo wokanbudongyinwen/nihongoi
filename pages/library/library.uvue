@@ -1,0 +1,210 @@
+<template>
+  <view class="page">
+    <view class="neo-card search-bar">
+      <input class="search-input" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onInput" />
+      <text class="count">{{ countText() }}</text>
+    </view>
+
+    <scroll-view class="list" scroll-y="true" show-scrollbar="false" @scrolltolower="loadMore">
+      <view class="neo-card-sm word-row pressable" hover-class="press" v-for="(w, i) in results" :key="w.id" @click="goDetail(w)">
+        <view class="word-main">
+          <view class="word-line">
+            <text class="word-term">{{ w.term }}</text>
+            <text class="word-reading">{{ w.reading }}</text>
+          </view>
+          <text class="word-meaning">{{ w.meaning }}</text>
+        </view>
+        <text class="word-pos">{{ w.pos }}</text>
+      </view>
+      <view class="loading" v-if="loading">
+        <text class="loading-text">加载中…</text>
+      </view>
+      <text class="list-end" v-if="!loading && results.length > 0 && results.length >= total">— 已全部加载（{{ results.length }} / {{ total }}）—</text>
+      <view class="empty" v-if="!loading && results.length == 0">
+        <text class="empty-text">{{ total > 0 ? '无匹配词条' : '词库为空（底库 base.db 导入后可见数据）' }}</text>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { listWordPage, countWords } from '../../services/wordEditor.uts'
+  import { Word } from '../../domain/types.uts'
+
+  const PAGE_SIZE = 50
+
+  const keyword = ref('')
+  const results = ref<Array<Word>>([])
+  const total = ref(0)
+  const loading = ref(false)
+  let loadingMore = false // 防重入（loadMore 触发期间不重复请求）
+  let settledKeyword = '' // 已加载结果对应的关键词（输入抖动丢弃过期响应）
+
+  // 总数文案（模板只能调本地函数）
+  const countText = (): string => {
+    if (total.value == 0) {
+      return ''
+    }
+    if (keyword.value.length == 0) {
+      return '共 ' + total.value + ' 词'
+    }
+    return '匹配 ' + total.value + ' 词'
+  }
+
+  // 首屏 / 关键词变化：重置分页后加载第一页
+  const doSearch = async () => {
+    const kw = keyword.value
+    settledKeyword = kw
+    loading.value = true
+    try {
+      const cnt = await countWords(kw)
+      if (settledKeyword != kw) {
+        return
+      }
+      total.value = cnt
+      const list = await listWordPage(kw, PAGE_SIZE, 0)
+      if (settledKeyword != kw) {
+        return
+      }
+      results.value = list
+    } catch (e) {
+      console.error('词库查询失败', e)
+    }
+    loading.value = false
+  }
+
+  // 滚动到底：追加下一页
+  const loadMore = async () => {
+    if (loadingMore || loading.value) {
+      return
+    }
+    const kw = keyword.value
+    if (results.value.length >= total.value) {
+      return
+    }
+    loadingMore = true
+    loading.value = true
+    try {
+      const list = await listWordPage(kw, PAGE_SIZE, results.value.length)
+      if (settledKeyword == kw && list.length > 0) {
+        // uts 数组追加：逐条 push（无 spread 合并）
+        for (let i = 0; i < list.length; i++) {
+          results.value.push(list[i])
+        }
+      }
+    } catch (e) {
+      console.error('词库分页加载失败', e)
+    }
+    loadingMore = false
+    loading.value = false
+  }
+
+  const onInput = (e: InputEvent) => {
+    keyword.value = e.detail.value
+    doSearch()
+  }
+
+  const goDetail = (w: Word) => {
+    uni.navigateTo({ url: '/pages/word/detail?id=' + w.id })
+  }
+
+  onLoad(() => {
+    doSearch()
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    padding: 24rpx 28rpx 0;
+    background-color: $n-bg;
+  }
+  .search-bar {
+    padding: 24rpx;
+    margin-bottom: 20rpx;
+  }
+  .search-input {
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 18rpx 22rpx;
+    font-size: 28rpx;
+    color: $n-ink;
+  }
+  .count {
+    font-size: 24rpx;
+    color: $n-text2;
+    font-weight: bold;
+    margin-top: 14rpx;
+  }
+  .list {
+    flex: 1;
+    padding: 4rpx 2rpx 40rpx;
+  }
+  .word-row {
+    padding: 24rpx;
+    margin: 0 4rpx 18rpx 0;
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-main {
+    flex: 1;
+  }
+  .word-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-term {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .word-reading {
+    font-size: 24rpx;
+    color: $n-blue;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .word-meaning {
+    font-size: 26rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+  }
+  .word-pos {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+    margin-left: 16rpx;
+  }
+  .loading {
+    padding: 24rpx 0;
+    align-items: center;
+  }
+  .loading-text {
+    font-size: 24rpx;
+    color: $n-text3;
+  }
+  .list-end {
+    font-size: 24rpx;
+    color: $n-text3;
+    text-align: center;
+    padding: 24rpx 0;
+  }
+  .empty {
+    padding: 80rpx 0;
+    align-items: center;
+  }
+  .empty-text {
+    font-size: 26rpx;
+    color: $n-text3;
+  }
+</style>

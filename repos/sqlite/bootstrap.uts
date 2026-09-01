@@ -1,0 +1,91 @@
+/**
+ * 数据库启动链路：App 启动时调用一次
+ *  1. 首启复制：应用数据库目录无 vocab 时，把打包底库 static/assets/base.db 复制过去
+ *     （base.db 由 tools/build-db 生成；复制失败降级为空库启动，不阻断）
+ *  2. 打开（不存在则创建）应用数据库
+ *  3. 建全部表（CREATE IF NOT EXISTS：对 base.db 幂等，全新环境补全计划域/学习域表）
+ *
+ * initDatabase 幂等（缓存 Promise）：onLaunch 调用后，页面/服务可 await awaitDatabase()
+ * 消除冷启动竞态（首页 onLoad 早于异步初始化完成）。
+ */
+import { SqlClient, DB_NAME, initSchema } from './sqlClient.uts'
+import { createSqlClient } from './meibaoClient.uts'
+import { ensureAppDatabase } from './assetCopy.uts'
+
+let client: SqlClient | null = null
+let ready: Promise<boolean> | null = null
+
+// 供各 Repo 实现取用；未初始化时为 null
+export function getClient(): SqlClient | null {
+  return client
+}
+
+async function doInit(): Promise<boolean> {
+  // 底库复制失败不阻断启动（退化为空库）
+  try {
+    ensureAppDatabase(DB_NAME, 'static/assets/base.db')
+  } catch (e) {
+    console.warn('base.db 复制失败，空库启动', e)
+  }
+  const c = createSqlClient()
+  const ok = await c.open(DB_NAME, '')
+  if (!ok) {
+    console.error('数据库打开失败')
+    return false
+  }
+  const schemaOk = await initSchema(c)
+  if (schemaOk) {
+    await migrate(c)
+    client = c
+    console.log('数据库初始化完成：' + DB_NAME)
+  } else {
+    console.error('数据库建表失败')
+  }
+  return schemaOk
+}
+
+// 旧库列迁移（CREATE IF NOT EXISTS 不会为已存在的表补列）
+async function migrate(c: SqlClient): Promise<void> {
+  // v2: word.romaji
+  const wordCols = await c.select(DB_NAME, 'PRAGMA table_info(word)')
+  let hasRomaji = false
+  for (let i = 0; i < wordCols.length; i++) {
+    if (wordCols[i][1] == 'romaji') {
+      hasRomaji = true
+      break
+    }
+  }
+  if (!hasRomaji) {
+    await c.execute(DB_NAME, "ALTER TABLE word ADD COLUMN romaji TEXT NOT NULL DEFAULT ''")
+    console.log('已迁移：word 表新增 romaji 列')
+  }
+  // v3: plan_item.priority（单词档位，默认 3 常规）
+  const itemCols = await c.select(DB_NAME, 'PRAGMA table_info(plan_item)')
+  let hasPriority = false
+  for (let i = 0; i < itemCols.length; i++) {
+    if (itemCols[i][1] == 'priority') {
+      hasPriority = true
+      break
+    }
+  }
+  if (!hasPriority) {
+    await c.execute(DB_NAME, 'ALTER TABLE plan_item ADD COLUMN priority INTEGER NOT NULL DEFAULT 3')
+    console.log('已迁移：plan_item 表新增 priority 列')
+  }
+}
+
+// 幂等初始化（App.uvue onLaunch 调用）
+export function initDatabase(): Promise<boolean> {
+  const cur = ready
+  if (cur != null) {
+    return cur
+  }
+  const created = doInit()
+  ready = created
+  return created
+}
+
+// 页面/服务在冷启动期访问数据库前 await 它，确保初始化完成
+export async function awaitDatabase(): Promise<boolean> {
+  return await initDatabase()
+}

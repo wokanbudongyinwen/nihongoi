@@ -1,0 +1,62 @@
+<script setup lang="uts">
+	import { initDatabase } from './repos/sqlite/bootstrap.uts'
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	let firstBackTime = 0
+	// #endif
+
+	onLaunch(() => {
+		console.log('App Launch')
+		// 数据库初始化：打开 vocab 库并建全部表（失败会在控制台输出错误）
+		// TODO: 首次启动复制 static/assets/base.db + 词库升级（只增不改）
+		initDatabase().then((ok) => {
+			if (!ok) {
+				console.error('数据库初始化失败')
+			}
+		}).catch((e) => {
+			console.error('数据库初始化异常: ' + e)
+		})
+	})
+
+	onAppShow(() => {
+		console.log('App Show')
+	})
+
+	onAppHide(() => {
+		console.log('App Hide')
+	})
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	onLastPageBackPress(() => {
+		console.log('App LastPageBackPress')
+		if (firstBackTime == 0) {
+			uni.showToast({
+				title: '再按一次退出应用',
+				position: 'bottom',
+			})
+			firstBackTime = Date.now()
+			setTimeout(() => {
+				firstBackTime = 0
+			}, 2000)
+		} else if (Date.now() - firstBackTime < 2000) {
+			firstBackTime = Date.now()
+			uni.exit()
+		}
+	})
+
+	onExit(() => {
+		console.log('App Exit')
+	})
+	// #endif
+</script>
+
+<style>
+	/*每个页面公共css */
+	.uni-row {
+		flex-direction: row;
+	}
+
+	.uni-column {
+		flex-direction: column;
+	}
+</style>

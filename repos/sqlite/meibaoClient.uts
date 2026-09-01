@@ -1,0 +1,143 @@
+/**
+ * meibao-Sqlite 适配层（SqlClient 的 Android 实现）
+ *
+ * 适配三件事：
+ *  1. 回调风格 → Promise 风格
+ *  2. 插件不支持参数绑定 → 提供 sqlStr()/sqlNum() 转义辅助，业务拼接统一走这里
+ *  3. 重复打开保护（插件对已打开的库返回 9000002）
+ *
+ * 依赖：uni_modules/meibao-Sqlite（插件市场免费导入，MIT，仅 Android App 端）
+ * 注意：必须先在 HBuilderX 中导入该插件，否则本文件编译报「模块不存在」。
+ * 将来若换自研/付费插件，仅需重写本文件的 createSqlClient()，业务层零改动。
+ */
+import { openDatabase, executeSql, selectSql, transaction, closeDatabase } from '@/uni_modules/meibao-Sqlite'
+import { SqlClient, ExecResult } from './sqlClient.uts'
+
+// SQL 字符串字面量：单引号转义为两个单引号
+export function sqlStr(v: string): string {
+  return "'" + v.split("'").join("''") + "'"
+}
+
+// SQL 数字字面量
+export function sqlNum(v: number): string {
+  return v.toString()
+}
+
+// 行值 → number（插件查询结果全部是字符串）
+export function toNum(v: string): number {
+  return parseFloat(v)
+}
+
+// 音调核列值（逗号分隔字符串，兼容旧库单个数字）→ number 数组
+export function toAccents(v: string): Array<number> {
+  const out: Array<number> = []
+  if (v.length == 0) {
+    return out
+  }
+  const parts = v.split(',')
+  for (let i = 0; i < parts.length; i++) {
+    const n = parseFloat(parts[i])
+    if (!isNaN(n)) {
+      out.push(n)
+    }
+  }
+  return out
+}
+
+// 当前已打开的数据库名（插件按 name 维护连接，重复打开报错）
+let openedName: string = ''
+
+export class MeibaoClient implements SqlClient {
+  open(name: string, path: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      if (openedName == name) {
+        resolve(true)
+        return
+      }
+      openDatabase({
+        name: name,
+        success: (_res) => {
+          openedName = name
+          resolve(true)
+        },
+        fail: (err) => {
+          reject(new Error('打开数据库失败: ' + err.errMsg))
+        }
+      })
+    })
+  }
+
+  execute(name: string, sql: string): Promise<ExecResult> {
+    return new Promise<ExecResult>((resolve, reject) => {
+      executeSql({
+        name: name,
+        sql: sql,
+        success: (res) => {
+          // uts→kotlin：先存 const 局部再做空判断，避免闭包捕获变量无法 smart cast
+          const iid = res.insertId
+          const r: ExecResult = {
+            rowsAffected: res.rowsAffected,
+            insertId: iid == null ? 0 : iid
+          }
+          resolve(r)
+        },
+        fail: (err) => {
+          reject(new Error('SQL 执行失败: ' + err.errMsg))
+        }
+      })
+    })
+  }
+
+  select(name: string, sql: string): Promise<Array<Array<string>>> {
+    return new Promise<Array<Array<string>>>((resolve, reject) => {
+      selectSql({
+        name: name,
+        sql: sql,
+        success: (res) => {
+          resolve(res.rows)
+        },
+        fail: (err) => {
+          reject(new Error('查询失败: ' + err.errMsg))
+        }
+      })
+    })
+  }
+
+  transaction(name: string, sqls: Array<string>): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      transaction({
+        name: name,
+        operation: (tx) => {
+          for (let i = 0; i < sqls.length; i++) {
+            tx.executeSql(sqls[i])
+          }
+        },
+        success: () => {
+          resolve(true)
+        },
+        fail: (err) => {
+          reject(new Error('事务失败: ' + err.errMsg))
+        }
+      })
+    })
+  }
+
+  close(name: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      closeDatabase({
+        name: name,
+        success: () => {
+          openedName = ''
+          resolve(true)
+        },
+        fail: (err) => {
+          reject(new Error('关闭数据库失败: ' + err.errMsg))
+        }
+      })
+    })
+  }
+}
+
+export function createSqlClient(): SqlClient {
+  return new MeibaoClient()
+}

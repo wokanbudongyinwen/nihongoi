@@ -1,0 +1,161 @@
+<template>
+  <view class="page">
+    <!-- 中央 logo：黄色 Neo 方块弹入（transition：初始缩小隐藏 → onReady 后切态） -->
+    <view class="neo-card logo-block" :class="logoIn ? 'logo-in' : 'logo-start'">
+      <text class="logo-char">語</text>
+    </view>
+    <!-- 标题上浮（transition + 延时切态） -->
+    <text class="title" :class="titleIn ? 'text-in' : 'text-start'">背单词</text>
+    <text class="subtitle" :class="subtitleIn ? 'text-in' : 'text-start'">日本語単語帳</text>
+
+    <!-- 底部三色点跳动（JS 定时器轮换抬起态 + transform 过渡） -->
+    <view class="dots">
+      <view class="dot dot-red" :class="liftIdx == 0 ? 'dot-lift' : ''"></view>
+      <view class="dot dot-yellow" :class="liftIdx == 1 ? 'dot-lift' : ''"></view>
+      <view class="dot dot-green" :class="liftIdx == 2 ? 'dot-lift' : ''"></view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  // uvue 不支持 @keyframes/animation-*：动画 = transition + 定时器切换状态类
+  const logoIn = ref(false)
+  const titleIn = ref(false)
+  const subtitleIn = ref(false)
+  const liftIdx = ref(-1) // 当前抬起的色点下标（-1 全平，制造节奏停顿）
+
+  let seq = 0
+  let timer = -1
+
+  const goHome = () => {
+    if (timer >= 0) {
+      clearInterval(timer)
+      timer = -1
+    }
+    uni.reLaunch({ url: '/pages/index/index' })
+  }
+
+  onReady(() => {
+    // 入场序列：logo → 标题 → 副标题（切到 -in 态触发 transition）
+    setTimeout(() => {
+      logoIn.value = true
+    }, 50)
+    setTimeout(() => {
+      titleIn.value = true
+    }, 350)
+    setTimeout(() => {
+      subtitleIn.value = true
+    }, 500)
+    // 三色点轮换：0 → 1 → 2 → 全平，循环
+    timer = setInterval(() => {
+      seq = (seq + 1) % 4
+      liftIdx.value = seq == 3 ? -1 : seq
+    }, 220)
+    // 停留 1.8s：覆盖冷启动数据库初始化 + 展示动画
+    setTimeout(() => {
+      goHome()
+    }, 1800)
+  })
+
+  onUnload(() => {
+    if (timer >= 0) {
+      clearInterval(timer)
+      timer = -1
+    }
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  /* ===== Neo 开屏（uvue 无 @keyframes：用 transition 属性过渡 + JS 切态实现） ===== */
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-block {
+    width: 200rpx;
+    height: 200rpx;
+    background-color: $n-yellow; /* 覆盖 neo-card 白底 */
+    align-items: center;
+    justify-content: center;
+    transition-property: transform, opacity;
+    transition-duration: 600ms;
+    transition-timing-function: ease-out;
+  }
+  .logo-start {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  .logo-in {
+    transform: scale(1);
+    opacity: 1;
+  }
+  .logo-char {
+    font-size: 110rpx;
+    font-weight: bold;
+    color: $n-ink;
+  }
+
+  .title {
+    font-size: 56rpx;
+    font-weight: bold;
+    color: $n-ink;
+    margin-top: 48rpx;
+    transition-property: transform, opacity;
+    transition-duration: 500ms;
+    transition-timing-function: ease-out;
+  }
+  .subtitle {
+    font-size: 26rpx;
+    color: $n-text3;
+    font-weight: bold;
+    margin-top: 12rpx;
+    transition-property: transform, opacity;
+    transition-duration: 500ms;
+    transition-timing-function: ease-out;
+  }
+  .text-start {
+    transform: translateY(24rpx);
+    opacity: 0;
+  }
+  .text-in {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .dots {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-top: 120rpx;
+    height: 48rpx;
+  }
+  .dot {
+    width: 18rpx;
+    height: 18rpx;
+    border-radius: 999rpx;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    margin: 0 10rpx;
+    transition-property: transform;
+    transition-duration: 160ms;
+    transition-timing-function: ease-in-out;
+  }
+  .dot-red {
+    background-color: $n-red;
+  }
+  .dot-yellow {
+    background-color: $n-yellow;
+  }
+  .dot-green {
+    background-color: $n-green;
+  }
+  .dot-lift {
+    transform: translateY(-14rpx);
+  }
+</style>

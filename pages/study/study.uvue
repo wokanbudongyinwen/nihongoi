@@ -1,0 +1,486 @@
+<template>
+  <view class="page">
+    <!-- 顶部：模式胶囊 + 计数 + 喇叭 -->
+    <view class="top" v-if="!finished">
+      <view class="mode-chip" :class="modeChipClass()">
+        <text class="mode-chip-text">{{ modeText }}</text>
+      </view>
+      <text class="count">{{ index + 1 }} / {{ total }}</text>
+      <text class="speaker pressable-soft" hover-class="press-soft" @click="playCurrent">音</text>
+    </view>
+    <!-- 线性进度 -->
+    <view class="track" v-if="!finished">
+      <view class="track-fill" :style="'width:' + progressPct() + '%'"></view>
+    </view>
+
+    <!-- 词卡：点击进入详情页，评分按钮悬浮在详情页底部 -->
+    <view class="neo-card card pressable" hover-class="press" @click="goDetail" v-if="!finished">
+      <view class="prio-pill" :class="prioClass()">
+        <text class="prio-pill-text" :class="prioTextClass()">{{ priorityLabel() }}</text>
+      </view>
+      <text class="term">{{ term }}</text>
+      <view class="accent-pill" v-if="accentText != ''">
+        <text class="accent-pill-text">{{ accentText }}</text>
+      </view>
+      <text class="card-hint">点击词卡查看释义并评分</text>
+    </view>
+
+    <!-- 会话结束 -->
+    <view class="done" v-if="finished && !empty">
+      <view class="neo-card done-badge">
+        <text class="done-badge-icon">✓</text>
+      </view>
+      <text class="done-title">本场完成</text>
+      <text class="done-text">{{ saved ? '学习记录已保存' : '评分将在结束时统一落库' }}</text>
+      <view class="neo-card-sm done-btn pressable" hover-class="press" @click="goBack">
+        <text class="done-btn-text">返回</text>
+      </view>
+    </view>
+
+    <!-- 空会话 -->
+    <view class="done" v-if="empty">
+      <view class="neo-card done-badge done-badge-dim">
+        <text class="done-badge-icon">🍵</text>
+      </view>
+      <text class="done-title">暂无任务</text>
+      <text class="done-text">{{ modeText }}队列为空</text>
+      <view class="neo-card-sm done-btn pressable" hover-class="press" @click="goBack">
+        <text class="done-btn-text">返回</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Word } from '../../domain/types.uts'
+  import { accentsDisplay } from '../../domain/format.uts'
+  import { autoPlayForWord, manualPlay } from '../../services/audio.uts'
+  import { SessionState, MODE_NEW, MODE_REVIEW, createSession, answer, answerMastered, snapshotDraft, hasDraft, restoreDraft, commitSession, consumeDetailRating, consumeDetailMastered } from '../../services/studySession.uts'
+  import { buildReviewQueue, pickNewWordQueue } from '../../services/today.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+
+  let session: SessionState | null = null
+  let studyMode = MODE_REVIEW
+  let currentWord: Word | null = null
+  let prioMap: Map<number, number> | null = null
+
+  const finished = ref(false)
+  const empty = ref(false)
+  const saved = ref(false)
+  const index = ref(0)
+  const total = ref(0)
+  const modeText = ref('复习')
+  const term = ref('')
+  const accentText = ref('')
+  const currentPriority = ref(3)
+
+  // 会话进度百分比（模板只能调本地函数）
+  const progressPct = (): number => {
+    if (total.value == 0) {
+      return 0
+    }
+    return index.value * 100 / total.value
+  }
+
+  // 档位徽章（1 一次即会 / 2 两次即会 / 3 常规）
+  const priorityLabel = (): string => {
+    if (currentPriority.value == 1) {
+      return '① 一次即会'
+    }
+    if (currentPriority.value == 2) {
+      return '② 两次即会'
+    }
+    return '③ 常规'
+  }
+
+  // 模式胶囊配色：复习=红 / 学新词=黄
+  const modeChipClass = (): string => {
+    return modeText.value == '学新词' ? 'chip-new' : 'chip-review'
+  }
+
+  const prioClass = (): string => {
+    if (currentPriority.value == 1) {
+      return 'prio-1'
+    }
+    if (currentPriority.value == 2) {
+      return 'prio-2'
+    }
+    return 'prio-3'
+  }
+
+  const prioTextClass = (): string => {
+    if (currentPriority.value == 1) {
+      return 'prio-text-1'
+    }
+    if (currentPriority.value == 2) {
+      return 'prio-text-2'
+    }
+    return 'prio-text-3'
+  }
+
+  // 当前词上屏（A 面含音调展示 + 自动朗读 + 档位徽章）
+  const showCurrent = (s: SessionState) => {
+    if (s.index >= s.queue.length) {
+      return
+    }
+    const w = s.queue[s.index]
+    currentWord = w
+    term.value = w.term
+    accentText.value = accentsDisplay(w.accent)
+    const m = prioMap
+    let p = 3
+    if (m != null) {
+      const v = m.get(w.id)
+      if (v != null) {
+        p = v
+      }
+    }
+    currentPriority.value = p
+    autoPlayForWord(w)
+  }
+
+  // 手动喇叭：当前词（无缓存时先下载再播）
+  const playCurrent = async () => {
+    const w = currentWord
+    if (w == null) {
+      return
+    }
+    const ok = await manualPlay(w)
+    if (!ok) {
+      uni.showToast({ title: '暂无音频（下载失败或无网络）', icon: 'none' })
+    }
+  }
+
+  const syncRefs = (s: SessionState) => {
+    index.value = s.index
+    total.value = s.queue.length
+    finished.value = s.finished
+    showCurrent(s)
+  }
+
+  // 新会话：按模式取真实队列
+  const startFresh = async (mode: string) => {
+    let queue: Array<Word> = [] as Array<Word>
+    if (mode == MODE_NEW) {
+      // 配额扣减在 pickNewWordQueue 内完成（学满返回空）
+      queue = await pickNewWordQueue()
+    } else {
+      const planRepo = getPlanRepo()
+      const plan = await planRepo.getActivePlan()
+      const cap = plan == null ? 200 : plan.dailyReviewCap
+      const items = await buildReviewQueue(cap)
+      for (let i = 0; i < items.length; i++) {
+        queue.push(items[i].word)
+      }
+    }
+    if (queue.length == 0) {
+      empty.value = true
+      finished.value = true
+      return
+    }
+    const s = createSession(mode, queue)
+    session = s
+    syncRefs(s)
+  }
+
+  // 草稿恢复
+  const startWithDraft = async (mode: string) => {
+    const d = await restoreDraft(mode)
+    if (d == null) {
+      await startFresh(mode)
+      return
+    }
+    session = d
+    syncRefs(d)
+  }
+
+  // 入口：加载档位映射，有草稿先询问
+  const start = async (mode: string) => {
+    try {
+      prioMap = await getPlanRepo().listWordPriorities()
+    } catch (e) {
+      prioMap = null
+    }
+    if (hasDraft(mode)) {
+      uni.showModal({
+        title: '恢复会话',
+        content: '检测到未完成的本场会话，是否继续？',
+        confirmText: '继续',
+        cancelText: '重新开始',
+        success: (res) => {
+          if (res.confirm) {
+            startWithDraft(mode)
+          } else {
+            startFresh(mode)
+          }
+        },
+        fail: (_e) => {
+          startFresh(mode)
+        }
+      })
+    } else {
+      startFresh(mode)
+    }
+  }
+
+  // 会话结束统一落库（须先于 rate 声明）
+  const doCommit = async () => {
+    const cur = session
+    if (cur == null) {
+      return
+    }
+    try {
+      const ok = await commitSession(cur)
+      saved.value = ok
+      if (!ok) {
+        uni.showToast({ title: '落库失败，草稿已保留', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('会话落库失败', e)
+      uni.showToast({ title: '落库失败，草稿已保留', icon: 'none' })
+    }
+  }
+
+  const rate = (rating: number) => {
+    const cur = session
+    if (cur == null || cur.finished) {
+      return
+    }
+    const s = answer(cur, rating, Date.now())
+    session = s
+    snapshotDraft(s)
+    syncRefs(s)
+    if (s.finished) {
+      doCommit()
+    }
+  }
+
+  // 「已掌握」快捷入口：当前词直接通过出列（1/2 档词，详情页底部按钮触发）
+  const mastered = () => {
+    const cur = session
+    if (cur == null || cur.finished) {
+      return
+    }
+    const s = answerMastered(cur)
+    session = s
+    snapshotDraft(s)
+    syncRefs(s)
+    if (s.finished) {
+      doCommit()
+    }
+  }
+
+  const goDetail = () => {
+    const w = currentWord
+    if (w == null) {
+      return
+    }
+    // rate=1：详情页底部显示三档评分
+    uni.navigateTo({ url: '/pages/word/detail?id=' + w.id + '&rate=1' })
+  }
+
+  const goBack = () => {
+    uni.navigateBack()
+  }
+
+  onLoad((options) => {
+    const mode = options == null ? MODE_REVIEW : (options['mode'] == MODE_NEW ? MODE_NEW : MODE_REVIEW)
+    studyMode = mode
+    modeText.value = mode == MODE_NEW ? '学新词' : '复习'
+    start(mode)
+  })
+
+  // 从详情页返回：消费详情页底部提交的评分/「已掌握」，出下一词
+  onShow(() => {
+    const m = consumeDetailMastered()
+    if (m && !finished.value) {
+      mastered()
+      return
+    }
+    const r = consumeDetailRating()
+    if (r >= 0 && !finished.value) {
+      rate(r)
+    }
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  /* ===== Neo 风格（Neubrutalism：黑边 + 硬投影 + 高饱和色块 + 按压动画） ===== */
+
+  .page {
+    flex: 1;
+    padding: 32rpx;
+    background-color: $n-bg;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .top {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20rpx;
+  }
+  .mode-chip {
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 24rpx;
+  }
+  .chip-review {
+    background-color: $n-red;
+  }
+  .chip-new {
+    background-color: $n-yellow;
+  }
+  .mode-chip-text {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .count {
+    flex: 1;
+    font-size: $c-fs-md;
+    font-weight: bold;
+    color: $n-ink;
+    text-align: center;
+  }
+  .speaker {
+    width: 58rpx;
+    height: 58rpx;
+    border-radius: 999rpx;
+    background-color: $n-yellow;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    font-size: 24rpx;
+    color: $n-ink;
+    font-weight: bold;
+    text-align: center;
+    line-height: 58rpx;
+  }
+  .track {
+    height: 24rpx;
+    border-radius: 999rpx;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    overflow: hidden;
+    margin-bottom: 24rpx;
+  }
+  .track-fill {
+    height: 24rpx;
+    border-radius: 999rpx;
+    background-color: $n-blue;
+  }
+
+  /* ---------- 词卡：白底黑边硬投影（neo-card 打底） ---------- */
+  .card {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 32rpx;
+  }
+  .term {
+    font-size: $c-fs-hero;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .prio-pill {
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 24rpx;
+    margin-bottom: 24rpx;
+  }
+  .prio-1 {
+    background-color: $n-green;
+  }
+  .prio-2 {
+    background-color: $n-yellow;
+  }
+  .prio-3 {
+    background-color: $n-cream;
+  }
+  .prio-pill-text {
+    font-size: $c-fs-xs;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .prio-text-1 {
+    color: $n-ink;
+  }
+  .prio-text-2 {
+    color: $n-ink;
+  }
+  .prio-text-3 {
+    color: $n-ink;
+  }
+  .accent-pill {
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 8rpx 28rpx;
+    margin-top: 28rpx;
+  }
+  .accent-pill-text {
+    font-size: $c-fs-md;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .card-hint {
+    font-size: $c-fs-xs;
+    color: $n-text3;
+    margin-top: 48rpx;
+    font-weight: bold;
+  }
+
+  /* ---------- 结束/空会话 ---------- */
+  .done {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+  .done-badge {
+    width: 128rpx;
+    height: 128rpx;
+    border-radius: 999rpx; /* 覆盖 neo-card 的 20rpx 圆角成圆形 */
+    background-color: $n-green;
+    align-items: center;
+    justify-content: center;
+  }
+  .done-badge-dim {
+    background-color: $n-cream;
+  }
+  .done-badge-icon {
+    font-size: 56rpx;
+    color: $n-ink;
+  }
+  .done-title {
+    font-size: $c-fs-xl;
+    font-weight: bold;
+    color: $n-ink;
+    margin-top: 32rpx;
+  }
+  .done-text {
+    font-size: $c-fs-sm;
+    color: $n-text3;
+    margin-top: 12rpx;
+    font-weight: bold;
+  }
+  .done-btn {
+    margin-top: 64rpx;
+    background-color: $n-yellow; /* 覆盖 neo-card-sm 的白底 */
+    padding: 22rpx 88rpx;
+  }
+  .done-btn-text {
+    color: $n-ink;
+    font-size: $c-fs-md;
+    font-weight: bold;
+  }
+</style>

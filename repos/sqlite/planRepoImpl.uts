@@ -1,0 +1,333 @@
+/**
+ * PlanRepo 的 SQLite 实现（计划域 DAO）
+ *
+ * 约定与 wordRepoImpl 相同：显式列清单按下标映射、字面量走 sqlStr/sqlNum、
+ * 取新行 id 用 insert()（last_insert_rowid）。
+ */
+import { Plan, PlanItem, Word } from '../../domain/types.uts'
+import { PlanRepo, PlanWordEntry } from '../planRepo.uts'
+import { SqlClient, DB_NAME } from './sqlClient.uts'
+import { getClient } from './bootstrap.uts'
+import { sqlStr, sqlNum, toNum, toAccents } from './meibaoClient.uts'
+
+const PLAN_COLS: string = 'id, name, is_active, daily_new, daily_review_cap, cycle_json, created_at'
+
+function rowToPlan(r: Array<string>): Plan {
+  const p: Plan = {
+    id: toNum(r[0]),
+    name: r[1],
+    isActive: toNum(r[2]) == 1,
+    dailyNew: toNum(r[3]),
+    dailyReviewCap: toNum(r[4]),
+    cycleJson: r[5],
+    createdAt: toNum(r[6])
+  }
+  return p
+}
+
+function rowToPlanItem(r: Array<string>): PlanItem {
+  const p: PlanItem = {
+    id: toNum(r[0]),
+    planId: toNum(r[1]),
+    wordId: toNum(r[2]),
+    sort: toNum(r[3]),
+    priority: toNum(r[4])
+  }
+  return p
+}
+
+// 联表查询的 word 列映射（顺序须与 SELECT 列清单一致：id,term,reading,romaji,accent,pos,meaning,verb_type,extra_json,created_at,updated_at）
+function rowToJoinWord(r: Array<string>): Word {
+  const w: Word = {
+    id: toNum(r[0]),
+    term: r[1],
+    reading: r[2],
+    romaji: r[3],
+    accent: toAccents(r[4]),
+    pos: r[5],
+    meaning: r[6],
+    verbType: r[7],
+    extraJson: r[8],
+    createdAt: toNum(r[9]),
+    updatedAt: toNum(r[10])
+  }
+  return w
+}
+
+const JOIN_WORD_COLS: string = 'w.id, w.term, w.reading, w.romaji, w.accent, w.pos, w.meaning, w.verb_type, w.extra_json, w.created_at, w.updated_at'
+
+class SqlitePlanRepo implements PlanRepo {
+  private client(): SqlClient {
+    const c = getClient()
+    if (c == null) {
+      throw new Error('数据库未初始化')
+    }
+    return c
+  }
+
+  // 插入并取新行 id（同 wordRepoImpl：插件 executeSql 的 insertId 恒 -1）
+  private async insert(sql: string): Promise<number> {
+    const c = this.client()
+    await c.execute(DB_NAME, sql)
+    const rows = await c.select(DB_NAME, 'SELECT last_insert_rowid()')
+    if (rows.length == 0) {
+      return -1
+    }
+    return toNum(rows[0][0])
+  }
+
+  async listPlans(): Promise<Array<Plan>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + PLAN_COLS + ' FROM plan ORDER BY created_at DESC, id DESC')
+    const list: Array<Plan> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToPlan(rows[i]))
+    }
+    return list
+  }
+
+  async getPlan(id: number): Promise<Plan | null> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + PLAN_COLS + ' FROM plan WHERE id = ' + sqlNum(id) + ' LIMIT 1')
+    if (rows.length == 0) {
+      return null
+    }
+    return rowToPlan(rows[0])
+  }
+
+  async getActivePlan(): Promise<Plan | null> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + PLAN_COLS + ' FROM plan WHERE is_active = 1 LIMIT 1')
+    if (rows.length == 0) {
+      return null
+    }
+    return rowToPlan(rows[0])
+  }
+
+  async createPlan(p: Plan, orderedWordIds: Array<number>, priorities: Array<number>): Promise<number> {
+    const planId = await this.insert(
+      'INSERT INTO plan (name, is_active, daily_new, daily_review_cap, cycle_json, created_at) VALUES (' +
+      sqlStr(p.name) + ', 0, ' + sqlNum(p.dailyNew) + ', ' + sqlNum(p.dailyReviewCap) + ', ' +
+      sqlStr(p.cycleJson) + ', ' + sqlNum(p.createdAt) + ')')
+    if (planId <= 0) {
+      return planId
+    }
+    // 词单按行序生成 plan_item（INSERT OR IGNORE 去重同词多行；priorities 与 ids 按下标对齐，缺省回退 3 档）
+    const sqls: Array<string> = []
+    for (let i = 0; i < orderedWordIds.length; i++) {
+      let pr = 3
+      if (i < priorities.length) {
+        pr = priorities[i]
+      }
+      sqls.push('INSERT OR IGNORE INTO plan_item (plan_id, word_id, sort, priority) VALUES (' +
+        sqlNum(planId) + ', ' + sqlNum(orderedWordIds[i]) + ', ' + sqlNum(i) + ', ' + sqlNum(pr) + ')')
+    }
+    if (sqls.length > 0) {
+      await this.client().transaction(DB_NAME, sqls)
+    }
+    return planId
+  }
+
+  async updatePlan(p: Plan): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME,
+      'UPDATE plan SET name = ' + sqlStr(p.name) + ', daily_new = ' + sqlNum(p.dailyNew) +
+      ', daily_review_cap = ' + sqlNum(p.dailyReviewCap) + ', cycle_json = ' + sqlStr(p.cycleJson) +
+      ' WHERE id = ' + sqlNum(p.id))
+    return r.rowsAffected > 0
+  }
+
+  async appendPlanItems(planId: number, orderedWordIds: Array<number>, priorities: Array<number>): Promise<boolean> {
+    if (orderedWordIds.length == 0) {
+      return true
+    }
+    // sort 接续现有最大值（COALESCE 兜底空表）
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COALESCE(MAX(sort), -1) FROM plan_item WHERE plan_id = ' + sqlNum(planId))
+    let next = 0
+    if (rows.length > 0 && rows[0][0].length > 0) {
+      next = toNum(rows[0][0]) + 1
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < orderedWordIds.length; i++) {
+      let pr = 3
+      if (i < priorities.length) {
+        pr = priorities[i]
+      }
+      sqls.push('INSERT OR IGNORE INTO plan_item (plan_id, word_id, sort, priority) VALUES (' +
+        sqlNum(planId) + ', ' + sqlNum(orderedWordIds[i]) + ', ' + sqlNum(next + i) + ', ' + sqlNum(pr) + ')')
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
+  async activatePlan(id: number): Promise<boolean> {
+    // 同一时间仅一个激活：先全部置 0 再置目标
+    await this.client().execute(DB_NAME, 'UPDATE plan SET is_active = 0 WHERE is_active = 1')
+    const r = await this.client().execute(DB_NAME,
+      'UPDATE plan SET is_active = 1 WHERE id = ' + sqlNum(id))
+    return r.rowsAffected > 0
+  }
+
+  async deletePlan(id: number): Promise<boolean> {
+    // 显式清理关联数据（SQLite 默认不开 FK 级联）
+    const sqls: Array<string> = [
+      'DELETE FROM review_log WHERE plan_id = ' + sqlNum(id),
+      'DELETE FROM word_state WHERE plan_id = ' + sqlNum(id),
+      'DELETE FROM plan_item WHERE plan_id = ' + sqlNum(id),
+      'DELETE FROM plan WHERE id = ' + sqlNum(id)
+    ]
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
+  async listPlanItems(planId: number): Promise<Array<PlanItem>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT id, plan_id, word_id, sort, priority FROM plan_item WHERE plan_id = ' + sqlNum(planId) + ' ORDER BY sort, id')
+    const list: Array<PlanItem> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToPlanItem(rows[i]))
+    }
+    return list
+  }
+
+  async listPlanWords(planId: number): Promise<Array<Word>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + JOIN_WORD_COLS +
+      ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
+      ' WHERE pi.plan_id = ' + sqlNum(planId) + ' ORDER BY pi.sort, pi.id')
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToJoinWord(rows[i]))
+    }
+    return list
+  }
+
+  async listPlanWordsWithStatus(planId: number): Promise<Array<PlanWordEntry>> {
+    const rows = await this.client().select(DB_NAME,
+      "SELECT " + JOIN_WORD_COLS + ", COALESCE(ws.status, 'new'), COALESCE(pi.priority, 3)" +
+      ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
+      ' LEFT JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
+      ' WHERE pi.plan_id = ' + sqlNum(planId) + ' ORDER BY pi.sort, pi.id')
+    const list: Array<PlanWordEntry> = []
+    for (let i = 0; i < rows.length; i++) {
+      const e: PlanWordEntry = { word: rowToJoinWord(rows[i]), status: rows[i][11], priority: toNum(rows[i][12]) }
+      list.push(e)
+    }
+    return list
+  }
+
+  async getPlanPriorities(planId: number): Promise<Map<number, number>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT word_id, priority FROM plan_item WHERE plan_id = ' + sqlNum(planId))
+    const map = new Map<number, number>()
+    for (let i = 0; i < rows.length; i++) {
+      map.set(toNum(rows[i][0]), toNum(rows[i][1]))
+    }
+    return map
+  }
+
+  async getWordPriority(wordId: number): Promise<number> {
+    // COALESCE 兜底：词不在任何计划中时 MIN 为 NULL → 3 常规
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COALESCE(MIN(priority), 3) FROM plan_item WHERE word_id = ' + sqlNum(wordId))
+    if (rows.length == 0 || rows[0][0].length == 0) {
+      return 3
+    }
+    return toNum(rows[0][0])
+  }
+
+  async listWordPriorities(): Promise<Map<number, number>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT word_id, MIN(priority) FROM plan_item GROUP BY word_id')
+    const map = new Map<number, number>()
+    for (let i = 0; i < rows.length; i++) {
+      map.set(toNum(rows[i][0]), toNum(rows[i][1]))
+    }
+    return map
+  }
+
+  async setPriority(planId: number, wordIds: Array<number>, priority: number): Promise<boolean> {
+    if (wordIds.length == 0) {
+      return true
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < wordIds.length; i++) {
+      sqls.push('UPDATE plan_item SET priority = ' + sqlNum(priority) +
+        ' WHERE plan_id = ' + sqlNum(planId) + ' AND word_id = ' + sqlNum(wordIds[i]))
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
+  async getLearnedCount(planId: number): Promise<number> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COUNT(*) FROM plan_item pi' +
+      ' JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
+      " WHERE pi.plan_id = " + sqlNum(planId) + " AND ws.status != 'new'")
+    if (rows.length == 0) {
+      return 0
+    }
+    return toNum(rows[0][0])
+  }
+
+  async countTodayFirstReviewed(planId: number, dayStart: number): Promise<number> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COUNT(DISTINCT word_id) FROM review_log' +
+      ' WHERE plan_id = ' + sqlNum(planId) + ' AND is_first = 1 AND reviewed_at >= ' + sqlNum(dayStart))
+    if (rows.length == 0) {
+      return 0
+    }
+    return toNum(rows[0][0])
+  }
+
+  async countTodayReviewed(planId: number, dayStart: number): Promise<number> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COUNT(DISTINCT word_id) FROM review_log' +
+      ' WHERE plan_id = ' + sqlNum(planId) + ' AND is_first = 0 AND reviewed_at >= ' + sqlNum(dayStart))
+    if (rows.length == 0) {
+      return 0
+    }
+    return toNum(rows[0][0])
+  }
+
+  async pickTodayNewWords(planId: number, limit: number): Promise<Array<Word>> {
+    // 激活计划中尚无学习状态或状态仍为 new 的词，按 sort 取前 N
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + JOIN_WORD_COLS +
+      ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
+      ' LEFT JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
+      ' WHERE pi.plan_id = ' + sqlNum(planId) + " AND (ws.word_id IS NULL OR ws.status = 'new')" +
+      ' ORDER BY pi.sort LIMIT ' + sqlNum(limit))
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToJoinWord(rows[i]))
+    }
+    return list
+  }
+
+  async pickLonelyWord(planId: number): Promise<Word | null> {
+    // 已学（status != new）且不参与任何自由关联（双向 NOT EXISTS），随机取 1 个
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + JOIN_WORD_COLS +
+      ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
+      ' JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
+      " WHERE pi.plan_id = " + sqlNum(planId) + " AND ws.status != 'new'" +
+      " AND NOT EXISTS (SELECT 1 FROM word_relation r WHERE r.relation_type = 'custom'" +
+      ' AND (r.from_word_id = pi.word_id OR r.to_word_id = pi.word_id))' +
+      ' ORDER BY RANDOM() LIMIT 1')
+    if (rows.length == 0) {
+      return null
+    }
+    return rowToJoinWord(rows[0])
+  }
+}
+
+// 单例（const 副本判空，uts→kotlin 模块级变量无法 smart cast）
+let instance: PlanRepo | null = null
+
+export function getPlanRepo(): PlanRepo {
+  const cur = instance
+  if (cur != null) {
+    return cur
+  }
+  const created = new SqlitePlanRepo()
+  instance = created
+  return created
+}

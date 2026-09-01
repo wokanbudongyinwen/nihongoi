@@ -1,0 +1,243 @@
+<template>
+  <view class="page">
+    <view class="neo-card section">
+      <text class="title">复习设置</text>
+      <view class="row">
+        <text class="label">周期阶梯</text>
+        <text class="value">1 · 2 · 4 天（掌握后退出复习）</text>
+      </view>
+      <view class="row">
+        <text class="label">熟练度系数</text>
+        <text class="value">0.8 ~ 1.2</text>
+      </view>
+    </view>
+
+    <view class="neo-card section">
+      <text class="title">数据</text>
+      <view class="neo-card-sm action action-primary pressable" hover-class="press" @click="exportBackup">
+        <text class="action-text">导出备份（JSON）</text>
+      </view>
+      <view class="neo-card-sm action action-secondary pressable" hover-class="press" @click="restoreBackup">
+        <text class="action-text">从备份恢复</text>
+      </view>
+    </view>
+
+    <!-- 调试工具（验证复习链路用，正式版可删） -->
+    <view class="neo-card section section-debug">
+      <text class="title">调试工具</text>
+      <view class="neo-card-sm action action-debug pressable" hover-class="press" @click="simulateDue">
+        <text class="action-text">模拟 5 个词立即到期（复习测试）</text>
+      </view>
+      <view class="neo-card-sm action action-secondary pressable" hover-class="press" @click="resetCycle">
+        <text class="action-text">所有计划周期阶梯改为 1·2·4</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { getClient, awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
+  import { DB_NAME } from '../../repos/sqlite/sqlClient.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { readTextFile } from '../../repos/native/fileText.uts'
+  import { exportAll, restoreAll } from '../../services/backup.uts'
+
+  // 导出：全量 JSON 写入应用外部私有目录 backups/
+  const exportBackup = async () => {
+    try {
+      const ok = await awaitDatabase()
+      if (!ok) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      uni.showLoading({ title: '导出中' })
+      const path = await exportAll()
+      uni.hideLoading()
+      uni.showModal({
+        title: '备份已导出',
+        content: path,
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    } catch (e) {
+      uni.hideLoading()
+      console.error('备份导出失败', e)
+      uni.showToast({ title: '导出失败', icon: 'none' })
+    }
+  }
+
+  // 恢复执行（须先于 restoreBackup 声明）
+  const doRestore = async (text: string) => {
+    try {
+      const ok = await awaitDatabase()
+      if (!ok) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      uni.showLoading({ title: '恢复中' })
+      const done = await restoreAll(text)
+      uni.hideLoading()
+      if (done) {
+        uni.showToast({ title: '恢复完成', icon: 'success' })
+      } else {
+        uni.showToast({ title: '恢复失败', icon: 'none' })
+      }
+    } catch (e) {
+      uni.hideLoading()
+      console.error('备份恢复失败', e)
+      uni.showToast({ title: '恢复失败', icon: 'none' })
+    }
+  }
+
+  // 恢复：选备份 JSON → 确认清库重灌
+  const restoreBackup = () => {
+    uni.chooseFile({
+      count: 1,
+      type: 'all',
+      success: (res) => {
+        if (res.tempFiles.length == 0) {
+          return
+        }
+        const f = res.tempFiles[0]
+        if (!f.name.toLowerCase().endsWith('.json')) {
+          uni.showToast({ title: '请选择 .json 备份文件', icon: 'none' })
+          return
+        }
+        const text = readTextFile(f.path)
+        if (text.length == 0) {
+          uni.showToast({ title: '文件读取失败', icon: 'none' })
+          return
+        }
+        uni.showModal({
+          title: '恢复备份',
+          content: '将清空当前全部数据并恢复为备份内容，确定继续？',
+          confirmText: '恢复',
+          cancelText: '取消',
+          success: (r) => {
+            if (r.confirm) {
+              doRestore(text)
+            }
+          }
+        })
+      },
+      fail: (err) => {
+        if (err.errCode != 1101001) {
+          console.error('选择备份文件失败', err)
+          uni.showToast({ title: '选择文件失败', icon: 'none' })
+        }
+      }
+    })
+  }
+
+  // 把激活计划中最早到期的 5 个词的 due_date 置 0（立即到期）
+  const simulateDue = async () => {
+    try {
+      const ok = await awaitDatabase()
+      if (!ok) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      const plan = await getPlanRepo().getActivePlan()
+      if (plan == null) {
+        uni.showToast({ title: '无激活计划', icon: 'none' })
+        return
+      }
+      const c = getClient()
+      if (c == null) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      const sql = 'UPDATE word_state SET due_date = 0 WHERE word_id IN (' +
+        'SELECT word_id FROM word_state WHERE plan_id = ' + plan.id + ' ORDER BY due_date ASC LIMIT 5)'
+      await c.execute(DB_NAME, sql)
+      uni.showToast({ title: '已模拟 5 词到期', icon: 'success' })
+    } catch (e) {
+      console.error('模拟到期失败', e)
+      uni.showToast({ title: '操作失败', icon: 'none' })
+    }
+  }
+
+  // 旧计划迁移到新阶梯（[1,2,4] 天）
+  const resetCycle = async () => {
+    try {
+      const ok = await awaitDatabase()
+      if (!ok) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      const c = getClient()
+      if (c == null) {
+        uni.showToast({ title: '数据库未就绪', icon: 'none' })
+        return
+      }
+      await c.execute(DB_NAME, "UPDATE plan SET cycle_json = '[1,2,4]'")
+      uni.showToast({ title: '周期阶梯已更新', icon: 'success' })
+    } catch (e) {
+      console.error('周期重置失败', e)
+      uni.showToast({ title: '操作失败', icon: 'none' })
+    }
+  }
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    padding: 28rpx 28rpx 48rpx;
+    background-color: $n-bg;
+  }
+  .section {
+    padding: 32rpx;
+    margin-bottom: 28rpx;
+  }
+  .section-debug {
+    background-color: $n-cream;
+  }
+  .title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $n-ink;
+    margin-bottom: 18rpx;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    padding: 16rpx 0;
+    border-bottom-width: 2rpx;
+    border-bottom-style: solid;
+    border-bottom-color: $n-cream;
+  }
+  .label {
+    width: 200rpx;
+    font-size: 24rpx;
+    color: $n-text2;
+    font-weight: bold;
+  }
+  .value {
+    flex: 1;
+    font-size: 26rpx;
+    color: $n-ink;
+  }
+  .action {
+    min-height: 48rpx;
+    padding: 20rpx 24rpx;
+    margin-top: 18rpx;
+    align-items: center;
+    justify-content: center;
+  }
+  .action-primary {
+    background-color: $n-yellow;
+  }
+  .action-secondary {
+    background-color: $n-card;
+  }
+  .action-debug {
+    background-color: $n-purple;
+  }
+  .action-text {
+    font-size: 26rpx;
+    color: $n-ink;
+    font-weight: bold;
+  }
+</style>

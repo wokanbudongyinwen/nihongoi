@@ -1,0 +1,935 @@
+<template>
+  <view class="page">
+  <scroll-view class="body" scroll-y="true" show-scrollbar="false">
+    <!-- 头部：表记 + 读音（音调核） + 词性 + 状态徽章 -->
+    <view class="neo-card header">
+      <view class="header-row" v-if="!editMode">
+        <text class="term">{{ word.term }}</text>
+        <text class="edit-link pressable-soft" hover-class="press-soft" @click="startEdit">编辑</text>
+      </view>
+      <view class="header-row" v-if="!editMode">
+        <text class="reading">{{ word.reading }}</text>
+        <text class="romaji" v-if="word.romaji != ''">{{ word.romaji }}</text>
+        <text class="accent" v-if="word.accent.length > 0">{{ accentText() }}</text>
+        <text class="speaker pressable-soft" hover-class="press-soft" @click="playWord">音</text>
+      </view>
+      <view class="word-meta" v-if="!editMode">
+        <text class="pos">{{ word.pos }}</text>
+        <text class="badge" v-if="statusText != ''">{{ statusText }}</text>
+      </view>
+
+      <!-- 词条编辑表单 -->
+      <view v-if="editMode">
+        <view class="form-row">
+          <text class="form-label">表记</text>
+          <input class="form-input" :value="editTerm" @input="onEditTerm" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">读音</text>
+          <input class="form-input" :value="editReading" @input="onEditReading" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">罗马音</text>
+          <input class="form-input" :value="editRomaji" @input="onEditRomaji" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">音调核</text>
+          <input class="form-input" :value="editAccent" @input="onEditAccent" placeholder="多个用逗号分隔，如 0,3（留空为未标注）" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">词性</text>
+          <input class="form-input" :value="editPos" @input="onEditPos" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">释义</text>
+          <input class="form-input" :value="editMeaning" @input="onEditMeaning" />
+        </view>
+        <view class="form-actions">
+          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" @click="doSaveWord"><text class="mini-btn-text-w">保存</text></view>
+          <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelEdit"><text class="mini-btn-text">取消</text></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 释义 -->
+    <view class="neo-card section">
+      <text class="section-title">释义</text>
+      <text class="section-body">{{ word.meaning }}</text>
+    </view>
+
+    <!-- 例句（增删改） -->
+    <view class="neo-card section">
+      <text class="section-title">例句</text>
+      <view class="sentence-item" v-for="(s, i) in sentences" :key="s.id">
+        <text class="section-body">{{ s.text }}</text>
+        <text class="section-sub" v-if="s.translation != ''">{{ s.translation }}</text>
+        <view class="item-actions">
+          <text class="action" @click="startEditSentence(s)">修改</text>
+          <text class="action danger" @click="doDeleteSentence(s)">删除</text>
+        </view>
+      </view>
+      <text class="empty-tip" v-if="sentences.length == 0">暂无例句</text>
+
+      <view class="add-form" v-if="sentenceEditing">
+        <input class="form-input" :value="sText" @input="onSText" placeholder="日文例句" />
+        <input class="form-input" :value="sTrans" @input="onSTrans" placeholder="中文译文（可选）" />
+        <view class="form-actions">
+          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" @click="doSaveSentence"><text class="mini-btn-text-w">{{ sentenceEditId > 0 ? '保存修改' : '添加' }}</text></view>
+          <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelSentence"><text class="mini-btn-text">取消</text></view>
+        </view>
+      </view>
+      <text class="add" v-if="!sentenceEditing" @click="startAddSentence">+ 添加例句</text>
+    </view>
+
+    <!-- 笔记（时间线：追加式） -->
+    <view class="neo-card section">
+      <text class="section-title">笔记</text>
+      <view class="note-item" v-for="(n, i) in notes" :key="n.id">
+        <text class="section-body">{{ n.content }}</text>
+        <view class="item-actions">
+          <text class="action danger" @click="doDeleteNote(n)">删除</text>
+        </view>
+      </view>
+      <text class="empty-tip" v-if="notes.length == 0">暂无笔记</text>
+
+      <view class="add-form" v-if="noteInputting">
+        <textarea class="form-textarea" :value="noteInput" @input="onNoteInput" placeholder="记点什么…" />
+        <view class="form-actions">
+          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" @click="doAddNote"><text class="mini-btn-text-w">添加</text></view>
+          <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelNote"><text class="mini-btn-text">取消</text></view>
+        </view>
+      </view>
+      <text class="add" v-if="!noteInputting" @click="startNote">+ 添加笔记</text>
+    </view>
+
+    <!-- 固定关联：近义词（系统 xref，可下钻） -->
+    <view class="neo-card section" v-if="synonyms.length > 0">
+      <text class="section-title">近义词</text>
+      <text class="link" v-for="(p, i) in synonyms" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
+    </view>
+
+    <!-- 固定关联：反义词（系统 ant，可下钻） -->
+    <view class="neo-card section" v-if="antonyms.length > 0">
+      <text class="section-title">反义词</text>
+      <text class="link" v-for="(p, i) in antonyms" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
+    </view>
+
+    <!-- 固定关联：自他动词对（可下钻） -->
+    <view class="neo-card section" v-if="transPairs.length > 0">
+      <text class="section-title">自他动词对</text>
+      <text class="link" v-for="(p, i) in transPairs" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
+    </view>
+
+    <!-- 固定关联：动词活用形（仅动词显示，派生计算） -->
+    <view class="neo-card section" v-if="word.verbType != ''">
+      <text class="section-title">活用形</text>
+      <view class="form-row" v-for="(f, i) in formRows" :key="i">
+        <text class="form-label">{{ f.label }}</text>
+        <text class="form-value">{{ f.value }}</text>
+      </view>
+    </view>
+
+    <!-- 自由关联（带理由，可下钻，可删） -->
+    <view class="neo-card section">
+      <text class="section-title">自由关联</text>
+      <view class="custom-item" v-for="(c, i) in customs" :key="c.id">
+        <text class="link" @click="goWord(c.otherId)">{{ c.otherTerm }}（{{ c.otherReading }}）</text>
+        <text class="section-sub" v-if="c.note != ''">{{ c.note }}</text>
+        <view class="item-actions">
+          <text class="action danger" @click="doDeleteRelation(c)">删除</text>
+        </view>
+      </view>
+
+      <!-- 添加自由关联：搜索 → 选中 → 理由 → 建立 -->
+      <view class="add-form" v-if="relSearching">
+        <input class="form-input" :value="relKeyword" @input="onRelKeyword" placeholder="搜索词库（表记/读音/罗马音/释义）" />
+        <view class="rel-result" v-for="(w, i) in relResults" :key="w.id" @click="pickRelWord(w)">
+          <view class="rel-line">
+            <text class="cand-on" v-if="relSelectedId == w.id">✓</text>
+            <text class="rel-term">{{ w.term }}（{{ w.reading }}）</text>
+          </view>
+          <text class="rel-meaning">{{ w.meaning }}</text>
+        </view>
+        <input class="form-input" v-if="relSelected != null" :value="relNote" @input="onRelNote" placeholder="关联理由（可选）" />
+        <view class="form-actions" v-if="relSelected != null">
+          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" @click="doAddRelation"><text class="mini-btn-text-w">建立关联</text></view>
+          <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelRelSearch"><text class="mini-btn-text">取消</text></view>
+        </view>
+      </view>
+      <text class="add" v-if="!relSearching" @click="startRelSearch">+ 搜索词库添加关联</text>
+    </view>
+    <view class="rate-space" v-if="rateMode"></view>
+  </scroll-view>
+
+  <!-- 背词会话进入时：三档评分悬浮底部（1/2 档词追加「已掌握」快捷入口） -->
+  <view class="rate-bar" v-if="rateMode">
+    <view class="neo-card-sm rate-btn rate-again pressable" hover-class="press" @click="onRate(0)"><text class="rate-text">忘记</text></view>
+    <view class="neo-card-sm rate-btn rate-hard pressable" hover-class="press" @click="onRate(1)"><text class="rate-text">模糊</text></view>
+    <view class="neo-card-sm rate-btn rate-good pressable" hover-class="press" @click="onRate(2)"><text class="rate-text">记得</text></view>
+    <view class="neo-card-sm rate-btn rate-master pressable" hover-class="press" v-if="showMasterBtn" @click="onMastered"><text class="rate-text rate-master-text">已掌握</text></view>
+  </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Word, Sentence, Note, RELATION_SYNONYM, RELATION_ANTONYM, RELATION_TRANS_INTRANS, RELATION_CUSTOM, WORD_STATUS_NEW, WORD_STATUS_MASTERED } from '../../domain/types.uts'
+  import { getConjugation, getWordDetail, RelationDisplay, searchWords, saveWord, addSentence, saveSentence, deleteSentence, addNote, deleteNote, addCustomRelation, removeRelation } from '../../services/wordEditor.uts'
+  import { ConjugationForms } from '../../domain/conjugation.uts'
+  import { accentsDisplay } from '../../domain/format.uts'
+  import { submitDetailRating, submitDetailMastered } from '../../services/studySession.uts'
+  import { getStateRepo } from '../../repos/sqlite/stateRepoImpl.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { manualPlay } from '../../services/audio.uts'
+
+  // 背词会话评分模式（study 页带 rate=1 进入时显示底部评分条）
+  const rateMode = ref(false)
+  // 1/2 档词显示「已掌握」快捷按钮（档位取跨计划最易档）
+  const showMasterBtn = ref(false)
+
+  // 词卡数据（空对象起步，onLoad 按 id 载入）
+  const emptyWord: Word = {
+    id: 0,
+    term: '',
+    reading: '',
+    romaji: '',
+    accent: [] as Array<number>,
+    pos: '',
+    meaning: '',
+    verbType: '',
+    extraJson: '{}',
+    createdAt: 0,
+    updatedAt: 0
+  }
+  const word = ref<Word>(emptyWord)
+  const forms = ref<ConjugationForms>(getConjugation(emptyWord))
+  const sentences = ref<Array<Sentence>>([])
+  const notes = ref<Array<Note>>([])
+  const transPairs = ref<Array<RelationDisplay>>([])
+  const synonyms = ref<Array<RelationDisplay>>([])
+  const antonyms = ref<Array<RelationDisplay>>([])
+  const customs = ref<Array<RelationDisplay>>([])
+  const statusText = ref('')
+  let curWordId = 0
+
+  // 活用形展示行（模板遍历用）
+  type FormRow = { label: string, value: string }
+  const formRows = ref<Array<FormRow>>([])
+  const buildFormRows = (f: ConjugationForms) => {
+    const rows: Array<FormRow> = [
+      { label: 'ます形', value: f.masu },
+      { label: 'て形', value: f.te },
+      { label: 'た形', value: f.ta },
+      { label: 'ない形', value: f.nai },
+      { label: '可能形', value: f.kanou },
+      { label: '被动形', value: f.ukemi },
+      { label: '使役形', value: f.shieki },
+      { label: '仮定形', value: f.katei },
+      { label: '意向形', value: f.ikou }
+    ]
+    formRows.value = rows
+  }
+
+  const statusLabel = (status: string): string => {
+    if (status == WORD_STATUS_NEW) {
+      return '未学习'
+    }
+    if (status == WORD_STATUS_MASTERED) {
+      return '已掌握'
+    }
+    if (status.length > 0) {
+      return '学习中'
+    }
+    return ''
+  }
+
+  const loadWord = async (id: number) => {
+    try {
+      const d = await getWordDetail(id)
+      if (d.word != null) {
+        const w = d.word
+        word.value = w
+        forms.value = getConjugation(w)
+        buildFormRows(forms.value)
+      }
+      sentences.value = d.sentences
+      notes.value = d.notes
+      const trans: Array<RelationDisplay> = []
+      const syn: Array<RelationDisplay> = []
+      const ant: Array<RelationDisplay> = []
+      const custom: Array<RelationDisplay> = []
+      for (let i = 0; i < d.relations.length; i++) {
+        const r = d.relations[i]
+        if (r.relationType == RELATION_TRANS_INTRANS) {
+          trans.push(r)
+        } else if (r.relationType == RELATION_SYNONYM) {
+          syn.push(r)
+        } else if (r.relationType == RELATION_ANTONYM) {
+          ant.push(r)
+        } else if (r.relationType == RELATION_CUSTOM) {
+          custom.push(r)
+        }
+      }
+      transPairs.value = trans
+      synonyms.value = syn
+      antonyms.value = ant
+      customs.value = custom
+      // 状态徽章：激活计划中该词的状态
+      try {
+        const plan = await getPlanRepo().getActivePlan()
+        if (plan != null) {
+          const states = await getStateRepo().getStatesOfWord(id)
+          for (let i = 0; i < states.length; i++) {
+            if (states[i].planId == plan.id) {
+              statusText.value = statusLabel(states[i].status)
+              break
+            }
+          }
+        }
+      } catch (e2) {
+        // 状态查询失败不影响页面
+      }
+      // 评分模式：1/2 档词追加「已掌握」快捷按钮
+      if (rateMode.value) {
+        try {
+          const pr = await getPlanRepo().getWordPriority(id)
+          showMasterBtn.value = pr <= 2
+        } catch (e3) {
+          showMasterBtn.value = false
+        }
+      }
+    } catch (e) {
+      console.error('词卡加载失败', e)
+    }
+  }
+
+  // ---------- 词条编辑 ----------
+
+  const editMode = ref(false)
+  const editTerm = ref('')
+  const editReading = ref('')
+  const editRomaji = ref('')
+  const editAccent = ref('')
+  const editPos = ref('')
+  const editMeaning = ref('')
+
+  // 音调核展示（模板只能调本地函数，包一层）
+  const accentText = (): string => {
+    return accentsDisplay(word.value.accent)
+  }
+
+  // 音调核编辑值解析：逗号分隔 → 数组（忽略非法片段）
+  const parseAccentInput = (raw: string): Array<number> => {
+    const out: Array<number> = []
+    if (raw.length == 0) {
+      return out
+    }
+    const parts = raw.split(',')
+    for (let i = 0; i < parts.length; i++) {
+      const n = parseFloat(parts[i].trim())
+      if (!isNaN(n)) {
+        out.push(n)
+      }
+    }
+    return out
+  }
+
+  const startEdit = () => {
+    const w = word.value
+    editTerm.value = w.term
+    editReading.value = w.reading
+    editRomaji.value = w.romaji
+    editAccent.value = w.accent.join(',')
+    editPos.value = w.pos
+    editMeaning.value = w.meaning
+    editMode.value = true
+  }
+
+  const cancelEdit = () => {
+    editMode.value = false
+  }
+
+  const onEditTerm = (e: InputEvent) => { editTerm.value = e.detail.value }
+  const onEditReading = (e: InputEvent) => { editReading.value = e.detail.value }
+  const onEditRomaji = (e: InputEvent) => { editRomaji.value = e.detail.value }
+  const onEditAccent = (e: InputEvent) => { editAccent.value = e.detail.value }
+  const onEditPos = (e: InputEvent) => { editPos.value = e.detail.value }
+  const onEditMeaning = (e: InputEvent) => { editMeaning.value = e.detail.value }
+
+  const doSaveWord = async () => {
+    if (editTerm.value.length == 0) {
+      uni.showToast({ title: '表记不能为空', icon: 'none' })
+      return
+    }
+    const now = Date.now()
+    const w: Word = {
+      id: curWordId,
+      term: editTerm.value,
+      reading: editReading.value,
+      romaji: editRomaji.value,
+      accent: parseAccentInput(editAccent.value),
+      pos: editPos.value,
+      meaning: editMeaning.value,
+      verbType: word.value.verbType,
+      extraJson: word.value.extraJson,
+      createdAt: word.value.createdAt,
+      updatedAt: now
+    }
+    try {
+      const ok = await saveWord(w)
+      if (ok) {
+        editMode.value = false
+        uni.showToast({ title: '已保存', icon: 'success' })
+        loadWord(curWordId)
+      } else {
+        uni.showToast({ title: '保存失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('词条保存失败', e)
+      uni.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }
+
+  // ---------- 例句 ----------
+
+  const sentenceEditing = ref(false)
+  const sentenceEditId = ref(0)
+  const sText = ref('')
+  const sTrans = ref('')
+
+  const startAddSentence = () => {
+    sentenceEditId.value = 0
+    sText.value = ''
+    sTrans.value = ''
+    sentenceEditing.value = true
+  }
+
+  const startEditSentence = (s: Sentence) => {
+    sentenceEditId.value = s.id
+    sText.value = s.text
+    sTrans.value = s.translation
+    sentenceEditing.value = true
+  }
+
+  const cancelSentence = () => {
+    sentenceEditing.value = false
+  }
+
+  const onSText = (e: InputEvent) => { sText.value = e.detail.value }
+  const onSTrans = (e: InputEvent) => { sTrans.value = e.detail.value }
+
+  const doSaveSentence = async () => {
+    if (sText.value.length == 0) {
+      uni.showToast({ title: '例句不能为空', icon: 'none' })
+      return
+    }
+    try {
+      if (sentenceEditId.value > 0) {
+        // 找原句保留归属字段
+        let orig: Sentence | null = null
+        for (let i = 0; i < sentences.value.length; i++) {
+          if (sentences.value[i].id == sentenceEditId.value) {
+            orig = sentences.value[i]
+            break
+          }
+        }
+        if (orig == null) {
+          cancelSentence()
+          return
+        }
+        const s: Sentence = {
+          id: orig.id, wordId: orig.wordId, text: sText.value, translation: sTrans.value,
+          remark: orig.remark, sort: orig.sort, createdAt: orig.createdAt
+        }
+        await saveSentence(s)
+      } else {
+        await addSentence(curWordId, sText.value, sTrans.value)
+      }
+      sentenceEditing.value = false
+      loadWord(curWordId)
+    } catch (e) {
+      console.error('例句保存失败', e)
+      uni.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }
+
+  const doDeleteSentenceConfirm = async (id: number) => {
+    try {
+      await deleteSentence(id)
+      loadWord(curWordId)
+    } catch (e) {
+      console.error('例句删除失败', e)
+    }
+  }
+
+  const doDeleteSentence = (s: Sentence) => {
+    uni.showModal({
+      title: '删除例句',
+      content: s.text,
+      success: (res) => {
+        if (res.confirm) {
+          doDeleteSentenceConfirm(s.id)
+        }
+      }
+    })
+  }
+
+  // ---------- 笔记 ----------
+
+  const noteInputting = ref(false)
+  const noteInput = ref('')
+
+  const startNote = () => {
+    noteInput.value = ''
+    noteInputting.value = true
+  }
+
+  const cancelNote = () => {
+    noteInputting.value = false
+  }
+
+  const onNoteInput = (e: InputEvent) => { noteInput.value = e.detail.value }
+
+  const doAddNote = async () => {
+    if (noteInput.value.length == 0) {
+      uni.showToast({ title: '笔记不能为空', icon: 'none' })
+      return
+    }
+    try {
+      await addNote(curWordId, noteInput.value)
+      noteInputting.value = false
+      loadWord(curWordId)
+    } catch (e) {
+      console.error('笔记添加失败', e)
+      uni.showToast({ title: '添加失败', icon: 'none' })
+    }
+  }
+
+  const doDeleteNoteConfirm = async (id: number) => {
+    try {
+      await deleteNote(id)
+      loadWord(curWordId)
+    } catch (e) {
+      console.error('笔记删除失败', e)
+    }
+  }
+
+  const doDeleteNote = (n: Note) => {
+    uni.showModal({
+      title: '删除笔记',
+      content: n.content,
+      success: (res) => {
+        if (res.confirm) {
+          doDeleteNoteConfirm(n.id)
+        }
+      }
+    })
+  }
+
+  // ---------- 自由关联 ----------
+
+  const relSearching = ref(false)
+  const relKeyword = ref('')
+  const relResults = ref<Array<Word>>([])
+  const relSelected = ref<Word | null>(null)
+  const relSelectedId = ref(-1) // 模板比对用（规避可空对象属性访问）
+  const relNote = ref('')
+
+  const startRelSearch = () => {
+    relKeyword.value = ''
+    relResults.value = [] as Array<Word>
+    relSelected.value = null
+    relSelectedId.value = -1
+    relNote.value = ''
+    relSearching.value = true
+  }
+
+  const cancelRelSearch = () => {
+    relSearching.value = false
+  }
+
+  const doRelSearch = async () => {
+    if (relKeyword.value.length == 0) {
+      relResults.value = [] as Array<Word>
+      return
+    }
+    try {
+      relResults.value = await searchWords(relKeyword.value, 20)
+    } catch (e) {
+      console.error('关联搜索失败', e)
+    }
+  }
+
+  const onRelKeyword = (e: InputEvent) => {
+    relKeyword.value = e.detail.value
+    doRelSearch()
+  }
+
+  const pickRelWord = (w: Word) => {
+    relSelected.value = w
+    relSelectedId.value = w.id
+  }
+
+  const onRelNote = (e: InputEvent) => { relNote.value = e.detail.value }
+
+  const doAddRelation = async () => {
+    const sel = relSelected.value
+    if (sel == null) {
+      return
+    }
+    try {
+      const ok = await addCustomRelation(curWordId, sel.id, relNote.value)
+      if (ok) {
+        relSearching.value = false
+        loadWord(curWordId)
+      } else {
+        uni.showToast({ title: '已存在该关联', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('关联建立失败', e)
+      uni.showToast({ title: '建立失败', icon: 'none' })
+    }
+  }
+
+  const doDeleteRelationConfirm = async (id: number) => {
+    try {
+      await removeRelation(id)
+      loadWord(curWordId)
+    } catch (e) {
+      console.error('关联删除失败', e)
+    }
+  }
+
+  const doDeleteRelation = (c: RelationDisplay) => {
+    uni.showModal({
+      title: '删除关联',
+      content: c.otherTerm,
+      success: (res) => {
+        if (res.confirm) {
+          doDeleteRelationConfirm(c.id)
+        }
+      }
+    })
+  }
+
+  // ---------- 导航与评分 ----------
+
+  // 喇叭：播放本词真人音频（无缓存时先下载再播）
+  const playWord = async () => {
+    const ok = await manualPlay(word.value)
+    if (!ok) {
+      uni.showToast({ title: '暂无音频（下载失败或无网络）', icon: 'none' })
+    }
+  }
+
+  const goWord = (id: number) => {
+    uni.navigateTo({ url: '/pages/word/detail?id=' + id })
+  }
+
+  // 详情页底部评分：回传给背词会话并返回
+  const onRate = (rating: number) => {
+    submitDetailRating(rating)
+    uni.navigateBack()
+  }
+
+  // 「已掌握」快捷入口（1/2 档词）：回传标记并返回，会话层直接通过并按 mastered 记账
+  const onMastered = () => {
+    submitDetailMastered()
+    uni.navigateBack()
+  }
+
+  onLoad((options) => {
+    const rateStr = options == null ? null : options['rate']
+    rateMode.value = rateStr == '1'
+    const idStr = options == null ? null : options['id']
+    if (idStr == null) {
+      return
+    }
+    curWordId = parseInt(idStr)
+    loadWord(curWordId)
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+  }
+  .body {
+    flex: 1;
+    padding: 28rpx 28rpx 48rpx;
+    background-color: $n-bg;
+  }
+  .rate-bar {
+    flex-direction: row;
+    background-color: $n-bg;
+    border-top-width: 2rpx;
+    border-top-style: solid;
+    border-top-color: $n-ink;
+    padding: 20rpx 24rpx 40rpx;
+  }
+  .rate-btn {
+    flex: 1;
+    padding: 24rpx 0;
+    margin: 0 8rpx;
+    align-items: center;
+  }
+  .rate-again {
+    background-color: $n-red;
+  }
+  .rate-hard {
+    background-color: $n-yellow;
+  }
+  .rate-good {
+    background-color: $n-green;
+  }
+  .rate-master {
+    background-color: $n-blue;
+  }
+  .rate-master-text {
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .rate-text {
+    font-size: 28rpx;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .rate-space {
+    height: 140rpx;
+  }
+  .header {
+    background-color: $n-yellow;
+    padding: 32rpx;
+    margin-bottom: 24rpx;
+  }
+  .header-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12rpx;
+  }
+  .term {
+    font-size: 56rpx;
+    font-weight: bold;
+    flex: 1;
+    color: $n-ink;
+  }
+  .badge {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-green;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 14rpx;
+    margin-left: 16rpx;
+  }
+  .reading {
+    font-size: 30rpx;
+    color: $n-ink;
+  }
+  .romaji {
+    flex: 1;
+    font-size: 24rpx;
+    color: $n-text2;
+    margin-left: 16rpx;
+  }
+  .speaker {
+    width: 54rpx;
+    height: 54rpx;
+    border-radius: 999rpx;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    font-size: 22rpx;
+    font-weight: bold;
+    color: $n-ink;
+    text-align: center;
+    line-height: 54rpx;
+    margin-left: 16rpx;
+  }
+  .rel-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .accent {
+    font-size: 24rpx;
+    color: $n-ink;
+    margin-left: 16rpx;
+  }
+  .edit-link {
+    font-size: 26rpx;
+    color: $n-ink;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 16rpx;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .pos {
+    flex: 1;
+    font-size: 26rpx;
+    color: $n-text2;
+  }
+  .word-meta {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4rpx;
+  }
+  .section {
+    padding: 32rpx;
+    margin-bottom: 24rpx;
+  }
+  .section-title {
+    font-size: 30rpx;
+    font-weight: bold;
+    margin-bottom: 16rpx;
+    color: $n-ink;
+  }
+  .section-body {
+    font-size: 28rpx;
+    color: $n-ink;
+  }
+  .section-sub {
+    font-size: 26rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+  }
+  .link {
+    font-size: 28rpx;
+    color: $n-blue;
+    font-weight: bold;
+  }
+  .empty-tip {
+    font-size: 26rpx;
+    color: $n-text3;
+  }
+  .sentence-item,
+  .note-item,
+  .custom-item {
+    margin-bottom: 16rpx;
+  }
+  .item-actions {
+    flex-direction: row;
+    margin-top: 8rpx;
+  }
+  .action {
+    font-size: 24rpx;
+    color: $n-blue;
+    font-weight: bold;
+    margin-right: 24rpx;
+  }
+  .danger {
+    color: $n-red;
+  }
+  .add {
+    font-size: 26rpx;
+    color: $n-ink;
+    background-color: $n-yellow;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 8rpx 18rpx;
+    font-weight: bold;
+    margin-top: 12rpx;
+  }
+  .add-form {
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 20rpx;
+    margin-top: 16rpx;
+  }
+  .form-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 8rpx 0;
+  }
+  .form-label {
+    width: 140rpx;
+    font-size: 26rpx;
+    color: $n-text2;
+    font-weight: bold;
+  }
+  .form-value {
+    flex: 1;
+    font-size: 28rpx;
+  }
+  .form-input {
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 12rpx 20rpx;
+    font-size: 26rpx;
+    margin-bottom: 12rpx;
+  }
+  .num {
+    width: 240rpx;
+  }
+  .form-textarea {
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 12rpx 20rpx;
+    font-size: 26rpx;
+    width: 100%;
+    height: 140rpx;
+  }
+  .form-actions {
+    flex-direction: row;
+    margin-top: 8rpx;
+  }
+  .mini-btn {
+    padding: 12rpx 40rpx;
+    background-color: $n-card;
+    margin-right: 16rpx;
+    align-items: center;
+  }
+  .mini-btn.primary {
+    background-color: $n-yellow;
+  }
+  .mini-btn-text {
+    font-size: 24rpx;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .mini-btn-text-w {
+    font-size: 24rpx;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .rel-result {
+    border-radius: $n-r-sm;
+    background-color: $n-card;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    padding: 14rpx 16rpx;
+    margin-bottom: 10rpx;
+  }
+  .cand-on {
+    font-size: 24rpx;
+    color: $n-green;
+  }
+  .rel-term {
+    font-size: 26rpx;
+  }
+  .rel-meaning {
+    font-size: 22rpx;
+    color: $n-text2;
+    margin-top: 4rpx;
+  }
+</style>

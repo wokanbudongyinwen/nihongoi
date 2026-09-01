@@ -1,0 +1,91 @@
+/**
+ * 设备文件文本读取（仅 App-Android）
+ *
+ * uni.chooseFile 在 Android 返回 content:// 协议路径（SAF），
+ * 用 ContentResolver 读流；普通文件路径走 FileInputStream。
+ */
+// #ifdef APP-ANDROID
+import File from 'java.io.File'
+import FileInputStream from 'java.io.FileInputStream'
+import FileOutputStream from 'java.io.FileOutputStream'
+import InputStream from 'java.io.InputStream'
+import BufferedReader from 'java.io.BufferedReader'
+import InputStreamReader from 'java.io.InputStreamReader'
+import OutputStreamWriter from 'java.io.OutputStreamWriter'
+import Uri from 'android.net.Uri'
+// #endif
+
+export function readTextFile(path: string): string {
+  // #ifdef APP-ANDROID
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return ''
+  }
+  let input: InputStream
+  if (path.startsWith('content://')) {
+    const uri = Uri.parse(path)
+    const opened = context.getContentResolver().openInputStream(uri)
+    if (opened == null) {
+      return ''
+    }
+    input = opened
+  } else {
+    input = new FileInputStream(new File(path))
+  }
+  const reader = new BufferedReader(new InputStreamReader(input, 'UTF-8'))
+  let out = ''
+  let line = reader.readLine()
+  while (line != null) {
+    out += line
+    out += '\n'
+    line = reader.readLine()
+  }
+  reader.close()
+  return out
+  // #endif
+  // #ifndef APP-ANDROID
+  return ''
+  // #endif
+}
+
+// 备份目录（应用外部私有目录 /backups，无需存储权限，文件管理器可见）
+export function getBackupDir(): string {
+  // #ifdef APP-ANDROID
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return ''
+  }
+  const ext = context.getExternalFilesDir(null)
+  if (ext == null) {
+    return ''
+  }
+  const dir = new File(ext.getAbsolutePath() + '/backups')
+  if (!dir.exists()) {
+    dir.mkdirs()
+  }
+  return dir.getAbsolutePath()
+  // #endif
+  // #ifndef APP-ANDROID
+  return ''
+  // #endif
+}
+
+// 写文本文件（UTF-8；父目录须已存在）
+export function writeTextFile(absolutePath: string, content: string): boolean {
+  // #ifdef APP-ANDROID
+  try {
+    const output = new FileOutputStream(new File(absolutePath))
+    const writer = new OutputStreamWriter(output, 'UTF-8')
+    writer.write(content)
+    writer.flush()
+    writer.close()
+    return true
+  } catch (e) {
+    console.error('写文件失败', e)
+    return false
+  }
+  // #endif
+  // #ifndef APP-ANDROID
+  return false
+  // #endif
+}

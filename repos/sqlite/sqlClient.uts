@@ -1,0 +1,37 @@
+/**
+ * SQLite 访问抽象（仓储层唯一依赖的存储接口）
+ *
+ * uni-app x 没有内置 SQLite API，需要通过 uts 插件（uni_modules）提供能力。
+ * 选型已定：meibao-Sqlite（免费/MIT/仅 Android App 端），适配实现见 meibaoClient.uts。
+ * 将来若换自研或付费多端插件，仅重写适配层，业务代码零改动。
+ */
+import { SCHEMA_SQL } from './schema.uts'
+
+export interface SqlClient {
+  // 打开（不存在则创建）数据库；path 为应用数据目录内相对路径
+  open(name: string, path: string): Promise<boolean>,
+  // 执行写操作/DDL；rowsAffected 影响行数，insertId 为 INSERT 的新行 id（非 INSERT 为 0）
+  execute(name: string, sql: string): Promise<ExecResult>,
+  // 查询，返回二维字符串数组（行 × 列）
+  select(name: string, sql: string): Promise<Array<Array<string>>>,
+  // 事务内顺序执行多条 SQL（会话结束统一落库、同步记账都依赖此接口）
+  transaction(name: string, sqls: Array<string>): Promise<boolean>,
+  close(name: string): Promise<boolean>
+}
+
+// execute 的返回结构
+export type ExecResult = {
+  rowsAffected: number,
+  insertId: number
+}
+
+// 应用主数据库名
+export const DB_NAME = 'vocab'
+
+/**
+ * 初始化数据库结构（首启建表 / 升级补表）
+ * 由 bootstrap.initDatabase() 在 App 启动时调用
+ */
+export function initSchema(client: SqlClient): Promise<boolean> {
+  return client.transaction(DB_NAME, SCHEMA_SQL)
+}

@@ -1,0 +1,814 @@
+<template>
+  <view class="page">
+    <scroll-view class="body" scroll-y="true" show-scrollbar="false" @scrolltolower="onLoadMore">
+      <!-- 参数 -->
+      <view class="neo-card section">
+        <view class="title-row">
+          <text class="title">{{ name }}</text>
+          <text class="badge" v-if="isActive">激活中</text>
+        </view>
+        <view class="row">
+          <text class="label">每日新词</text>
+          <input class="input" type="number" :value="dailyNewText" @input="onDailyNew" />
+        </view>
+        <view class="row">
+          <text class="label">复习上限/日</text>
+          <input class="input" type="number" :value="capText" @input="onCap" />
+        </view>
+        <view class="row">
+          <text class="label">周期阶梯</text>
+          <text class="value">{{ cycleText }}</text>
+        </view>
+        <view class="row">
+          <text class="label">进度</text>
+          <text class="value">{{ learned }} / {{ entries.length }} 已学</text>
+        </view>
+        <view class="neo-card-sm save-btn pressable" hover-class="press" @click="doSave">
+          <text class="save-text">保存参数</text>
+        </view>
+        <view class="neo-card-sm audio-btn pressable" hover-class="press" @click="doPrefetchAudio" v-if="!audioDownloading">
+          <text class="audio-text">预下载本计划音频（真人朗读）</text>
+        </view>
+        <view class="neo-card-sm audio-btn" v-if="audioDownloading">
+          <text class="audio-text">音频下载中 {{ audioDone }} / {{ audioTotal }}…</text>
+        </view>
+      </view>
+
+      <!-- 词单：搜索 + 状态筛选 + 多选状态管理 -->
+      <view class="neo-card section">
+        <view class="title-row2">
+          <text class="title">词单（按导入顺序）</text>
+          <text class="manage-toggle pressable-soft" hover-class="press-soft" @click="toggleManage">{{ manageMode ? '完成' : '管理状态' }}</text>
+        </view>
+        <input class="search" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onSearch" />
+        <view class="chips">
+          <text class="chip" :class="filterMode == -1 ? 'chip-on' : ''" @click="setFilter(-1)">全部</text>
+          <text class="chip" :class="filterMode == 0 ? 'chip-on' : ''" @click="setFilter(0)">未学习</text>
+          <text class="chip" :class="filterMode == 1 ? 'chip-on' : ''" @click="setFilter(1)">学习中</text>
+          <text class="chip" :class="filterMode == 2 ? 'chip-on' : ''" @click="setFilter(2)">已掌握</text>
+        </view>
+        <text class="pr-hint">档位：①一次即会（一次记得即掌握）②两次即会 ③常规 · 点行内档位标签切换</text>
+        <view class="select-tools" v-if="manageMode">
+          <text class="select-info">已选 {{ selectedCount() }} 词</text>
+          <text class="select-action" @click="selectAllVisible">全选当前列表</text>
+          <text class="select-action" @click="clearSelect">清空</text>
+        </view>
+        <view class="select-tools" v-if="manageMode">
+          <text class="select-info">批量设档</text>
+          <text class="pr-chip pr-1" @click="doSetPriority(1)">① 一次即会</text>
+          <text class="pr-chip pr-2" @click="doSetPriority(2)">② 两次即会</text>
+          <text class="pr-chip pr-3" @click="doSetPriority(3)">③ 常规</text>
+        </view>
+        <view class="word-row pressable-soft" hover-class="press-soft" v-for="(e, i) in visibleList" :key="e.word.id">
+          <view class="check" :class="isSelected(e.word.id) ? 'check-on' : ''" v-if="manageMode" @click="toggleSelect(e)">
+            <text class="check-icon" v-if="isSelected(e.word.id)">✓</text>
+          </view>
+          <text class="word-no">{{ i + 1 }}</text>
+          <text class="pr-chip" :class="prClass(e.priority)" @click="cyclePriority(e)">{{ prText(e.priority) }}</text>
+          <view class="word-main" @click="onRowClick(e)">
+            <view class="word-line">
+              <text class="word-term">{{ e.word.term }}</text>
+              <text class="word-reading">{{ e.word.reading }}</text>
+              <text class="status" :class="statusClass(e.status)">{{ statusText(e.status) }}</text>
+            </view>
+            <text class="word-meaning">{{ e.word.meaning }}</text>
+          </view>
+        </view>
+        <view class="load-more" v-if="visibleList.length > 0 && hasMore()">
+          <text class="load-more-text">上拉加载更多（{{ visibleList.length }} / {{ filtered.length }}）</text>
+        </view>
+        <view class="empty" v-if="filtered.length == 0">
+          <text class="empty-text">{{ entries.length == 0 ? '词单为空' : '无匹配词条' }}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 多选模式：底部批量操作条 -->
+    <view class="manage-bar" v-if="manageMode">
+      <view class="neo-card-sm manage-btn manage-ok pressable" hover-class="press" @click="doMarkMastered">
+        <text class="manage-btn-text">标为已掌握</text>
+      </view>
+      <view class="neo-card-sm manage-btn manage-reset pressable" hover-class="press" @click="doResetNew">
+        <text class="manage-btn-text">恢复未学习</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Plan, Word, WORD_STATUS_NEW, WORD_STATUS_MASTERED } from '../../domain/types.uts'
+  import { PlanWordEntry } from '../../repos/planRepo.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { getStateRepo } from '../../repos/sqlite/stateRepoImpl.uts'
+  import { prefetchAudio } from '../../services/audio.uts'
+
+  const name = ref('')
+  const isActive = ref(false)
+  const dailyNewText = ref('10')
+  const capText = ref('200')
+  const cycleText = ref('1 · 2 · 4 天')
+  const learned = ref(0)
+  const keyword = ref('')
+  const filterMode = ref(-1) // -1 全部 / 0 未学习 / 1 学习中 / 2 已掌握
+  const entries = ref<Array<PlanWordEntry>>([])
+  const filtered = ref<Array<PlanWordEntry>>([])
+
+  // 渲染层滚动分页：数据全量在内存（搜索/筛选不变），v-for 只渲染前 renderCount 条
+  const RENDER_PAGE = 50
+  let renderCount = RENDER_PAGE
+  const visibleList = ref<Array<PlanWordEntry>>([])
+
+  // 须先声明（applyFilter 引用，坑④）
+  const rebuildVisible = () => {
+    const src = filtered.value
+    const n = renderCount < src.length ? renderCount : src.length
+    const list: Array<PlanWordEntry> = []
+    for (let i = 0; i < n; i++) {
+      list.push(src[i])
+    }
+    visibleList.value = list
+  }
+
+  const hasMore = (): boolean => {
+    return visibleList.value.length < filtered.value.length
+  }
+
+  const onLoadMore = () => {
+    if (renderCount >= filtered.value.length) {
+      return
+    }
+    renderCount = renderCount + RENDER_PAGE
+    rebuildVisible()
+  }
+
+  // 保存时回填用的原始值（避免持有可空对象）
+  let planId = 0
+  let planName = ''
+  let planCycle = '[1,2,4,7,15,30,60]'
+
+  const parseCycle = (cycleJson: string): string => {
+    const parsed = JSON.parse(cycleJson)
+    if (parsed == null) {
+      return cycleJson
+    }
+    const arr = parsed as Array<number>
+    let out = ''
+    for (let i = 0; i < arr.length; i++) {
+      if (i > 0) {
+        out += ' · '
+      }
+      out += arr[i].toString()
+    }
+    return out + ' 天'
+  }
+
+  // 状态分组：0 未学习 / 1 学习中 / 2 已掌握
+  const statusGroup = (status: string): number => {
+    if (status == WORD_STATUS_NEW) {
+      return 0
+    }
+    if (status == WORD_STATUS_MASTERED) {
+      return 2
+    }
+    return 1 // learning / reviewing
+  }
+
+  const statusText = (status: string): string => {
+    const g = statusGroup(status)
+    if (g == 0) {
+      return '未学习'
+    }
+    if (g == 2) {
+      return '已掌握'
+    }
+    return '学习中'
+  }
+
+  const statusClass = (status: string): string => {
+    const g = statusGroup(status)
+    if (g == 0) {
+      return 'status-new'
+    }
+    if (g == 2) {
+      return 'status-mastered'
+    }
+    return 'status-learning'
+  }
+
+  // 关键词 + 状态筛选（内存过滤，词单量级小），渲染层只取前 renderCount 条
+  const applyFilter = () => {
+    const kw = keyword.value
+    const mode = filterMode.value
+    const list: Array<PlanWordEntry> = []
+    for (let i = 0; i < entries.value.length; i++) {
+      const e = entries.value[i]
+      if (mode >= 0 && statusGroup(e.status) != mode) {
+        continue
+      }
+      if (kw.length > 0 && e.word.term.indexOf(kw) < 0 && e.word.reading.indexOf(kw) < 0 && e.word.romaji.indexOf(kw) < 0 && e.word.meaning.indexOf(kw) < 0) {
+        continue
+      }
+      list.push(e)
+    }
+    filtered.value = list
+    renderCount = RENDER_PAGE // 搜索/筛选切换重置渲染条数
+    rebuildVisible()
+  }
+
+  const onSearch = (e: InputEvent) => {
+    keyword.value = e.detail.value
+    applyFilter()
+  }
+
+  const setFilter = (mode: number) => {
+    filterMode.value = mode
+    applyFilter()
+  }
+
+  const load = async (id: number) => {
+    try {
+      const repo = getPlanRepo()
+      const p = await repo.getPlan(id)
+      if (p == null) {
+        return
+      }
+      planId = p.id
+      planName = p.name
+      planCycle = p.cycleJson
+      name.value = p.name
+      isActive.value = p.isActive
+      dailyNewText.value = p.dailyNew.toString()
+      capText.value = p.dailyReviewCap.toString()
+      cycleText.value = parseCycle(p.cycleJson)
+      entries.value = await repo.listPlanWordsWithStatus(id)
+      applyFilter()
+      learned.value = await repo.getLearnedCount(id)
+    } catch (e) {
+      console.error('计划详情加载失败', e)
+    }
+  }
+
+  const onDailyNew = (e: InputEvent) => {
+    dailyNewText.value = e.detail.value
+  }
+
+  const onCap = (e: InputEvent) => {
+    capText.value = e.detail.value
+  }
+
+  const doSave = async () => {
+    const dn = parseInt(dailyNewText.value)
+    const cap = parseInt(capText.value)
+    if (isNaN(dn) || dn <= 0 || isNaN(cap) || cap <= 0) {
+      uni.showToast({ title: '请输入有效数字', icon: 'none' })
+      return
+    }
+    const p: Plan = {
+      id: planId,
+      name: planName,
+      isActive: false, // updatePlan 不改激活状态，由激活切换负责
+      dailyNew: dn,
+      dailyReviewCap: cap,
+      cycleJson: planCycle,
+      createdAt: 0
+    }
+    try {
+      const ok = await getPlanRepo().updatePlan(p)
+      if (ok) {
+        uni.showToast({ title: '已保存', icon: 'success' })
+      } else {
+        uni.showToast({ title: '保存失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('计划参数保存失败', e)
+      uni.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }
+
+  const goWord = (id: number) => {
+    uni.navigateTo({ url: '/pages/word/detail?id=' + id })
+  }
+
+  // ---------- 词单多选状态管理 ----------
+
+  const manageMode = ref(false)
+  const selectedIds = ref<Array<number>>([])
+
+  const isSelected = (id: number): boolean => {
+    return selectedIds.value.indexOf(id) >= 0
+  }
+
+  const selectedCount = (): number => {
+    return selectedIds.value.length
+  }
+
+  const toggleSelect = (e: PlanWordEntry) => {
+    const id = e.word.id
+    const idx = selectedIds.value.indexOf(id)
+    if (idx >= 0) {
+      selectedIds.value.splice(idx, 1)
+    } else {
+      selectedIds.value.push(id)
+    }
+  }
+
+  const selectAllVisible = () => {
+    const ids: Array<number> = []
+    for (let i = 0; i < filtered.value.length; i++) {
+      ids.push(filtered.value[i].word.id)
+    }
+    selectedIds.value = ids
+  }
+
+  const clearSelect = () => {
+    selectedIds.value = [] as Array<number>
+  }
+
+  const toggleManage = () => {
+    manageMode.value = !manageMode.value
+    clearSelect()
+  }
+
+  const onRowClick = (e: PlanWordEntry) => {
+    if (manageMode.value) {
+      toggleSelect(e)
+    } else {
+      goWord(e.word.id)
+    }
+  }
+
+  // ---------- 档位管理 ----------
+
+  const prText = (p: number): string => {
+    if (p == 1) {
+      return '①'
+    }
+    if (p == 2) {
+      return '②'
+    }
+    return '③'
+  }
+
+  const prClass = (p: number): string => {
+    if (p == 1) {
+      return 'pr-1'
+    }
+    if (p == 2) {
+      return 'pr-2'
+    }
+    return 'pr-3'
+  }
+
+  const prLabel = (p: number): string => {
+    if (p == 1) {
+      return '① 一次即会'
+    }
+    if (p == 2) {
+      return '② 两次即会'
+    }
+    return '③ 常规'
+  }
+
+  // 行内循环切换：1 → 2 → 3 → 1（原位替换 + 重建过滤列表保证视图刷新）
+  const cyclePriority = async (e: PlanWordEntry) => {
+    const next = e.priority >= 3 ? 1 : e.priority + 1
+    try {
+      const ok = await getPlanRepo().setPriority(planId, [e.word.id], next)
+      if (!ok) {
+        uni.showToast({ title: '设置失败', icon: 'none' })
+        return
+      }
+      const idx = entries.value.indexOf(e)
+      if (idx >= 0) {
+        const updated: PlanWordEntry = { word: e.word, status: e.status, priority: next }
+        entries.value[idx] = updated
+      }
+      applyFilter()
+      uni.showToast({ title: '已设为 ' + prLabel(next), icon: 'none' })
+    } catch (err) {
+      console.error('档位设置失败', err)
+      uni.showToast({ title: '设置失败', icon: 'none' })
+    }
+  }
+
+  // 管理模式批量设档
+  const doSetPriority = async (priority: number) => {
+    const ids = selectedIds.value
+    if (ids.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    try {
+      const ok = await getPlanRepo().setPriority(planId, ids, priority)
+      if (ok) {
+        uni.showToast({ title: '已将 ' + ids.length + ' 词设为 ' + prLabel(priority), icon: 'none' })
+        load(planId)
+      } else {
+        uni.showToast({ title: '设置失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('批量设档失败', e)
+      uni.showToast({ title: '设置失败', icon: 'none' })
+    }
+  }
+
+  // 实际执行（先声明，供确认弹窗回调引用）
+  const doMarkMasteredRun = async () => {
+    const ids = selectedIds.value
+    if (ids.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    try {
+      const ok = await getStateRepo().markMastered(planId, ids, Date.now())
+      if (ok) {
+        uni.showToast({ title: '已将 ' + ids.length + ' 词标为已掌握', icon: 'none' })
+        manageMode.value = false
+        load(planId)
+      } else {
+        uni.showToast({ title: '操作失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('批量标记失败', e)
+      uni.showToast({ title: '操作失败', icon: 'none' })
+    }
+  }
+
+  const doMarkMastered = () => {
+    if (selectedIds.value.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    uni.showModal({
+      title: '标为已掌握',
+      content: '将 ' + selectedIds.value.length + ' 个词标记为已掌握，它们将退出复习队列',
+      success: (res) => {
+        if (res.confirm) {
+          doMarkMasteredRun()
+        }
+      }
+    })
+  }
+
+  const doResetNewRun = async () => {
+    const ids = selectedIds.value
+    if (ids.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    try {
+      const ok = await getStateRepo().resetToNew(planId, ids)
+      if (ok) {
+        uni.showToast({ title: '已将 ' + ids.length + ' 词恢复未学习', icon: 'none' })
+        manageMode.value = false
+        load(planId)
+      } else {
+        uni.showToast({ title: '操作失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('批量重置失败', e)
+      uni.showToast({ title: '操作失败', icon: 'none' })
+    }
+  }
+
+  const doResetNew = () => {
+    if (selectedIds.value.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    uni.showModal({
+      title: '恢复未学习',
+      content: '将 ' + selectedIds.value.length + ' 个词的学习状态清除，重新从头学习',
+      success: (res) => {
+        if (res.confirm) {
+          doResetNewRun()
+        }
+      }
+    })
+  }
+
+  // ---------- 音频预下载 ----------
+
+  const audioDownloading = ref(false)
+  const audioDone = ref(0)
+  const audioTotal = ref(0)
+
+  const doPrefetchAudio = async () => {
+    if (audioDownloading.value || entries.value.length == 0) {
+      return
+    }
+    audioDownloading.value = true
+    audioDone.value = 0
+    audioTotal.value = entries.value.length
+    const words: Array<Word> = []
+    for (let i = 0; i < entries.value.length; i++) {
+      words.push(entries.value[i].word)
+    }
+    try {
+      await prefetchAudio(words, (done: number, total: number, _ok: boolean) => {
+        audioDone.value = done
+        audioTotal.value = total
+      })
+      uni.showToast({ title: '音频下载完成', icon: 'success' })
+    } catch (e) {
+      console.error('音频预下载失败', e)
+      uni.showToast({ title: '下载中断', icon: 'none' })
+    }
+    audioDownloading.value = false
+  }
+
+  onLoad((options) => {
+    const idStr = options == null ? null : options['id']
+    if (idStr == null) {
+      return
+    }
+    load(parseInt(idStr))
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+  }
+  .body {
+    flex: 1;
+    padding: 28rpx 28rpx 48rpx;
+    background-color: $n-bg;
+  }
+  .section {
+    padding: 32rpx;
+    margin-bottom: 28rpx;
+  }
+  .title-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20rpx;
+  }
+  .title {
+    font-size: 34rpx;
+    font-weight: bold;
+    color: $n-ink;
+    flex: 1;
+  }
+  .badge {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-green;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 14rpx;
+    font-weight: bold;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    padding: 12rpx 0;
+  }
+  .label {
+    width: 200rpx;
+    font-size: 26rpx;
+    color: $n-text2;
+    font-weight: bold;
+  }
+  .value {
+    flex: 1;
+    font-size: 28rpx;
+    color: $n-ink;
+  }
+  .input {
+    width: 200rpx;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 10rpx 20rpx;
+    font-size: 28rpx;
+  }
+  .save-btn {
+    margin-top: 20rpx;
+    background-color: $n-yellow;
+    padding: 18rpx 0;
+    align-items: center;
+  }
+  .save-text {
+    color: $n-ink;
+    font-size: 28rpx;
+    font-weight: bold;
+  }
+  .audio-btn {
+    margin-top: 16rpx;
+    background-color: $n-blue;
+    padding: 16rpx 0;
+    align-items: center;
+  }
+  .audio-text {
+    color: $n-ink;
+    font-size: 26rpx;
+    font-weight: bold;
+  }
+  .word-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 16rpx 0;
+    border-bottom-width: 2rpx;
+    border-bottom-color: $n-cream;
+  }
+  .word-no {
+    width: 56rpx;
+    font-size: 22rpx;
+    color: $n-text3;
+  }
+  .word-main {
+    flex: 1;
+  }
+  .word-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-term {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .word-reading {
+    font-size: 24rpx;
+    color: $n-blue;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .word-meaning {
+    font-size: 24rpx;
+    color: $n-text2;
+    margin-top: 4rpx;
+  }
+  .empty {
+    padding: 40rpx 0;
+    align-items: center;
+  }
+  .empty-text {
+    font-size: 26rpx;
+    color: $n-text3;
+  }
+  .load-more {
+    padding: 24rpx 0 40rpx;
+    align-items: center;
+  }
+  .load-more-text {
+    font-size: 24rpx;
+    color: $n-text3;
+  }
+  .search {
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: $n-r-sm;
+    padding: 14rpx 20rpx;
+    font-size: 26rpx;
+    margin-bottom: 16rpx;
+  }
+  .chips {
+    flex-direction: row;
+    margin-bottom: 20rpx;
+  }
+  .chip {
+    font-size: 24rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 8rpx 24rpx;
+    margin-right: 16rpx;
+  }
+  .chip-on {
+    color: $n-ink;
+    background-color: $n-yellow;
+    font-weight: bold;
+  }
+  .status {
+    font-size: 20rpx;
+    border-radius: 999rpx;
+    padding: 2rpx 12rpx;
+    margin-left: 12rpx;
+  }
+  .status-new {
+    color: $n-ink;
+    background-color: $n-cream;
+  }
+  .status-learning {
+    color: $n-ink;
+    background-color: $n-yellow;
+  }
+  .status-mastered {
+    color: $n-ink;
+    background-color: $n-green;
+  }
+
+  /* ---------- 档位 ---------- */
+  .pr-hint {
+    font-size: 22rpx;
+    color: $n-text3;
+    margin-bottom: 16rpx;
+  }
+  .pr-chip {
+    font-size: 22rpx;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+    margin-right: 12rpx;
+  }
+  .pr-1 {
+    color: $n-ink;
+    background-color: $n-green;
+  }
+  .pr-2 {
+    color: $n-ink;
+    background-color: $n-yellow;
+  }
+  .pr-3 {
+    color: $n-ink;
+    background-color: $n-cream;
+  }
+
+  /* ---------- 多选状态管理 ---------- */
+  .title-row2 {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16rpx;
+  }
+  .manage-toggle {
+    font-size: 26rpx;
+    color: $n-ink;
+    background-color: $n-purple;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 16rpx;
+    font-weight: bold;
+  }
+  .select-tools {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16rpx;
+  }
+  .select-info {
+    flex: 1;
+    font-size: 24rpx;
+    color: $n-text2;
+  }
+  .select-action {
+    font-size: 24rpx;
+    color: $n-blue;
+    font-weight: bold;
+    margin-left: 24rpx;
+  }
+  .check {
+    width: 36rpx;
+    height: 36rpx;
+    border-radius: 999rpx;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16rpx;
+  }
+  .check-on {
+    background-color: $n-green;
+    border-color: $n-ink;
+  }
+  .check-icon {
+    font-size: 22rpx;
+    color: $n-ink;
+  }
+  .manage-bar {
+    flex-direction: row;
+    background-color: $n-bg;
+    padding: 20rpx 24rpx 40rpx;
+  }
+  .manage-btn {
+    flex: 1;
+    padding: 20rpx 0;
+    align-items: center;
+    margin: 0 8rpx;
+  }
+  .manage-ok {
+    background-color: $n-green;
+  }
+  .manage-reset {
+    background-color: $n-yellow;
+  }
+  .manage-btn-text {
+    color: $n-ink;
+    font-size: 26rpx;
+    font-weight: bold;
+  }
+</style>

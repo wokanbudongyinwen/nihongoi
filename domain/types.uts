@@ -1,0 +1,119 @@
+/**
+ * 领域类型定义（纯类型与常量，无 IO）
+ */
+
+// ---------- 学习状态 ----------
+export const WORD_STATUS_NEW = 'new'
+export const WORD_STATUS_LEARNING = 'learning'
+export const WORD_STATUS_REVIEWING = 'reviewing'
+export const WORD_STATUS_MASTERED = 'mastered'
+
+// ---------- 评分三档（2026-08-28 由四档简化） ----------
+export const RATING_AGAIN = 0 // 忘记：stage 降一档、间隔 ×0.5
+export const RATING_HARD = 1  // 模糊：stage 不动、间隔 ×0.7
+export const RATING_GOOD = 2  // 记得：stage +1
+export const RATING_EASY = 3  // 预留（当前 UI 不使用）
+
+// ---------- 关联类型 ----------
+export const RELATION_SYNONYM = 'synonym'        // 近义
+export const RELATION_ANTONYM = 'antonym'        // 反义
+export const RELATION_TRANS_INTRANS = 'trans_intrans' // 自他动词对
+export const RELATION_CUSTOM = 'custom'          // 自由关联
+
+// ---------- 单词档位（重要程度，按计划隔离） ----------
+export const PRIORITY_EASY = 1   // 1档：一次记得即掌握
+export const PRIORITY_MID = 2    // 2档：两次记得即掌握（首考 + 1 次复习）
+export const PRIORITY_NORMAL = 3 // 3档：常规记忆（默认）
+
+// ---------- 动词类型 ----------
+export const VERB_GODAN = 'godan'     // 五段
+export const VERB_ICHIDAN = 'ichidan' // 一段
+export const VERB_SURU = 'suru'       // サ变
+export const VERB_KURU = 'kuru'       // カ变
+
+// ---------- 知识域 ----------
+export type Word = {
+  id: number,
+  term: string,        // 表记（開ける）
+  reading: string,     // 读音（あける）
+  romaji: string,      // 罗马音（akeru）
+  accent: Array<number>, // 音调核列表（多音词可有多个值；空数组 = 未标注）
+  pos: string,         // 词性（动词·他动词 / 名词 ...）
+  meaning: string,     // 中文释义
+  verbType: string,    // 动词类型常量，非动词为空字符串
+  extraJson: string,   // 扩展 JSON：活用不规则 override、音频等
+  createdAt: number,
+  updatedAt: number
+}
+
+export type Sentence = {
+  id: number,
+  wordId: number,
+  text: string,        // 日文例句
+  translation: string, // 中文译文
+  remark: string,
+  sort: number,
+  createdAt: number
+}
+
+export type Note = {
+  id: number,
+  wordId: number,
+  content: string,
+  createdAt: number,
+  updatedAt: number
+}
+
+export type WordRelation = {
+  id: number,
+  fromWordId: number,
+  toWordId: number,
+  relationType: string, // RELATION_* 常量
+  isSystem: boolean,    // true=预置固定关联 / false=用户自由关联
+  note: string,         // 关联理由（自由关联尤其有用）
+  createdAt: number
+}
+
+// ---------- 计划域 ----------
+export type Plan = {
+  id: number,
+  name: string,
+  isActive: boolean,       // 同一时间仅一个激活
+  dailyNew: number,        // 每日新词数
+  dailyReviewCap: number,  // 每日复习上限
+  cycleJson: string,       // 周期阶梯 JSON，如 [1,2,4,7,15,30,60]（天）
+  createdAt: number
+}
+
+export type PlanItem = {
+  id: number,
+  planId: number,
+  wordId: number,
+  sort: number,    // 背词顺序（导入文件行序）
+  priority: number // 档位 PRIORITY_*（1 一次即会 / 2 两次即会 / 3 常规）
+}
+
+// ---------- 学习域 ----------
+export type WordState = {
+  planId: number,
+  wordId: number,
+  status: string,       // WORD_STATUS_* 常量
+  stage: number,        // 当前周期档位（指向 cycle 下标）
+  familiarity: number,  // 熟练度 0~100
+  dueDate: number,      // 下次到期时间（毫秒时间戳）
+  streak: number,       // 连续答对次数
+  lapses: number,       // 累计忘记次数
+  lastReviewedAt: number // -1 表示从未复习
+}
+
+export type ReviewLog = {
+  id: number,
+  planId: number,
+  wordId: number,
+  reviewedAt: number,
+  rating: number,       // RATING_* 常量
+  isFirst: boolean,     // 是否首考
+  prevStage: number,
+  newStage: number,
+  dueDate: number
+}

@@ -1,0 +1,7 @@
+unpackage/
+.DS_Store
+.hbuilderx/
+node_modules/
+tools/build-db/node_modules/
+tools/build-db/base.db
+tools/build-db/cache/

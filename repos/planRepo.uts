@@ -1,0 +1,51 @@
+/**
+ * PlanRepo：计划域数据访问接口（DAO）
+ * SQLite 实现：repos/sqlite/planRepoImpl.uts（getPlanRepo() 取实例）
+ */
+import { Plan, PlanItem, Word } from '../domain/types.uts'
+
+// 词单条目：词条 + 该计划内的学习状态（'new' 未学 / learning / reviewing / mastered）+ 档位
+export type PlanWordEntry = {
+  word: Word,
+  status: string,
+  priority: number
+}
+
+export interface PlanRepo {
+  listPlans(): Promise<Array<Plan>>,
+  getPlan(id: number): Promise<Plan | null>,
+  // 同一时间仅一个激活计划
+  getActivePlan(): Promise<Plan | null>,
+  createPlan(p: Plan, orderedWordIds: Array<number>, priorities: Array<number>): Promise<number>,
+  // 追加词到已有计划（sort 接续现有最大值；已在计划中的词由 INSERT OR IGNORE 跳过，附加数据仍由服务层合并）
+  appendPlanItems(planId: number, orderedWordIds: Array<number>, priorities: Array<number>): Promise<boolean>,
+  updatePlan(p: Plan): Promise<boolean>,
+  activatePlan(id: number): Promise<boolean>,
+  deletePlan(id: number): Promise<boolean>,
+
+  // 计划词单（按 sort 排序）
+  listPlanItems(planId: number): Promise<Array<PlanItem>>,
+  // 计划词单的词条数据（按 sort 排序，计划详情页用）
+  listPlanWords(planId: number): Promise<Array<Word>>,
+  // 词单词条 + 学习状态 + 档位（详情页搜索/筛选用）
+  listPlanWordsWithStatus(planId: number): Promise<Array<PlanWordEntry>>,
+  // 某计划 wordId → 档位映射（会话记账/展示用）
+  getPlanPriorities(planId: number): Promise<Map<number, number>>,
+  // 某词跨计划最易档（词卡详情页判断是否显示「已掌握」快捷入口）
+  getWordPriority(wordId: number): Promise<number>,
+  // 全部计划 wordId → 最易档映射（背词页档位徽章）
+  listWordPriorities(): Promise<Map<number, number>>,
+  // 批量设档（行内循环切换 / 管理模式批量）
+  setPriority(planId: number, wordIds: Array<number>, priority: number): Promise<boolean>,
+  // 已学词数（word_state 存在且 status != new）
+  getLearnedCount(planId: number): Promise<number>,
+  // 今日零点以来的首考数（每日新词配额已用量）
+  countTodayFirstReviewed(planId: number, dayStart: number): Promise<number>,
+  // 今日零点以来的复习词数（去重）
+  countTodayReviewed(planId: number, dayStart: number): Promise<number>,
+  // 今日新词：激活计划中 status 仍为 new 的前 N 个（按 sort）
+  // 实现上需联表 word_state，接口语义由 sqlite 实现保证
+  pickTodayNewWords(planId: number, limit: number): Promise<Array<Word>>,
+  // 链式记忆：随机取一个「已学且无任何自由关联」的孤单词（全部串完返回 null）
+  pickLonelyWord(planId: number): Promise<Word | null>
+}

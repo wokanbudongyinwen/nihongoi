@@ -1,0 +1,263 @@
+/**
+ * BackupService：备份导出/恢复
+ *
+ * 导出 JSON 按依赖顺序：words → sentences/notes/relations → plans/plan_items
+ *                    → word_states → review_logs（含 schema 版本号）
+ * 恢复为「清库重灌」：单事务内逆序清空 → 按依赖顺序带 id 插入（保持引用一致）。
+ * 导出文件写入应用外部私有目录 backups/（文件管理器可见，无需存储权限）。
+ */
+import { getClient } from '../repos/sqlite/bootstrap.uts'
+import { DB_NAME, SqlClient } from '../repos/sqlite/sqlClient.uts'
+import { sqlStr, sqlNum } from '../repos/sqlite/meibaoClient.uts'
+import { getBackupDir, writeTextFile } from '../repos/native/fileText.uts'
+
+// 数据结构版本号：结构变更时 +1，恢复时校验（2=word.romaji；3=word.accent 多值文本）
+export const SCHEMA_VERSION = 3
+
+// ---------- 表列定义（导出用；类型 s=字符串 n=数字 b=布尔） ----------
+
+const T_WORDS: Array<Array<string>> = [
+  ['id', 'term', 'reading', 'romaji', 'accent', 'pos', 'meaning', 'verb_type', 'extra_json', 'created_at', 'updated_at'],
+  ['n', 's', 's', 's', 's', 's', 's', 's', 's', 'n', 'n']
+]
+const T_SENTENCES: Array<Array<string>> = [
+  ['id', 'wordId', 'text', 'translation', 'remark', 'sort', 'createdAt'],
+  ['n', 'n', 's', 's', 's', 'n', 'n']
+]
+const T_NOTES: Array<Array<string>> = [
+  ['id', 'wordId', 'content', 'createdAt', 'updatedAt'],
+  ['n', 'n', 's', 'n', 'n']
+]
+const T_RELATIONS: Array<Array<string>> = [
+  ['id', 'fromWordId', 'toWordId', 'relationType', 'isSystem', 'note', 'createdAt'],
+  ['n', 'n', 'n', 's', 'b', 's', 'n']
+]
+const T_PLANS: Array<Array<string>> = [
+  ['id', 'name', 'isActive', 'dailyNew', 'dailyReviewCap', 'cycleJson', 'createdAt'],
+  ['n', 's', 'b', 'n', 'n', 's', 'n']
+]
+const T_PLAN_ITEMS: Array<Array<string>> = [
+  ['id', 'planId', 'wordId', 'sort', 'priority'],
+  ['n', 'n', 'n', 'n', 'n']
+]
+const T_WORD_STATES: Array<Array<string>> = [
+  ['planId', 'wordId', 'status', 'stage', 'familiarity', 'dueDate', 'streak', 'lapses', 'lastReviewedAt'],
+  ['n', 'n', 's', 'n', 'n', 'n', 'n', 'n', 'n']
+]
+const T_REVIEW_LOGS: Array<Array<string>> = [
+  ['id', 'planId', 'wordId', 'reviewedAt', 'rating', 'isFirst', 'prevStage', 'newStage', 'dueDate'],
+  ['n', 'n', 'n', 'n', 'n', 'b', 'n', 'n', 'n']
+]
+
+// ---------- JSON 构造 ----------
+
+function jsonEscape(s: string): string {
+  return s.split('\\').join('\\\\').split('"').join('\\"')
+    .split('\n').join('\\n').split('\r').join('\\r').split('\t').join('\\t')
+}
+
+function rowToJson(r: Array<string>, keys: Array<string>, types: Array<string>): string {
+  let out = '{'
+  for (let i = 0; i < keys.length; i++) {
+    if (i > 0) {
+      out += ','
+    }
+    out += '"' + keys[i] + '":'
+    if (types[i] == 's') {
+      out += '"' + jsonEscape(r[i]) + '"'
+    } else if (types[i] == 'b') {
+      out += parseFloat(r[i]) == 1 ? 'true' : 'false'
+    } else {
+      out += r[i].length == 0 ? '0' : r[i]
+    }
+  }
+  return out + '}'
+}
+
+async function tableToJson(cols: string, table: string, keys: Array<string>, types: Array<string>, client: SqlClient): Promise<string> {
+  const rows = await client.select(DB_NAME, 'SELECT ' + cols + ' FROM ' + table)
+  let out = '['
+  for (let i = 0; i < rows.length; i++) {
+    if (i > 0) {
+      out += ','
+    }
+    out += rowToJson(rows[i], keys, types)
+  }
+  return out + ']'
+}
+
+/**
+ * 全量导出：返回写入的文件绝对路径（失败抛异常）。
+ */
+export async function exportAll(): Promise<string> {
+  const client = getClient()
+  if (client == null) {
+    throw new Error('数据库未初始化')
+  }
+  const words = await tableToJson('id, term, reading, romaji, accent, pos, meaning, verb_type, extra_json, created_at, updated_at', 'word', T_WORDS[0], T_WORDS[1], client)
+  const sentences = await tableToJson('id, word_id, text, translation, remark, sort, created_at', 'sentence', T_SENTENCES[0], T_SENTENCES[1], client)
+  const notes = await tableToJson('id, word_id, content, created_at, updated_at', 'note', T_NOTES[0], T_NOTES[1], client)
+  const relations = await tableToJson('id, from_word_id, to_word_id, relation_type, is_system, note, created_at', 'word_relation', T_RELATIONS[0], T_RELATIONS[1], client)
+  const plans = await tableToJson('id, name, is_active, daily_new, daily_review_cap, cycle_json, created_at', 'plan', T_PLANS[0], T_PLANS[1], client)
+  const planItems = await tableToJson('id, plan_id, word_id, sort, priority', 'plan_item', T_PLAN_ITEMS[0], T_PLAN_ITEMS[1], client)
+  const wordStates = await tableToJson('plan_id, word_id, status, stage, familiarity, due_date, streak, lapses, last_reviewed_at', 'word_state', T_WORD_STATES[0], T_WORD_STATES[1], client)
+  const reviewLogs = await tableToJson('id, plan_id, word_id, reviewed_at, rating, is_first, prev_stage, new_stage, due_date', 'review_log', T_REVIEW_LOGS[0], T_REVIEW_LOGS[1], client)
+
+  const json = '{"schemaVersion":' + SCHEMA_VERSION + ',"exportedAt":' + Date.now() +
+    ',"words":' + words +
+    ',"sentences":' + sentences +
+    ',"notes":' + notes +
+    ',"relations":' + relations +
+    ',"plans":' + plans +
+    ',"planItems":' + planItems +
+    ',"wordStates":' + wordStates +
+    ',"reviewLogs":' + reviewLogs + '}'
+
+  // 文件名：nihongo-backup-时间戳.json
+  const dir = getBackupDir()
+  if (dir.length == 0) {
+    throw new Error('备份目录创建失败')
+  }
+  const path = dir + '/nihongo-backup-' + Date.now() + '.json'
+  const ok = writeTextFile(path, json)
+  if (!ok) {
+    throw new Error('备份文件写入失败')
+  }
+  return path
+}
+
+// ---------- 恢复（清库重灌） ----------
+
+function num(v: number | null): number {
+  return v == null ? 0 : v
+}
+
+// 档位恢复：旧备份无 priority 字段（null）时按 3 常规
+function pri(v: number | null): number {
+  if (v == 1 || v == 2) {
+    return v
+  }
+  return 3
+}
+
+function str(v: string | null): string {
+  return v == null ? '' : v
+}
+
+function bool(v: boolean | null): boolean {
+  return v == null ? false : v
+}
+
+/**
+ * 从备份 JSON 恢复：校验 schemaVersion → 单事务内清空全部表 → 按依赖顺序带 id 插入。
+ * 任何一步失败整体回滚，不留半截数据。
+ */
+export async function restoreAll(text: string): Promise<boolean> {
+  const client = getClient()
+  if (client == null) {
+    throw new Error('数据库未初始化')
+  }
+  const parsed = JSON.parse(text)
+  if (parsed == null) {
+    throw new Error('JSON 解析失败')
+  }
+  const root = parsed as UTSJSONObject
+  const ver = root.getNumber('schemaVersion')
+  if (ver == null || ver != SCHEMA_VERSION) {
+    throw new Error('备份版本不匹配（当前 v' + SCHEMA_VERSION + '）')
+  }
+
+  const sqls: Array<string> = []
+  // 逆序清空
+  sqls.push('DELETE FROM review_log')
+  sqls.push('DELETE FROM word_state')
+  sqls.push('DELETE FROM plan_item')
+  sqls.push('DELETE FROM plan')
+  sqls.push('DELETE FROM word_relation')
+  sqls.push('DELETE FROM note')
+  sqls.push('DELETE FROM sentence')
+  sqls.push('DELETE FROM word')
+
+  // 按依赖顺序插入（带原 id，保持引用一致）
+  const wordsArr = root.getArray('words')
+  if (wordsArr != null) {
+    for (let i = 0; i < wordsArr.length; i++) {
+      const o = wordsArr[i] as UTSJSONObject
+      sqls.push('INSERT INTO word (id, term, reading, romaji, accent, pos, meaning, verb_type, extra_json, created_at, updated_at) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlStr(str(o.getString('term'))) + ', ' + sqlStr(str(o.getString('reading'))) +
+        ', ' + sqlStr(str(o.getString('romaji'))) + ', ' + sqlStr(str(o.getString('accent'))) + ', ' + sqlStr(str(o.getString('pos'))) +
+        ', ' + sqlStr(str(o.getString('meaning'))) + ', ' + sqlStr(str(o.getString('verbType'))) + ', ' + sqlStr(str(o.getString('extraJson'))) +
+        ', ' + sqlNum(num(o.getNumber('createdAt'))) + ', ' + sqlNum(num(o.getNumber('updatedAt'))) + ')')
+    }
+  }
+  const sents = root.getArray('sentences')
+  if (sents != null) {
+    for (let i = 0; i < sents.length; i++) {
+      const o = sents[i] as UTSJSONObject
+      sqls.push('INSERT INTO sentence (id, word_id, text, translation, remark, sort, created_at) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlNum(num(o.getNumber('wordId'))) + ', ' + sqlStr(str(o.getString('text'))) +
+        ', ' + sqlStr(str(o.getString('translation'))) + ', ' + sqlStr(str(o.getString('remark'))) + ', ' + sqlNum(num(o.getNumber('sort'))) +
+        ', ' + sqlNum(num(o.getNumber('createdAt'))) + ')')
+    }
+  }
+  const notesArr = root.getArray('notes')
+  if (notesArr != null) {
+    for (let i = 0; i < notesArr.length; i++) {
+      const o = notesArr[i] as UTSJSONObject
+      sqls.push('INSERT INTO note (id, word_id, content, created_at, updated_at) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlNum(num(o.getNumber('wordId'))) + ', ' + sqlStr(str(o.getString('content'))) +
+        ', ' + sqlNum(num(o.getNumber('createdAt'))) + ', ' + sqlNum(num(o.getNumber('updatedAt'))) + ')')
+    }
+  }
+  const rels = root.getArray('relations')
+  if (rels != null) {
+    for (let i = 0; i < rels.length; i++) {
+      const o = rels[i] as UTSJSONObject
+      sqls.push('INSERT INTO word_relation (id, from_word_id, to_word_id, relation_type, is_system, note, created_at) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlNum(num(o.getNumber('fromWordId'))) + ', ' + sqlNum(num(o.getNumber('toWordId'))) +
+        ', ' + sqlStr(str(o.getString('relationType'))) + ', ' + (bool(o.getBoolean('isSystem')) ? '1' : '0') + ', ' + sqlStr(str(o.getString('note'))) +
+        ', ' + sqlNum(num(o.getNumber('createdAt'))) + ')')
+    }
+  }
+  const plansArr = root.getArray('plans')
+  if (plansArr != null) {
+    for (let i = 0; i < plansArr.length; i++) {
+      const o = plansArr[i] as UTSJSONObject
+      sqls.push('INSERT INTO plan (id, name, is_active, daily_new, daily_review_cap, cycle_json, created_at) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlStr(str(o.getString('name'))) + ', ' + (bool(o.getBoolean('isActive')) ? '1' : '0') +
+        ', ' + sqlNum(num(o.getNumber('dailyNew'))) + ', ' + sqlNum(num(o.getNumber('dailyReviewCap'))) + ', ' + sqlStr(str(o.getString('cycleJson'))) +
+        ', ' + sqlNum(num(o.getNumber('createdAt'))) + ')')
+    }
+  }
+  const items = root.getArray('planItems')
+  if (items != null) {
+    for (let i = 0; i < items.length; i++) {
+      const o = items[i] as UTSJSONObject
+      sqls.push('INSERT INTO plan_item (id, plan_id, word_id, sort, priority) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlNum(num(o.getNumber('planId'))) + ', ' + sqlNum(num(o.getNumber('wordId'))) +
+        ', ' + sqlNum(num(o.getNumber('sort'))) + ', ' + sqlNum(pri(o.getNumber('priority'))) + ')')
+    }
+  }
+  const states = root.getArray('wordStates')
+  if (states != null) {
+    for (let i = 0; i < states.length; i++) {
+      const o = states[i] as UTSJSONObject
+      sqls.push('INSERT INTO word_state (plan_id, word_id, status, stage, familiarity, due_date, streak, lapses, last_reviewed_at) VALUES (' +
+        sqlNum(num(o.getNumber('planId'))) + ', ' + sqlNum(num(o.getNumber('wordId'))) + ', ' + sqlStr(str(o.getString('status'))) +
+        ', ' + sqlNum(num(o.getNumber('stage'))) + ', ' + sqlNum(num(o.getNumber('familiarity'))) + ', ' + sqlNum(num(o.getNumber('dueDate'))) +
+        ', ' + sqlNum(num(o.getNumber('streak'))) + ', ' + sqlNum(num(o.getNumber('lapses'))) + ', ' + sqlNum(num(o.getNumber('lastReviewedAt'))) + ')')
+    }
+  }
+  const logs = root.getArray('reviewLogs')
+  if (logs != null) {
+    for (let i = 0; i < logs.length; i++) {
+      const o = logs[i] as UTSJSONObject
+      sqls.push('INSERT INTO review_log (id, plan_id, word_id, reviewed_at, rating, is_first, prev_stage, new_stage, due_date) VALUES (' +
+        sqlNum(num(o.getNumber('id'))) + ', ' + sqlNum(num(o.getNumber('planId'))) + ', ' + sqlNum(num(o.getNumber('wordId'))) +
+        ', ' + sqlNum(num(o.getNumber('reviewedAt'))) + ', ' + sqlNum(num(o.getNumber('rating'))) + ', ' + (bool(o.getBoolean('isFirst')) ? '1' : '0') +
+        ', ' + sqlNum(num(o.getNumber('prevStage'))) + ', ' + sqlNum(num(o.getNumber('newStage'))) + ', ' + sqlNum(num(o.getNumber('dueDate'))) + ')')
+    }
+  }
+
+  return await client.transaction(DB_NAME, sqls)
+}

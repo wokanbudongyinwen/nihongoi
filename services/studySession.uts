@@ -1,0 +1,565 @@
+/**
+ * StudySession：背词会话状态机（新词/复习共用）
+ *
+ * 三档评分（忘记/模糊/记得）与通过规则（新词/复习统一）：
+ *  - 记得：直接通过
+ *  - 模糊/忘记：放回队尾；此后需**连续两次**记得才通过（中途再点模糊/忘记则连对清零重计）
+ *  - 落库记账：从未失败 → 按「记得」记；失败过 → 按**最严重的失败评分**（忘记 > 模糊）记
+ *
+ * 档位（plan_item.priority）：记账时按词所属计划的档位放宽掌握判定（1档一次记得即掌握 / 2档两次）
+ *
+ * 「已掌握」快捷入口（1/2档词）：answerMastered 直接通过，落库按 mastered + EASY 评分记账
+ *
+ * 草稿：每题后快照到本地存储 session_draft，异常退出重进可恢复或丢弃。
+ * 落库：会话结束统一提交（单事务）；主动放弃（不调 commitSession）不落账。
+ * 记账：一次评分 = 更新该词所有到期计划的 word_state + 逐计划写 review_log。
+ */
+import { Word, ReviewLog, WordState, RATING_GOOD, RATING_EASY, WORD_STATUS_MASTERED } from '../domain/types.uts'
+import { applyFirstRating, applyReviewRating, SchedState } from '../domain/scheduler.uts'
+import { getWordRepo } from '../repos/sqlite/wordRepoImpl.uts'
+import { getPlanRepo } from '../repos/sqlite/planRepoImpl.uts'
+import { getStateRepo } from '../repos/sqlite/stateRepoImpl.uts'
+import { setStoredString, getStoredString, removeStored } from '../repos/native/storage.uts'
+
+// 会话草稿在本地存储中的 key
+export const SESSION_DRAFT_KEY = 'session_draft'
+
+export type SessionMode = string // 'new' | 'review'
+export const MODE_NEW = 'new'
+export const MODE_REVIEW = 'review'
+
+export type PendingAnswer = {
+  wordId: number,
+  rating: number,
+  isFirst: boolean,
+  answeredAt: number
+}
+
+// 词在本场的通过进度
+export type WordProgress = {
+  consec: number,   // 连续「记得」次数
+  failed: boolean,  // 本场是否点过 模糊/忘记
+  worst: number     // 最严重的失败评分（0 忘记 严于 1 模糊；未失败为 -1）
+}
+
+export type SessionState = {
+  mode: SessionMode,
+  queue: Array<Word>,
+  index: number,
+  flipped: boolean,
+  pending: Array<PendingAnswer>,
+  progress: Map<number, WordProgress>,
+  manualMastered: Array<number>, // 本场手动标「已掌握」的 wordId（1/2 档快捷入口）
+  finished: boolean
+}
+
+function newProgress(): WordProgress {
+  const p: WordProgress = { consec: 0, failed: false, worst: -1 }
+  return p
+}
+
+export function createSession(mode: SessionMode, queue: Array<Word>): SessionState {
+  const s: SessionState = {
+    mode: mode,
+    queue: queue,
+    index: 0,
+    flipped: false,
+    pending: [],
+    progress: new Map<number, WordProgress>(),
+    manualMastered: [] as Array<number>,
+    finished: queue.length == 0
+  }
+  return s
+}
+
+/**
+ * 提交一题评分（纯内存操作，返回更新后的会话状态）。
+ * 记得→通过（失败过的词需连对 2 次）；模糊/忘记→放回队尾。
+ */
+export function answer(s: SessionState, rating: number, now: number): SessionState {
+  const w = s.queue[s.index]
+  const p: PendingAnswer = { wordId: w.id, rating: rating, isFirst: s.mode == MODE_NEW, answeredAt: now }
+  s.pending.push(p)
+
+  let prog = s.progress.get(w.id)
+  if (prog == null) {
+    prog = newProgress()
+    s.progress.set(w.id, prog)
+  }
+
+  let passed = false
+  if (rating == RATING_GOOD) {
+    prog.consec = prog.consec + 1
+    passed = !prog.failed || prog.consec >= 2
+  } else {
+    // 模糊 / 忘记：连对清零，记录最严重失败评分，放回队尾
+    prog.consec = 0
+    prog.failed = true
+    if (prog.worst == -1 || rating < prog.worst) {
+      prog.worst = rating
+    }
+  }
+
+  s.flipped = false
+  if (!passed) {
+    s.queue.push(w)
+  }
+  const nextIndex = s.index + 1
+  if (nextIndex >= s.queue.length) {
+    s.finished = true
+  }
+  s.index = nextIndex
+  return s
+}
+
+/**
+ * 「已掌握」快捷入口（1/2 档词）：当前词直接通过出列，落库按 mastered 记账。
+ * 与普通评分互斥：点此按钮不产生评分记录（记 EASY 预留档），优先级高于之前的失败评分。
+ */
+export function answerMastered(s: SessionState): SessionState {
+  const w = s.queue[s.index]
+  s.manualMastered.push(w.id)
+  s.flipped = false
+  const nextIndex = s.index + 1
+  if (nextIndex >= s.queue.length) {
+    s.finished = true
+  }
+  s.index = nextIndex
+  return s
+}
+
+// ---------- 草稿 ----------
+
+// 草稿 JSON 结构：{mode, wordIds, index, pending, progress, manualMastered}
+function draftToJson(s: SessionState): string {
+  let ids = '['
+  for (let i = 0; i < s.queue.length; i++) {
+    if (i > 0) {
+      ids += ','
+    }
+    ids += s.queue[i].id.toString()
+  }
+  ids += ']'
+  let pending = '['
+  for (let i = 0; i < s.pending.length; i++) {
+    const p = s.pending[i]
+    if (i > 0) {
+      pending += ','
+    }
+    pending += '{"wordId":' + p.wordId + ',"rating":' + p.rating + ',"isFirst":' + (p.isFirst ? 'true' : 'false') +
+      ',"answeredAt":' + p.answeredAt + '}'
+  }
+  pending += ']'
+  let progress = '['
+  let first = true
+  const keyList = progressKeys(s)
+  for (let i = 0; i < keyList.length; i++) {
+    const p = s.progress.get(keyList[i])
+    if (p == null) {
+      continue
+    }
+    if (!first) {
+      progress += ','
+    }
+    first = false
+    progress += '{"id":' + keyList[i] + ',"consec":' + p.consec + ',"failed":' + (p.failed ? 'true' : 'false') +
+      ',"worst":' + p.worst + '}'
+  }
+  progress += ']'
+  let manual = '['
+  for (let i = 0; i < s.manualMastered.length; i++) {
+    if (i > 0) {
+      manual += ','
+    }
+    manual += s.manualMastered[i].toString()
+  }
+  manual += ']'
+  return '{"mode":"' + s.mode + '","wordIds":' + ids + ',"index":' + s.index +
+    ',"pending":' + pending + ',"progress":' + progress + ',"manualMastered":' + manual + '}'
+}
+
+// Map 无 keys() 遍历保障，从 pending 里收集出现过/在队列中的 wordId
+function progressKeys(s: SessionState): Array<number> {
+  const seen = new Map<number, boolean>()
+  const list: Array<number> = []
+  for (let i = 0; i < s.pending.length; i++) {
+    const wid = s.pending[i].wordId
+    if (!seen.has(wid)) {
+      seen.set(wid, true)
+      list.push(wid)
+    }
+  }
+  return list
+}
+
+// 每题后调用：快照当前会话
+export function snapshotDraft(s: SessionState) {
+  setStoredString(SESSION_DRAFT_KEY, draftToJson(s))
+}
+
+// 是否存在指定模式的草稿
+export function hasDraft(mode: SessionMode): boolean {
+  const raw = getStoredString(SESSION_DRAFT_KEY)
+  if (raw.length == 0) {
+    return false
+  }
+  const parsed = JSON.parse(raw)
+  if (parsed == null) {
+    return false
+  }
+  const obj = parsed as UTSJSONObject
+  const m = obj.getString('mode')
+  return m == mode
+}
+
+// 恢复草稿为会话（按 wordIds 回查词条；已结束或词条缺失返回 null）
+export async function restoreDraft(mode: SessionMode): Promise<SessionState | null> {
+  const raw = getStoredString(SESSION_DRAFT_KEY)
+  if (raw.length == 0) {
+    return null
+  }
+  const parsed = JSON.parse(raw)
+  if (parsed == null) {
+    return null
+  }
+  const obj = parsed as UTSJSONObject
+  const m = obj.getString('mode')
+  if (m != mode) {
+    return null
+  }
+  const idsArr = obj.getArray('wordIds')
+  const idx = obj.getNumber('index')
+  if (idsArr == null || idx == null) {
+    return null
+  }
+  const repo = getWordRepo()
+  const queue: Array<Word> = []
+  for (let i = 0; i < idsArr.length; i++) {
+    const wid = idsArr[i]
+    const w = await repo.getById(parseFloat(wid.toString()))
+    if (w != null) {
+      queue.push(w)
+    }
+  }
+  if (queue.length == 0) {
+    return null
+  }
+  const pendArr = obj.getArray('pending')
+  const pending: Array<PendingAnswer> = []
+  if (pendArr != null) {
+    for (let i = 0; i < pendArr.length; i++) {
+      const item = pendArr[i] as UTSJSONObject
+      const wordId = item.getNumber('wordId')
+      const rating = item.getNumber('rating')
+      const isFirst = item.getBoolean('isFirst')
+      const answeredAt = item.getNumber('answeredAt')
+      if (wordId == null || rating == null || isFirst == null || answeredAt == null) {
+        continue
+      }
+      const p: PendingAnswer = { wordId: wordId, rating: rating, isFirst: isFirst, answeredAt: answeredAt }
+      pending.push(p)
+    }
+  }
+  const progress = new Map<number, WordProgress>()
+  const progArr = obj.getArray('progress')
+  if (progArr != null) {
+    for (let i = 0; i < progArr.length; i++) {
+      const item = progArr[i] as UTSJSONObject
+      const id = item.getNumber('id')
+      const consec = item.getNumber('consec')
+      const failed = item.getBoolean('failed')
+      const worst = item.getNumber('worst')
+      if (id == null || consec == null || failed == null || worst == null) {
+        continue
+      }
+      const p: WordProgress = { consec: consec, failed: failed, worst: worst }
+      progress.set(id, p)
+    }
+  }
+  const manual: Array<number> = []
+  const manualArr = obj.getArray('manualMastered')
+  if (manualArr != null) {
+    for (let i = 0; i < manualArr.length; i++) {
+      const v = parseFloat(manualArr[i].toString())
+      if (!isNaN(v)) {
+        manual.push(v)
+      }
+    }
+  }
+  const s: SessionState = {
+    mode: mode,
+    queue: queue,
+    index: idx >= queue.length ? queue.length : idx,
+    flipped: false,
+    pending: pending,
+    progress: progress,
+    manualMastered: manual,
+    finished: idx >= queue.length
+  }
+  return s
+}
+
+export function clearDraft() {
+  removeStored(SESSION_DRAFT_KEY)
+}
+
+// ---------- 详情页评分回传（背词会话中从词卡详情页底部提交评分） ----------
+
+let detailRating: number = -1
+
+export function submitDetailRating(rating: number) {
+  detailRating = rating
+}
+
+// 消费一次回传评分（无则返回 -1）
+export function consumeDetailRating(): number {
+  const r = detailRating
+  detailRating = -1
+  return r
+}
+
+// 详情页「已掌握」快捷入口回传（布尔暂存，与评分回传互斥使用）
+let detailMastered = false
+
+export function submitDetailMastered() {
+  detailMastered = true
+}
+
+export function consumeDetailMastered(): boolean {
+  const v = detailMastered
+  detailMastered = false
+  return v
+}
+
+// ---------- 会话结束统一落库 ----------
+
+function parseCycle(cycleJson: string): Array<number> {
+  const parsed = JSON.parse(cycleJson)
+  if (parsed == null) {
+    return [1, 2, 4]
+  }
+  const arr = parsed as Array<number>
+  if (arr.length == 0) {
+    return [1, 2, 4]
+  }
+  return arr
+}
+
+function schedOf(st: WordState): SchedState {
+  const s: SchedState = {
+    status: st.status,
+    stage: st.stage,
+    familiarity: st.familiarity,
+    dueDate: st.dueDate,
+    streak: st.streak,
+    lapses: st.lapses
+  }
+  return s
+}
+
+function isManualMastered(s: SessionState, wordId: number): boolean {
+  return s.manualMastered.indexOf(wordId) >= 0
+}
+
+// 手动「已掌握」的记账：state 置 mastered（与批量管理 markMastered 同构），log 记 EASY 预留档
+function pushMastered(states: Array<WordState>, logs: Array<ReviewLog>, planId: number, wordId: number, isFirst: boolean, prevStage: number, now: number) {
+  const st: WordState = {
+    planId: planId,
+    wordId: wordId,
+    status: WORD_STATUS_MASTERED,
+    stage: 0,
+    familiarity: 100,
+    dueDate: now,
+    streak: 0,
+    lapses: 0,
+    lastReviewedAt: now
+  }
+  states.push(st)
+  const log: ReviewLog = {
+    id: 0,
+    planId: planId,
+    wordId: wordId,
+    reviewedAt: now,
+    rating: RATING_EASY,
+    isFirst: isFirst,
+    prevStage: prevStage,
+    newStage: 0,
+    dueDate: now
+  }
+  logs.push(log)
+}
+
+/**
+ * 会话结束统一落库（单事务）：
+ * - 每词取最后一次作答时间；记账评分 = 从未失败→记得；失败过→最严重失败评分（忘记 > 模糊）
+ * - 首考：对激活计划写初始 state + log；复习：对该词所有到期计划逐个更新 state + log（同步记账）
+ * - 档位：按 plan_item.priority 放宽掌握判定（1档一次记得即掌握 / 2档两次）
+ * - 手动「已掌握」：新词→激活计划；复习→该词所有到期计划；state=mastered，log 记 EASY
+ * 成功后清除草稿。
+ */
+export async function commitSession(s: SessionState): Promise<boolean> {
+  // 去重：每词保留最后一次作答，保持首次出现顺序
+  const lastByWord = new Map<number, PendingAnswer>()
+  const wordOrder: Array<number> = []
+  for (let i = 0; i < s.pending.length; i++) {
+    const p = s.pending[i]
+    if (!lastByWord.has(p.wordId)) {
+      wordOrder.push(p.wordId)
+    }
+    lastByWord.set(p.wordId, p)
+  }
+
+  const stateRepo = getStateRepo()
+  const planRepo = getPlanRepo()
+  const states: Array<WordState> = []
+  const logs: Array<ReviewLog> = []
+
+  // 首考需要激活计划及其周期（懒加载一次）
+  let activePlanId = -1
+  let activeCycle: Array<number> = [1, 2, 4]
+  let activeLoaded = false
+
+  // 各计划的周期/档位缓存
+  const cycleCache = new Map<number, Array<number>>()
+  const prioCache = new Map<number, Map<number, number>>()
+
+  for (let i = 0; i < wordOrder.length; i++) {
+    const wordId = wordOrder[i]
+    if (isManualMastered(s, wordId)) {
+      continue // 手动掌握的词不走评分记账，下方统一处理
+    }
+    const p = lastByWord.get(wordId)
+    if (p == null) {
+      continue
+    }
+    // 记账评分：失败过按最严重失败档，未失败按记得
+    const prog = s.progress.get(wordId)
+    let commitRating = RATING_GOOD
+    if (prog != null && prog.failed && prog.worst >= 0) {
+      commitRating = prog.worst
+    }
+
+    if (p.isFirst) {
+      if (!activeLoaded) {
+        const active = await planRepo.getActivePlan()
+        if (active != null) {
+          activePlanId = active.id
+          activeCycle = parseCycle(active.cycleJson)
+        }
+        activeLoaded = true
+      }
+      if (activePlanId <= 0) {
+        continue // 无激活计划，无法记账（正常不会发生）
+      }
+      let prios = prioCache.get(activePlanId)
+      if (prios == null) {
+        prios = await planRepo.getPlanPriorities(activePlanId)
+        prioCache.set(activePlanId, prios)
+      }
+      const pr = prios.get(wordId)
+      const priority = pr == null ? 3 : pr
+      const ns = applyFirstRating(commitRating, activeCycle, p.answeredAt, priority)
+      const st: WordState = {
+        planId: activePlanId,
+        wordId: wordId,
+        status: ns.status,
+        stage: ns.stage,
+        familiarity: ns.familiarity,
+        dueDate: ns.dueDate,
+        streak: ns.streak,
+        lapses: ns.lapses,
+        lastReviewedAt: p.answeredAt
+      }
+      states.push(st)
+      const log: ReviewLog = {
+        id: 0,
+        planId: activePlanId,
+        wordId: wordId,
+        reviewedAt: p.answeredAt,
+        rating: commitRating,
+        isFirst: true,
+        prevStage: -1,
+        newStage: ns.stage,
+        dueDate: ns.dueDate
+      }
+      logs.push(log)
+    } else {
+      // 复习：该词所有到期计划同步记账
+      const dueStates = await stateRepo.listDueStatesOfWord(wordId, p.answeredAt)
+      for (let j = 0; j < dueStates.length; j++) {
+        const ds = dueStates[j]
+        let cycle = cycleCache.get(ds.planId)
+        if (cycle == null) {
+          const plan = await planRepo.getPlan(ds.planId)
+          cycle = plan == null ? [1, 2, 4] : parseCycle(plan.cycleJson)
+          cycleCache.set(ds.planId, cycle)
+        }
+        let prios = prioCache.get(ds.planId)
+        if (prios == null) {
+          prios = await planRepo.getPlanPriorities(ds.planId)
+          prioCache.set(ds.planId, prios)
+        }
+        const pr = prios.get(wordId)
+        const priority = pr == null ? 3 : pr
+        const ns = applyReviewRating(commitRating, schedOf(ds), cycle, p.answeredAt, priority)
+        const st: WordState = {
+          planId: ds.planId,
+          wordId: wordId,
+          status: ns.status,
+          stage: ns.stage,
+          familiarity: ns.familiarity,
+          dueDate: ns.dueDate,
+          streak: ns.streak,
+          lapses: ns.lapses,
+          lastReviewedAt: p.answeredAt
+        }
+        states.push(st)
+        const log: ReviewLog = {
+          id: 0,
+          planId: ds.planId,
+          wordId: wordId,
+          reviewedAt: p.answeredAt,
+          rating: commitRating,
+          isFirst: false,
+          prevStage: ds.stage,
+          newStage: ns.stage,
+          dueDate: ns.dueDate
+        }
+        logs.push(log)
+      }
+    }
+  }
+
+  // 手动「已掌握」记账：新词会话→激活计划；复习会话→该词所有到期计划
+  if (s.manualMastered.length > 0) {
+    const now = Date.now()
+    for (let i = 0; i < s.manualMastered.length; i++) {
+      const wordId = s.manualMastered[i]
+      if (s.mode == MODE_NEW) {
+        if (!activeLoaded) {
+          const active = await planRepo.getActivePlan()
+          if (active != null) {
+            activePlanId = active.id
+            activeCycle = parseCycle(active.cycleJson)
+          }
+          activeLoaded = true
+        }
+        if (activePlanId <= 0) {
+          continue
+        }
+        pushMastered(states, logs, activePlanId, wordId, true, -1, now)
+      } else {
+        const dueStates = await stateRepo.listDueStatesOfWord(wordId, now)
+        for (let j = 0; j < dueStates.length; j++) {
+          pushMastered(states, logs, dueStates[j].planId, wordId, false, dueStates[j].stage, now)
+        }
+      }
+    }
+  }
+
+  const ok = await stateRepo.commitRatings(states, logs)
+  if (ok) {
+    clearDraft()
+  }
+  return ok
+}

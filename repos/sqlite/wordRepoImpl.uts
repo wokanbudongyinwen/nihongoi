@@ -1,0 +1,316 @@
+/**
+ * WordRepo 的 SQLite 实现（知识域 DAO）
+ *
+ * 约定：
+ * - SELECT 一律显式列清单，行→实体按列下标映射（插件查询结果无列名，仅二维字符串数组）
+ * - 插件不支持参数绑定，所有字面量拼接必须走 sqlStr/sqlNum
+ * - LIKE 关键词经 likeEscape 转义（% _ \），配合 ESCAPE '\' 子句
+ */
+import { Word, Sentence, Note, WordRelation } from '../../domain/types.uts'
+import { WordRepo } from '../wordRepo.uts'
+import { SqlClient, DB_NAME } from './sqlClient.uts'
+import { getClient } from './bootstrap.uts'
+import { sqlStr, sqlNum, toNum, toAccents } from './meibaoClient.uts'
+
+// word 表查询列（行映射下标依据，勿改顺序）
+const WORD_COLS: string = 'id, term, reading, romaji, accent, pos, meaning, verb_type, extra_json, created_at, updated_at'
+const SENTENCE_COLS: string = 'id, word_id, text, translation, remark, sort, created_at'
+const NOTE_COLS: string = 'id, word_id, content, created_at, updated_at'
+const RELATION_COLS: string = 'id, from_word_id, to_word_id, relation_type, is_system, note, created_at'
+
+// LIKE 关键词转义：% _ \ 前加反斜杠
+function likeEscape(kw: string): string {
+  return kw.split('\\').join('\\\\').split('%').join('\\%').split('_').join('\\_')
+}
+
+function rowToWord(r: Array<string>): Word {
+  const w: Word = {
+    id: toNum(r[0]),
+    term: r[1],
+    reading: r[2],
+    romaji: r[3],
+    accent: toAccents(r[4]),
+    pos: r[5],
+    meaning: r[6],
+    verbType: r[7],
+    extraJson: r[8],
+    createdAt: toNum(r[9]),
+    updatedAt: toNum(r[10])
+  }
+  return w
+}
+
+function rowToSentence(r: Array<string>): Sentence {
+  const s: Sentence = {
+    id: toNum(r[0]),
+    wordId: toNum(r[1]),
+    text: r[2],
+    translation: r[3],
+    remark: r[4],
+    sort: toNum(r[5]),
+    createdAt: toNum(r[6])
+  }
+  return s
+}
+
+function rowToNote(r: Array<string>): Note {
+  const n: Note = {
+    id: toNum(r[0]),
+    wordId: toNum(r[1]),
+    content: r[2],
+    createdAt: toNum(r[3]),
+    updatedAt: toNum(r[4])
+  }
+  return n
+}
+
+function rowToRelation(r: Array<string>): WordRelation {
+  const rel: WordRelation = {
+    id: toNum(r[0]),
+    fromWordId: toNum(r[1]),
+    toWordId: toNum(r[2]),
+    relationType: r[3],
+    isSystem: toNum(r[4]) == 1,
+    note: r[5],
+    createdAt: toNum(r[6])
+  }
+  return rel
+}
+
+class SqliteWordRepo implements WordRepo {
+  // 取已初始化的客户端；启动链路未跑完时直接抛错（App.uvue onLaunch 已保证先于页面）
+  private client(): SqlClient {
+    const c = getClient()
+    if (c == null) {
+      throw new Error('数据库未初始化')
+    }
+    return c
+  }
+
+  // 插入并取新行 id：插件 executeSql 不回传 insertId（恒 -1），改为查 last_insert_rowid
+  // （同一连接 + 顺序 await，无并发插入，取值安全）
+  private async insert(sql: string): Promise<number> {
+    const c = this.client()
+    await c.execute(DB_NAME, sql)
+    const rows = await c.select(DB_NAME, 'SELECT last_insert_rowid()')
+    if (rows.length == 0) {
+      return -1
+    }
+    return toNum(rows[0][0])
+  }
+
+  async getById(id: number): Promise<Word | null> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + WORD_COLS + ' FROM word WHERE id = ' + sqlNum(id) + ' LIMIT 1')
+    if (rows.length == 0) {
+      return null
+    }
+    return rowToWord(rows[0])
+  }
+
+  async search(keyword: string, limit: number): Promise<Array<Word>> {
+    const pat = sqlStr('%' + likeEscape(keyword) + '%')
+    const esc = " ESCAPE '\\'"
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + WORD_COLS + ' FROM word WHERE term LIKE ' + pat + esc +
+      ' OR reading LIKE ' + pat + esc +
+      ' OR romaji LIKE ' + pat + esc +
+      ' OR meaning LIKE ' + pat + esc +
+      ' ORDER BY id LIMIT ' + sqlNum(limit))
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToWord(rows[i]))
+    }
+    return list
+  }
+
+  // 分页浏览：WHERE 条件同 search（空关键词 = 全库），LIMIT offset, limit
+  async listPage(keyword: string, limit: number, offset: number): Promise<Array<Word>> {
+    let where = ''
+    if (keyword.length > 0) {
+      const pat = sqlStr('%' + likeEscape(keyword) + '%')
+      const esc = " ESCAPE '\\'"
+      where = ' WHERE term LIKE ' + pat + esc +
+        ' OR reading LIKE ' + pat + esc +
+        ' OR romaji LIKE ' + pat + esc +
+        ' OR meaning LIKE ' + pat + esc
+    }
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + WORD_COLS + ' FROM word' + where + ' ORDER BY id LIMIT ' + sqlNum(limit) + ' OFFSET ' + sqlNum(offset))
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToWord(rows[i]))
+    }
+    return list
+  }
+
+  async countWords(keyword: string): Promise<number> {
+    let where = ''
+    if (keyword.length > 0) {
+      const pat = sqlStr('%' + likeEscape(keyword) + '%')
+      const esc = " ESCAPE '\\'"
+      where = ' WHERE term LIKE ' + pat + esc +
+        ' OR reading LIKE ' + pat + esc +
+        ' OR romaji LIKE ' + pat + esc +
+        ' OR meaning LIKE ' + pat + esc
+    }
+    const rows = await this.client().select(DB_NAME,
+      'SELECT COUNT(*) FROM word' + where)
+    if (rows.length == 0) {
+      return 0
+    }
+    return toNum(rows[0][0])
+  }
+
+  async findByTerm(term: string): Promise<Array<Word>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + WORD_COLS + ' FROM word WHERE term = ' + sqlStr(term) + ' ORDER BY id')
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToWord(rows[i]))
+    }
+    return list
+  }
+
+  async findByReading(reading: string): Promise<Array<Word>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + WORD_COLS + ' FROM word WHERE reading = ' + sqlStr(reading) + ' ORDER BY id')
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToWord(rows[i]))
+    }
+    return list
+  }
+
+  async create(w: Word): Promise<number> {
+    return await this.insert(
+      'INSERT INTO word (term, reading, romaji, accent, pos, meaning, verb_type, extra_json, created_at, updated_at) VALUES (' +
+      sqlStr(w.term) + ', ' + sqlStr(w.reading) + ', ' + sqlStr(w.romaji) + ', ' + sqlStr(w.accent.join(',')) + ', ' + sqlStr(w.pos) + ', ' +
+      sqlStr(w.meaning) + ', ' + sqlStr(w.verbType) + ', ' + sqlStr(w.extraJson) + ', ' +
+      sqlNum(w.createdAt) + ', ' + sqlNum(w.updatedAt) + ')')
+  }
+
+  async update(w: Word): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME,
+      'UPDATE word SET term = ' + sqlStr(w.term) + ', reading = ' + sqlStr(w.reading) +
+      ', romaji = ' + sqlStr(w.romaji) +
+      ', accent = ' + sqlStr(w.accent.join(',')) + ', pos = ' + sqlStr(w.pos) + ', meaning = ' + sqlStr(w.meaning) +
+      ', verb_type = ' + sqlStr(w.verbType) + ', extra_json = ' + sqlStr(w.extraJson) +
+      ', updated_at = ' + sqlNum(w.updatedAt) + ' WHERE id = ' + sqlNum(w.id))
+    return r.rowsAffected > 0
+  }
+
+  // ---------- 例句 ----------
+
+  async listSentences(wordId: number): Promise<Array<Sentence>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + SENTENCE_COLS + ' FROM sentence WHERE word_id = ' + sqlNum(wordId) + ' ORDER BY sort, id')
+    const list: Array<Sentence> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToSentence(rows[i]))
+    }
+    return list
+  }
+
+  async addSentence(s: Sentence): Promise<number> {
+    return await this.insert(
+      'INSERT INTO sentence (word_id, text, translation, remark, sort, created_at) VALUES (' +
+      sqlNum(s.wordId) + ', ' + sqlStr(s.text) + ', ' + sqlStr(s.translation) + ', ' + sqlStr(s.remark) + ', ' +
+      sqlNum(s.sort) + ', ' + sqlNum(s.createdAt) + ')')
+  }
+
+  async updateSentence(s: Sentence): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME,
+      'UPDATE sentence SET text = ' + sqlStr(s.text) + ', translation = ' + sqlStr(s.translation) +
+      ', remark = ' + sqlStr(s.remark) + ', sort = ' + sqlNum(s.sort) + ' WHERE id = ' + sqlNum(s.id))
+    return r.rowsAffected > 0
+  }
+
+  async deleteSentence(id: number): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME, 'DELETE FROM sentence WHERE id = ' + sqlNum(id))
+    return r.rowsAffected > 0
+  }
+
+  // ---------- 笔记 ----------
+
+  async listNotes(wordId: number): Promise<Array<Note>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + NOTE_COLS + ' FROM note WHERE word_id = ' + sqlNum(wordId) + ' ORDER BY created_at DESC, id DESC')
+    const list: Array<Note> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToNote(rows[i]))
+    }
+    return list
+  }
+
+  async addNote(n: Note): Promise<number> {
+    return await this.insert(
+      'INSERT INTO note (word_id, content, created_at, updated_at) VALUES (' +
+      sqlNum(n.wordId) + ', ' + sqlStr(n.content) + ', ' + sqlNum(n.createdAt) + ', ' + sqlNum(n.updatedAt) + ')')
+  }
+
+  async deleteNote(id: number): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME, 'DELETE FROM note WHERE id = ' + sqlNum(id))
+    return r.rowsAffected > 0
+  }
+
+  // ---------- 关联 ----------
+
+  async listRelations(wordId: number): Promise<Array<WordRelation>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + RELATION_COLS + ' FROM word_relation WHERE from_word_id = ' + sqlNum(wordId) +
+      ' OR to_word_id = ' + sqlNum(wordId) + ' ORDER BY created_at, id')
+    const list: Array<WordRelation> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToRelation(rows[i]))
+    }
+    return list
+  }
+
+  async listRelationsOfMany(wordIds: Array<number>): Promise<Array<WordRelation>> {
+    if (wordIds.length == 0) {
+      return [] as Array<WordRelation>
+    }
+    let ids = ''
+    for (let i = 0; i < wordIds.length; i++) {
+      if (i > 0) {
+        ids += ','
+      }
+      ids += sqlNum(wordIds[i])
+    }
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + RELATION_COLS + ' FROM word_relation WHERE from_word_id IN (' + ids +
+      ') OR to_word_id IN (' + ids + ') ORDER BY created_at, id')
+    const list: Array<WordRelation> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToRelation(rows[i]))
+    }
+    return list
+  }
+
+  async addRelation(r: WordRelation): Promise<number> {
+    return await this.insert(
+      'INSERT INTO word_relation (from_word_id, to_word_id, relation_type, is_system, note, created_at) VALUES (' +
+      sqlNum(r.fromWordId) + ', ' + sqlNum(r.toWordId) + ', ' + sqlStr(r.relationType) + ', ' +
+      (r.isSystem ? '1' : '0') + ', ' + sqlStr(r.note) + ', ' + sqlNum(r.createdAt) + ')')
+  }
+
+  async deleteRelation(id: number): Promise<boolean> {
+    const r = await this.client().execute(DB_NAME, 'DELETE FROM word_relation WHERE id = ' + sqlNum(id))
+    return r.rowsAffected > 0
+  }
+}
+
+// 单例（无状态，仅复用实例避免重复构造）
+let instance: WordRepo | null = null
+
+export function getWordRepo(): WordRepo {
+  // uts→kotlin：模块级可变变量无法 smart cast，先取 const 副本
+  const cur = instance
+  if (cur != null) {
+    return cur
+  }
+  const created = new SqliteWordRepo()
+  instance = created
+  return created
+}

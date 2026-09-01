@@ -1,0 +1,72 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://doc.dcloud.net.cn/uni-app-x/collocation/pagesjson.html
+		{
+			"path": "pages/splash/splash",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "背单词"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "今日"
+			}
+		},
+		{
+			"path": "pages/study/study",
+			"style": {
+				"navigationBarTitleText": "背词"
+			}
+		},
+		{
+			"path": "pages/word/detail",
+			"style": {
+				"navigationBarTitleText": "词卡"
+			}
+		},
+		{
+			"path": "pages/word/chain",
+			"style": {
+				"navigationBarTitleText": "链式记忆"
+			}
+		},
+		{
+			"path": "pages/plan/list",
+			"style": {
+				"navigationBarTitleText": "计划"
+			}
+		},
+		{
+			"path": "pages/plan/detail",
+			"style": {
+				"navigationBarTitleText": "计划详情"
+			}
+		},
+		{
+			"path": "pages/plan/import",
+			"style": {
+				"navigationBarTitleText": "导入预览"
+			}
+		},
+		{
+			"path": "pages/library/library",
+			"style": {
+				"navigationBarTitleText": "词库"
+			}
+		},
+		{
+			"path": "pages/settings/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "背单词",
+		"navigationBarBackgroundColor": "#FAF6EE",
+		"backgroundColor": "#FAF6EE"
+	},
+	"uniIdRouter": {}
+}

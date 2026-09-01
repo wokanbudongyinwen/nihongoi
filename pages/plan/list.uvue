@@ -1,0 +1,162 @@
+<template>
+  <view class="page">
+    <view class="neo-card plan pressable" hover-class="press" :class="p.isActive ? 'plan-on' : ''" v-for="(p, i) in plans" :key="p.id" @click="goDetail(p)">
+      <view class="plan-main">
+        <text class="plan-name">{{ p.name }}</text>
+        <text class="plan-sub">{{ p.dailyNew }} 新词/日</text>
+      </view>
+      <text class="plan-active" v-if="p.isActive">激活中</text>
+    </view>
+
+    <view class="neo-card empty" v-if="plans.length == 0">
+      <text class="empty-text">暂无计划，从下方导入 JSON 词表开始</text>
+    </view>
+
+    <view class="neo-card import-btn pressable" hover-class="press" @click="doImport">
+      <text class="import-text">导入 JSON 词表，新建计划</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Plan } from '../../domain/types.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { parseAndMatch, setPendingImport } from '../../services/importer.uts'
+  import { readTextFile } from '../../repos/native/fileText.uts'
+
+  const plans = ref<Array<Plan>>([])
+
+  const loadPlans = async () => {
+    try {
+      plans.value = await getPlanRepo().listPlans()
+    } catch (e) {
+      console.error('计划列表加载失败', e)
+    }
+  }
+
+  const goDetail = (p: Plan) => {
+    uni.navigateTo({ url: '/pages/plan/detail?id=' + p.id })
+  }
+
+  // 解析匹配并跳预览页（须先于 doImport 声明：uts 要求先声明后引用）
+  const doParse = async (text: string) => {
+    uni.showLoading({ title: '解析匹配中' })
+    try {
+      const r = await parseAndMatch(text)
+      uni.hideLoading()
+      if (r.rows.length == 0) {
+        uni.showToast({ title: '无有效词条（term 必填）', icon: 'none' })
+        return
+      }
+      setPendingImport(r)
+      uni.navigateTo({ url: '/pages/plan/import' })
+    } catch (e) {
+      uni.hideLoading()
+      console.error('导入解析失败', e)
+      uni.showToast({ title: 'JSON 解析失败', icon: 'none' })
+    }
+  }
+
+  const doImport = () => {
+    // count=1 单选；Android 返回 content:// 路径
+    uni.chooseFile({
+      count: 1,
+      type: 'all',
+      success: (res) => {
+        if (res.tempFiles.length == 0) {
+          return
+        }
+        const f = res.tempFiles[0]
+        if (!f.name.toLowerCase().endsWith('.json')) {
+          uni.showToast({ title: '请选择 .json 文件', icon: 'none' })
+          return
+        }
+        const text = readTextFile(f.path)
+        if (text.length == 0) {
+          uni.showToast({ title: '文件读取失败', icon: 'none' })
+          return
+        }
+        doParse(text)
+      },
+      fail: (err) => {
+        // 1101001 = 用户取消，静默；其余提示
+        if (err.errCode != 1101001) {
+          console.error('选择文件失败', err)
+          uni.showToast({ title: '选择文件失败', icon: 'none' })
+        }
+      }
+    })
+  }
+
+  onLoad(() => {
+    loadPlans()
+  })
+
+  onShow(() => {
+    // 从导入预览返回后刷新列表
+    loadPlans()
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    padding: 28rpx 28rpx 48rpx;
+    background-color: $n-bg;
+  }
+  .plan {
+    padding: 32rpx;
+    margin-bottom: 24rpx;
+    flex-direction: row;
+    align-items: center;
+  }
+  .plan-on {
+    background-color: $n-yellow;
+  }
+  .plan-main {
+    flex: 1;
+  }
+  .plan-name {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $n-ink;
+  }
+  .plan-sub {
+    font-size: 24rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+  }
+  .plan-active {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-green;
+    border-width: 2rpx;
+    border-style: solid;
+    border-color: $n-ink;
+    border-radius: 999rpx;
+    padding: 6rpx 14rpx;
+    font-weight: bold;
+  }
+  .import-btn {
+    padding: 28rpx 32rpx;
+    background-color: $n-blue;
+    align-items: center;
+  }
+  .import-text {
+    font-size: 28rpx;
+    color: $n-ink;
+    font-weight: bold;
+  }
+  .empty {
+    padding: 80rpx 28rpx;
+    margin-bottom: 28rpx;
+    align-items: center;
+  }
+  .empty-text {
+    font-size: 26rpx;
+    color: $n-text2;
+    text-align: center;
+  }
+</style>

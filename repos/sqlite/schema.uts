@@ -1,0 +1,115 @@
+/**
+ * SQLite 建表 DDL（App 端唯一 schema 来源）
+ *
+ * - 知识域表（word/sentence/note/word_relation）也可由打包的 base.db 预置，
+ *   此处 CREATE IF NOT EXISTS 保证全新环境下也能建全。
+ * - 学习域/计划域表由 App 首次启动时在此建出。
+ */
+
+export const SCHEMA_SQL: Array<string> = [
+  // ---------- 知识域 ----------
+  `CREATE TABLE IF NOT EXISTS word (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    term TEXT NOT NULL,
+    reading TEXT NOT NULL DEFAULT '',
+    romaji TEXT NOT NULL DEFAULT '',
+    accent TEXT NOT NULL DEFAULT '',
+    pos TEXT NOT NULL DEFAULT '',
+    meaning TEXT NOT NULL DEFAULT '',
+    verb_type TEXT NOT NULL DEFAULT '',
+    extra_json TEXT NOT NULL DEFAULT '{}',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_word_term ON word(term)`,
+  `CREATE INDEX IF NOT EXISTS idx_word_reading ON word(reading)`,
+  `CREATE INDEX IF NOT EXISTS idx_word_romaji ON word(romaji)`,
+
+  `CREATE TABLE IF NOT EXISTS sentence (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    translation TEXT NOT NULL DEFAULT '',
+    remark TEXT NOT NULL DEFAULT '',
+    sort INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_sentence_word ON sentence(word_id)`,
+
+  `CREATE TABLE IF NOT EXISTS note (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_note_word ON note(word_id)`,
+
+  `CREATE TABLE IF NOT EXISTS word_relation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    to_word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    relation_type TEXT NOT NULL,
+    is_system INTEGER NOT NULL DEFAULT 0,
+    note TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    UNIQUE(from_word_id, to_word_id, relation_type)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_relation_from ON word_relation(from_word_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_relation_to ON word_relation(to_word_id)`,
+
+  // ---------- 计划域 ----------
+  `CREATE TABLE IF NOT EXISTS plan (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 0,
+    daily_new INTEGER NOT NULL DEFAULT 10,
+    daily_review_cap INTEGER NOT NULL DEFAULT 200,
+    cycle_json TEXT NOT NULL DEFAULT '[1,2,4]',
+    created_at INTEGER NOT NULL
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS plan_item (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    plan_id INTEGER NOT NULL REFERENCES plan(id) ON DELETE CASCADE,
+    word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    sort INTEGER NOT NULL DEFAULT 0,
+    priority INTEGER NOT NULL DEFAULT 3,
+    UNIQUE(plan_id, word_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_plan_item_plan ON plan_item(plan_id, sort)`,
+
+  // ---------- 学习域 ----------
+  `CREATE TABLE IF NOT EXISTS word_state (
+    plan_id INTEGER NOT NULL REFERENCES plan(id) ON DELETE CASCADE,
+    word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'new',
+    stage INTEGER NOT NULL DEFAULT 0,
+    familiarity INTEGER NOT NULL DEFAULT 0,
+    due_date INTEGER NOT NULL DEFAULT 0,
+    streak INTEGER NOT NULL DEFAULT 0,
+    lapses INTEGER NOT NULL DEFAULT 0,
+    last_reviewed_at INTEGER NOT NULL DEFAULT -1,
+    PRIMARY KEY (plan_id, word_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_state_due ON word_state(due_date)`,
+
+  `CREATE TABLE IF NOT EXISTS review_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    plan_id INTEGER NOT NULL,
+    word_id INTEGER NOT NULL,
+    reviewed_at INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    is_first INTEGER NOT NULL DEFAULT 0,
+    prev_stage INTEGER NOT NULL DEFAULT -1,
+    new_stage INTEGER NOT NULL DEFAULT -1,
+    due_date INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_review_log_word ON review_log(word_id)`,
+
+  // ---------- 设置 ----------
+  `CREATE TABLE IF NOT EXISTS setting (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL DEFAULT ''
+  )`
+]

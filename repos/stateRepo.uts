@@ -1,0 +1,26 @@
+/**
+ * StateRepo：学习域数据访问接口（DAO）
+ * SQLite 实现：repos/sqlite/stateRepoImpl.uts（getStateRepo() 取实例）
+ */
+import { WordState, ReviewLog, Word } from '../domain/types.uts'
+
+export interface StateRepo {
+  // 全局到期词（跨计划求并集，同词多计划到期由服务层合并展示）
+  listDueStates(now: number, cap: number): Promise<Array<WordState>>,
+  // 某词在所有已到期计划中的 state（同步记账的目标集合）
+  listDueStatesOfWord(wordId: number, now: number): Promise<Array<WordState>>,
+  getStatesOfWord(wordId: number): Promise<Array<WordState>>,
+  // 事务内批量写入 word_state（INSERT OR REPLACE）+ review_log（评分提交唯一入口）
+  // states/logs 自带 planId 归属，可跨计划混合提交
+  commitRatings(states: Array<WordState>, logs: Array<ReviewLog>): Promise<boolean>,
+
+  // 统计
+  countByStatus(planId: number): Promise<Map<string, number>>,
+  listRecentLogs(wordId: number, limit: number): Promise<Array<ReviewLog>>,
+
+  // 计划词单状态管理（手动批量调整）
+  // 批量置为已掌握：UPSERT word_state（status=mastered / familiarity=100），不写 review_log
+  markMastered(planId: number, wordIds: Array<number>, now: number): Promise<boolean>,
+  // 批量恢复未学习：删除 word_state 记录（未学 = 无行，与调度语义一致）
+  resetToNew(planId: number, wordIds: Array<number>): Promise<boolean>
+}

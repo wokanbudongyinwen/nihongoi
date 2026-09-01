@@ -1,0 +1,171 @@
+/**
+ * StateRepo 的 SQLite 实现（学习域 DAO）
+ *
+ * 复习记账语义：一次评分 = 更新该词所有到期计划的 word_state + 逐计划写 review_log。
+ * states/logs 自带 planId，commitRatings 单事务混合提交。
+ */
+import { WordState, ReviewLog, WORD_STATUS_MASTERED } from '../../domain/types.uts'
+import { StateRepo } from '../stateRepo.uts'
+import { SqlClient, DB_NAME } from './sqlClient.uts'
+import { getClient } from './bootstrap.uts'
+import { sqlNum, toNum } from './meibaoClient.uts'
+
+const STATE_COLS: string = 'plan_id, word_id, status, stage, familiarity, due_date, streak, lapses, last_reviewed_at'
+
+function rowToState(r: Array<string>): WordState {
+  const s: WordState = {
+    planId: toNum(r[0]),
+    wordId: toNum(r[1]),
+    status: r[2],
+    stage: toNum(r[3]),
+    familiarity: toNum(r[4]),
+    dueDate: toNum(r[5]),
+    streak: toNum(r[6]),
+    lapses: toNum(r[7]),
+    lastReviewedAt: toNum(r[8])
+  }
+  return s
+}
+
+function stateSql(s: WordState): string {
+  return 'INSERT OR REPLACE INTO word_state (plan_id, word_id, status, stage, familiarity, due_date, streak, lapses, last_reviewed_at) VALUES (' +
+    sqlNum(s.planId) + ', ' + sqlNum(s.wordId) + ", '" + s.status + "', " + sqlNum(s.stage) + ', ' +
+    sqlNum(s.familiarity) + ', ' + sqlNum(s.dueDate) + ', ' + sqlNum(s.streak) + ', ' + sqlNum(s.lapses) + ', ' +
+    sqlNum(s.lastReviewedAt) + ')'
+}
+
+function logSql(l: ReviewLog): string {
+  return 'INSERT INTO review_log (plan_id, word_id, reviewed_at, rating, is_first, prev_stage, new_stage, due_date) VALUES (' +
+    sqlNum(l.planId) + ', ' + sqlNum(l.wordId) + ', ' + sqlNum(l.reviewedAt) + ', ' + sqlNum(l.rating) + ', ' +
+    (l.isFirst ? '1' : '0') + ', ' + sqlNum(l.prevStage) + ', ' + sqlNum(l.newStage) + ', ' + sqlNum(l.dueDate) + ')'
+}
+
+class SqliteStateRepo implements StateRepo {
+  private client(): SqlClient {
+    const c = getClient()
+    if (c == null) {
+      throw new Error('数据库未初始化')
+    }
+    return c
+  }
+
+  async listDueStates(now: number, cap: number): Promise<Array<WordState>> {
+    // mastered 词完全退出复习队列（用户决策；数据保留，统计可见）
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + STATE_COLS + ' FROM word_state WHERE due_date <= ' + sqlNum(now) +
+      " AND status != 'mastered' ORDER BY due_date LIMIT " + sqlNum(cap))
+    const list: Array<WordState> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToState(rows[i]))
+    }
+    return list
+  }
+
+  async listDueStatesOfWord(wordId: number, now: number): Promise<Array<WordState>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + STATE_COLS + ' FROM word_state WHERE word_id = ' + sqlNum(wordId) +
+      ' AND due_date <= ' + sqlNum(now) + ' ORDER BY plan_id')
+    const list: Array<WordState> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToState(rows[i]))
+    }
+    return list
+  }
+
+  async getStatesOfWord(wordId: number): Promise<Array<WordState>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + STATE_COLS + ' FROM word_state WHERE word_id = ' + sqlNum(wordId) + ' ORDER BY plan_id')
+    const list: Array<WordState> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToState(rows[i]))
+    }
+    return list
+  }
+
+  async commitRatings(states: Array<WordState>, logs: Array<ReviewLog>): Promise<boolean> {
+    const sqls: Array<string> = []
+    for (let i = 0; i < states.length; i++) {
+      sqls.push(stateSql(states[i]))
+    }
+    for (let i = 0; i < logs.length; i++) {
+      sqls.push(logSql(logs[i]))
+    }
+    if (sqls.length == 0) {
+      return true
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
+  async countByStatus(planId: number): Promise<Map<string, number>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT status, COUNT(*) FROM word_state WHERE plan_id = ' + sqlNum(planId) + ' GROUP BY status')
+    const map = new Map<string, number>()
+    for (let i = 0; i < rows.length; i++) {
+      map.set(rows[i][0], toNum(rows[i][1]))
+    }
+    return map
+  }
+
+  async listRecentLogs(wordId: number, limit: number): Promise<Array<ReviewLog>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT id, plan_id, word_id, reviewed_at, rating, is_first, prev_stage, new_stage, due_date' +
+      ' FROM review_log WHERE word_id = ' + sqlNum(wordId) + ' ORDER BY reviewed_at DESC, id DESC LIMIT ' + sqlNum(limit))
+    const list: Array<ReviewLog> = []
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]
+      const l: ReviewLog = {
+        id: toNum(r[0]),
+        planId: toNum(r[1]),
+        wordId: toNum(r[2]),
+        reviewedAt: toNum(r[3]),
+        rating: toNum(r[4]),
+        isFirst: toNum(r[5]) == 1,
+        prevStage: toNum(r[6]),
+        newStage: toNum(r[7]),
+        dueDate: toNum(r[8])
+      }
+      list.push(l)
+    }
+    return list
+  }
+
+  // ---------- 计划词单状态管理（手动批量调整） ----------
+
+  async markMastered(planId: number, wordIds: Array<number>, now: number): Promise<boolean> {
+    if (wordIds.length == 0) {
+      return true
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < wordIds.length; i++) {
+      // 手动标记：熟练度拉满、stage 归 0（status=mastered 已使其退出队列，stage 不参与调度）
+      sqls.push('INSERT OR REPLACE INTO word_state (' + STATE_COLS + ") VALUES (" +
+        sqlNum(planId) + ', ' + sqlNum(wordIds[i]) + ", '" + WORD_STATUS_MASTERED + "', 0, 100, " +
+        sqlNum(now) + ', 0, 0, ' + sqlNum(now) + ')')
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
+  async resetToNew(planId: number, wordIds: Array<number>): Promise<boolean> {
+    if (wordIds.length == 0) {
+      return true
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < wordIds.length; i++) {
+      sqls.push('DELETE FROM word_state WHERE plan_id = ' + sqlNum(planId) + ' AND word_id = ' + sqlNum(wordIds[i]))
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+}
+
+// 单例（const 副本判空）
+let instance: StateRepo | null = null
+
+export function getStateRepo(): StateRepo {
+  const cur = instance
+  if (cur != null) {
+    return cur
+  }
+  const created = new SqliteStateRepo()
+  instance = created
+  return created
+}
