@@ -1,56 +1,66 @@
 <template>
   <view class="page">
     <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
-    <!-- 头部：日期 + 计划胶囊 + 问候 -->
-    <view class="neo-card hero">
+    <!-- 头部：以留白和排版建立编辑感，不再套用大卡片 -->
+    <view class="hero">
       <view class="hero-top">
         <text class="hero-date">{{ todayText() }}</text>
         <view class="plan-chip" v-if="planName != ''">
           <text class="plan-chip-text">{{ planName }}</text>
         </view>
       </view>
+      <text class="hero-kicker">TODAY'S STUDY</text>
       <text class="hero-hello">{{ helloText() }}</text>
+      <text class="hero-note">一点一点，让今天的词留下来。</text>
     </view>
 
-    <!-- 三色进度总览（已掌握/学习中/未学） -->
-    <view class="neo-card panel" v-if="planName != '' && totalCount > 0">
-      <view class="bar">
-        <view class="bar-ok" :style="'width:' + masterPct() + '%'"></view>
-        <view class="bar-learning" :style="'width:' + learningPct() + '%'"></view>
-        <view class="bar-rest"></view>
-      </view>
-      <view class="legend">
-        <view class="legend-item">
-          <view class="dot dot-ok"></view>
-          <text class="legend-text">已掌握 {{ masteredCount }}</text>
-        </view>
-        <view class="legend-item">
-          <view class="dot dot-learning"></view>
-          <text class="legend-text">学习中 {{ learningCount }}</text>
-        </view>
-        <view class="legend-item">
-          <view class="dot dot-rest"></view>
-          <text class="legend-text">未学 {{ restCount() }}</text>
-        </view>
-      </view>
+    <view class="section-heading">
+      <text class="section-kicker">TODAY</text>
+      <text class="section-title">今日任务</text>
     </view>
 
-    <!-- 两大入口 -->
+    <!-- 今日主任务：采用不对称编辑网格，突出优先复习 -->
     <view class="entries">
       <view class="neo-card entry entry-review pressable" hover-class="press" @click="goStudy('review')">
+        <text class="entry-kicker">REVIEW</text>
         <text class="entry-title">复习</text>
         <text class="entry-num">{{ dueCount }}</text>
         <text class="entry-unit">个到期</text>
       </view>
       <view class="neo-card entry entry-new pressable" hover-class="press" @click="goStudy('new')">
+        <text class="entry-kicker">NEW WORDS</text>
         <text class="entry-title">学新词</text>
         <text class="entry-num">{{ todayNewCount }}</text>
         <text class="entry-unit">今日已学</text>
       </view>
     </view>
 
-    <!-- 统计条 -->
-    <view class="neo-card panel" v-if="planName != ''">
+    <!-- 进度与统计合并为一张信息面板，减少卡片堆叠 -->
+    <view class="neo-card panel overview" v-if="planName != ''">
+      <view class="overview-head">
+        <text class="overview-label">LEARNING PROGRESS</text>
+        <text class="overview-total">{{ learnedCount }} / {{ totalCount }}</text>
+      </view>
+      <view class="bar" v-if="totalCount > 0">
+        <view class="bar-ok" :style="'width:' + masterPct() + '%'"></view>
+        <view class="bar-learning" :style="'width:' + learningPct() + '%'"></view>
+        <view class="bar-rest"></view>
+      </view>
+      <view class="legend" v-if="totalCount > 0">
+        <view class="legend-item">
+          <view class="dot dot-ok"></view>
+          <text class="legend-text">掌握 {{ masteredCount }}</text>
+        </view>
+        <view class="legend-item">
+          <view class="dot dot-learning"></view>
+          <text class="legend-text">学习 {{ learningCount }}</text>
+        </view>
+        <view class="legend-item legend-last">
+          <view class="dot dot-rest"></view>
+          <text class="legend-text">未学 {{ restCount() }}</text>
+        </view>
+      </view>
+      <view class="overview-line"></view>
       <view class="stats-row">
         <view class="stat">
           <text class="stat-num num-blue">{{ learningCount }}</text>
@@ -71,23 +81,32 @@
       </view>
     </view>
 
-    <!-- 其他入口 -->
+    <view class="section-heading tools-heading">
+      <text class="section-kicker">EXPLORE</text>
+      <text class="section-title">学习工具</text>
+    </view>
+
+    <!-- 文字目录式导航：编号承担识别，不使用不统一的伪图标 -->
     <view class="nav-row">
-      <view class="neo-card-sm nav nav-purple pressable" hover-class="press" @click="go('/pages/word/chain')">
-        <text class="nav-icon">链</text>
+      <view class="nav nav-purple pressable" hover-class="press" @click="go('/pages/word/chain')">
+        <text class="nav-index">01</text>
         <text class="nav-text">链式记忆</text>
+        <text class="nav-desc">建立关联</text>
       </view>
-      <view class="neo-card-sm nav nav-blue pressable" hover-class="press" @click="go('/pages/plan/list')">
-        <text class="nav-icon">计</text>
+      <view class="nav nav-blue pressable" hover-class="press" @click="go('/pages/plan/list')">
+        <text class="nav-index">02</text>
         <text class="nav-text">计划</text>
+        <text class="nav-desc">学习节奏</text>
       </view>
-      <view class="neo-card-sm nav nav-green pressable" hover-class="press" @click="go('/pages/library/library')">
-        <text class="nav-icon">あ</text>
+      <view class="nav nav-green pressable" hover-class="press" @click="go('/pages/library/library')">
+        <text class="nav-index">03</text>
         <text class="nav-text">词库</text>
+        <text class="nav-desc">浏览检索</text>
       </view>
-      <view class="neo-card-sm nav pressable" hover-class="press" @click="go('/pages/settings/settings')">
-        <text class="nav-icon">设</text>
+      <view class="nav nav-neutral nav-right pressable" hover-class="press" @click="go('/pages/settings/settings')">
+        <text class="nav-index">04</text>
         <text class="nav-text">设置</text>
+        <text class="nav-desc">周期备份</text>
       </view>
     </view>
   </view>
@@ -195,7 +214,7 @@
 <style lang="scss">
   @import '../../uni.scss';
 
-  /* ===== Aurora Editorial：氛围渐变 + 编辑式层级 + 轻质感面板 ===== */
+  /* ===== Aurora Editorial：首页采用编辑封面 + 不对称任务网格 + 目录式导航 ===== */
 
   .page {
     flex: 1;
@@ -204,15 +223,9 @@
     background-image: linear-gradient(180deg, #f7eee5 0%, #faf7f1 54%, #f0edf5 100%);
   }
 
-  /* ---------- 头部：暮色渐变承担氛围，正文仍保持深色对比 ---------- */
+  /* ---------- 头部：去除容器感，让留白、日期和标题形成封面节奏 ---------- */
   .hero {
-    background-color: #f4c58e;
-    background-image: linear-gradient(135deg, #f6db9b 0%, #f3a181 48%, #a8c4df 100%);
-    border-width: 0rpx;
-    border-radius: 42rpx;
-    box-shadow: 0rpx 22rpx 54rpx rgba(87, 63, 78, 0.16);
-    padding: 42rpx 36rpx 48rpx;
-    margin-bottom: 30rpx;
+    padding: 22rpx 6rpx 42rpx;
   }
   .hero-top {
     flex-direction: row;
@@ -223,10 +236,10 @@
     font-size: $c-fs-xs;
     color: $n-ink;
     font-family: monospace;
-    letter-spacing: 3rpx;
+    letter-spacing: 2rpx;
   }
   .plan-chip {
-    background-color: rgba(255, 253, 249, 0.82);
+    background-color: rgba(255, 253, 249, 0.72);
     border-width: 1rpx;
     border-style: solid;
     border-color: rgba(37, 34, 43, 0.12);
@@ -238,50 +251,102 @@
     color: $n-ink;
     font-weight: 500;
   }
+  .hero-kicker {
+    font-size: 20rpx;
+    color: $a-red-ink;
+    font-family: monospace;
+    letter-spacing: 5rpx;
+    margin-top: 48rpx;
+  }
   .hero-hello {
-    font-size: 46rpx;
+    font-size: 50rpx;
     font-family: serif;
     font-weight: 500;
     line-height: 62rpx;
     color: $n-ink;
-    margin-top: 36rpx;
+    margin-top: 12rpx;
+  }
+  .hero-note {
+    font-size: $c-fs-sm;
+    color: $n-text2;
+    margin-top: 12rpx;
+    letter-spacing: 1rpx;
   }
 
-  /* ---------- 三色进度条：连续柔和色带 ---------- */
+  /* ---------- 分区标题 ---------- */
+  .section-heading {
+    flex-direction: row;
+    align-items: center;
+    margin: 0rpx 4rpx 18rpx;
+  }
+  .section-kicker {
+    font-size: 20rpx;
+    color: $n-text3;
+    font-family: monospace;
+    letter-spacing: 4rpx;
+  }
+  .section-title {
+    font-size: $c-fs-md;
+    color: $n-ink;
+    font-family: serif;
+    margin-left: 18rpx;
+  }
+
+  /* ---------- 进度面板：进度、图例和统计整合在同一信息块 ---------- */
   .panel {
-    padding: 32rpx;
-    margin-bottom: 30rpx;
+    padding: 28rpx 30rpx 26rpx;
+    margin-bottom: 34rpx;
+  }
+  .overview-head {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16rpx;
+  }
+  .overview-label {
+    flex: 1;
+    font-size: 20rpx;
+    color: $n-text3;
+    font-family: monospace;
+    letter-spacing: 3rpx;
+  }
+  .overview-total {
+    font-size: $c-fs-sm;
+    color: $n-ink;
+    font-family: monospace;
   }
   .bar {
     flex-direction: row;
     align-items: stretch;
-    height: 18rpx;
+    height: 14rpx;
     border-radius: 999rpx;
     overflow: hidden;
     background-color: $n-card;
     border-width: 0rpx;
   }
   .bar-ok {
-    height: 18rpx;
+    height: 14rpx;
     background-color: $n-green;
   }
   .bar-learning {
-    height: 18rpx;
+    height: 14rpx;
     background-color: $n-blue;
   }
   .bar-rest {
     flex: 1;
-    height: 18rpx;
+    height: 14rpx;
     background-color: $n-cream;
   }
   .legend {
     flex-direction: row;
-    margin-top: 20rpx;
+    margin-top: 16rpx;
   }
   .legend-item {
     flex-direction: row;
     align-items: center;
-    margin-right: 32rpx;
+    margin-right: 24rpx;
+  }
+  .legend-last {
+    margin-right: 0rpx;
   }
   .dot {
     width: 14rpx;
@@ -303,39 +368,53 @@
     font-size: $c-fs-xs;
     color: $n-text2;
     font-family: monospace;
-    letter-spacing: 1rpx;
+    letter-spacing: 0rpx;
+  }
+  .overview-line {
+    height: 1rpx;
+    background-color: rgba(37, 34, 43, 0.09);
+    margin: 24rpx 0 22rpx;
   }
 
-  /* ---------- 两大入口：像杂志信息块一样清晰分栏 ---------- */
+  /* ---------- 今日任务：主次不对称，更接近编辑版面而非按钮宫格 ---------- */
   .entries {
     flex-direction: row;
-    margin-bottom: 28rpx;
+    align-items: stretch;
+    margin-bottom: 26rpx;
   }
   .entry {
-    flex: 1;
-    padding: 38rpx 0 34rpx;
-    align-items: center;
+    min-height: 230rpx;
+    padding: 28rpx 26rpx 24rpx;
     border-width: 0rpx;
   }
   .neo-card.entry-review {
+    flex: 1.18;
     background-color: $n-red;
   }
   .neo-card.entry-new {
+    flex: 0.82;
     background-color: $n-yellow;
     margin-left: 24rpx;
+  }
+  .entry-kicker {
+    font-size: 19rpx;
+    color: $n-ink;
+    font-family: monospace;
+    letter-spacing: 3rpx;
+    opacity: 0.58;
   }
   .entry-title {
     font-size: $c-fs-md;
     color: $n-ink;
-    font-family: monospace;
-    letter-spacing: 2rpx;
+    font-family: serif;
+    margin-top: 10rpx;
   }
   .entry-num {
-    font-size: 72rpx;
+    font-size: 78rpx;
     font-family: serif;
     font-weight: 500;
     color: $n-ink;
-    margin-top: 8rpx;
+    margin-top: 20rpx;
   }
   .entry-unit {
     font-size: $c-fs-xs;
@@ -344,7 +423,7 @@
     letter-spacing: 1rpx;
   }
 
-  /* ---------- 统计条：彩色数字 ---------- */
+  /* ---------- 紧凑统计条 ---------- */
   .stats-row {
     flex-direction: row;
   }
@@ -353,7 +432,7 @@
     align-items: center;
   }
   .stat-num {
-    font-size: $c-fs-xl;
+    font-size: $c-fs-lg;
     font-family: serif;
     font-weight: 500;
     color: $n-ink;
@@ -370,49 +449,61 @@
   .stat-label {
     font-size: $c-fs-xs;
     color: $n-text3;
-    margin-top: 8rpx;
+    margin-top: 4rpx;
     font-family: monospace;
     letter-spacing: 1rpx;
   }
 
-  /* ---------- 底部入口：低饱和功能索引 ---------- */
+  /* ---------- 底部入口：无图标的编辑目录，编号提供稳定识别 ---------- */
+  .tools-heading {
+    margin-top: 0rpx;
+  }
   .nav-row {
     flex-direction: row;
+    margin-bottom: 0rpx;
   }
   .nav {
     flex: 1;
-    padding: 26rpx 0 24rpx;
-    align-items: center;
-    margin-right: 16rpx;
+    min-height: 112rpx;
+    padding: 16rpx 12rpx 14rpx;
+    margin-right: 12rpx;
+    border-top-width: 2rpx;
+    border-top-style: solid;
+    border-top-color: rgba(37, 34, 43, 0.32);
+    background-color: rgba(255, 253, 249, 0.42);
   }
   .nav-purple {
-    background-color: $n-purple;
+    border-top-color: $a-purple-ink;
   }
   .nav-blue {
-    background-color: $n-blue;
+    border-top-color: $a-blue-ink;
   }
   .nav-green {
-    background-color: $n-green;
+    border-top-color: $a-green-ink;
   }
-  .nav-icon {
-    width: 54rpx;
-    height: 54rpx;
-    border-radius: 999rpx;
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.14);
-    font-size: 32rpx;
+  .nav-neutral {
+    border-top-color: $a-red-ink;
+  }
+  .nav-right {
+    margin-right: 0rpx;
+  }
+  .nav-index {
+    font-size: 19rpx;
+    color: $n-text3;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+  }
+  .nav-text {
+    font-size: $c-fs-sm;
     color: $n-ink;
     font-family: serif;
     font-weight: 500;
-    text-align: center;
-    line-height: 54rpx;
-  }
-  .nav-text {
-    font-size: $c-fs-xs;
-    color: $n-ink;
-    font-weight: 500;
     margin-top: 8rpx;
+  }
+  .nav-desc {
+    font-size: 18rpx;
+    color: $n-text2;
+    margin-top: 4rpx;
+    letter-spacing: 1rpx;
   }
 </style>
