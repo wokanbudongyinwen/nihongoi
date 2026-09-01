@@ -82,6 +82,30 @@ export async function pickNewWordQueue(): Promise<Array<Word>> {
   return await planRepo.pickTodayNewWords(plan.id, plan.dailyNew)
 }
 
+// ---------- 首页统计条下钻（type 与 stats 页 URL 参数一致） ----------
+
+// 统计条件词列表分页（无激活计划时返回空）
+export async function listStatsWordPage(type: string, keyword: string, limit: number, offset: number): Promise<Array<Word>> {
+  const planRepo = getPlanRepo()
+  const plan = await planRepo.getActivePlan()
+  if (plan == null) {
+    return [] as Array<Word>
+  }
+  const dayStart = type == 'todayReview' ? startOfToday() : 0
+  return await planRepo.listStatsWords(plan.id, type, dayStart, keyword, limit, offset)
+}
+
+// 统计条件词总数（无激活计划时为 0）
+export async function countStatsWords(type: string, keyword: string): Promise<number> {
+  const planRepo = getPlanRepo()
+  const plan = await planRepo.getActivePlan()
+  if (plan == null) {
+    return 0
+  }
+  const dayStart = type == 'todayReview' ? startOfToday() : 0
+  return await planRepo.countStatsWords(plan.id, type, dayStart, keyword)
+}
+
 export async function buildReviewQueue(cap: number): Promise<Array<ReviewQueueItem>> {
   const stateRepo = getStateRepo()
   const dueStates = await stateRepo.listDueStates(Date.now(), cap * 3)

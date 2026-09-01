@@ -30,13 +30,13 @@
       <text class="pr-hint">档位：①一次即会（一次记得即掌握）②两次即会 ③常规 · 点行内档位标签可切换。命中旧词时，例句/笔记/自由关联按内容去重后追加合并（相同跳过，不覆盖旧数据）</text>
     </view>
 
-    <!-- 逐条确认列表 -->
-    <scroll-view class="list" scroll-y="true" show-scrollbar="false">
-      <view class="neo-card-sm row" v-for="(vm, i) in rows" :key="vm.row.lineNo">
+    <!-- 逐条确认列表（分页渲染：滚动到底追加，避免大词单一次性渲染卡顿） -->
+    <scroll-view class="list" scroll-y="true" show-scrollbar="false" @scrolltolower="loadMore">
+      <view class="neo-card-sm row" v-for="(vm, i) in visible" :key="vm.row.lineNo">
         <view class="row-head">
           <text class="row-no">{{ vm.row.lineNo }}</text>
           <text class="row-term">{{ termText(vm.row) }}</text>
-          <text class="pr-chip" :class="prClass(vm.row.priority)" @click="cyclePriority(i)">{{ prText(vm.row.priority) }}</text>
+          <text class="pr-chip" :class="prClass(vm.row.priority)" @click="cyclePriority(vm)">{{ prText(vm.row.priority) }}</text>
           <text class="tag" :class="tagClass(vm.row.matchType)">{{ tagText(vm.row.matchType) }}</text>
         </view>
         <text class="row-meaning" v-if="vm.row.meaning != ''">{{ vm.row.meaning }}</text>
@@ -48,12 +48,13 @@
         <!-- 多候选：点选 -->
         <view class="cands" v-if="vm.row.matchType == MATCH_MULTI">
           <view class="cand pressable-soft" hover-class="press-soft" :class="vm.chosenWordId == c.id ? 'cand-on' : ''"
-            v-for="(c, j) in vm.row.candidates" :key="c.id" @click="pick(i, c.id)">
+            v-for="(c, j) in vm.row.candidates" :key="c.id" @click="pick(vm, c.id)">
             <text class="cand-term">{{ c.term }}（{{ c.reading }}）</text>
             <text class="cand-meaning">{{ c.meaning }}</text>
           </view>
         </view>
       </view>
+      <text class="list-end" v-if="visible.length > 0 && visible.length >= rows.length">— 已全部加载（{{ visible.length }} / {{ rows.length }}）—</text>
       <view class="empty" v-if="rows.length == 0">
         <text class="empty-text">无待确认词条</text>
       </view>
@@ -61,7 +62,7 @@
 
     <!-- 确认导入 -->
     <view class="footer">
-      <view class="neo-card btn pressable" hover-class="press" @click="doConfirm">
+      <view class="neo-card-sm btn pressable" hover-class="press" @click="doConfirm">
         <text class="btn-text">{{ appendMode ? '确认追加（' + rows.length + ' 词）' : '确认导入（' + rows.length + ' 词）' }}</text>
       </view>
     </view>
@@ -79,9 +80,13 @@
     chosenWordId: number // MULTI 时的当前选择（默认第 1 个）
   }
 
+  const PAGE_SIZE = 50
+
   const planName = ref('')
   const dailyNewText = ref('10')
   const rows = ref<Array<RowVM>>([])
+  // 分页渲染：rows 为全量数据（确认导入按全量提交），visible 为已渲染切片
+  const visible = ref<Array<RowVM>>([])
   const confirming = ref(false)
 
   // 导入模式：false 新建计划 / true 追加到已有计划（分课导入同一教材）
@@ -140,14 +145,14 @@
     return 'tag-new'
   }
 
-  const pick = (rowIndex: number, wordId: number) => {
-    rows.value[rowIndex].chosenWordId = wordId
+  // 事件直接传 vm 对象（引用类型，与 rows 中同一实例；分页切片不依赖全局下标）
+  const pick = (vm: RowVM, wordId: number) => {
+    vm.chosenWordId = wordId
   }
 
   // 档位循环切换：1 → 2 → 3 → 1
-  const cyclePriority = (rowIndex: number) => {
-    const row = rows.value[rowIndex].row
-    row.priority = row.priority >= 3 ? 1 : row.priority + 1
+  const cyclePriority = (vm: RowVM) => {
+    vm.row.priority = vm.row.priority >= 3 ? 1 : vm.row.priority + 1
   }
 
   const prText = (p: number): string => {
@@ -195,6 +200,18 @@
     return (r.matchType == MATCH_NEW ? '将写入：' : '合并追加：') + out
   }
 
+  // 滚动到底：从 rows 追加下一页到 visible（同词库/统计词单分页模式）
+  const loadMore = () => {
+    if (visible.value.length >= rows.value.length) {
+      return
+    }
+    const end = visible.value.length + PAGE_SIZE
+    const max = rows.value.length
+    for (let i = visible.value.length; i < end && i < max; i++) {
+      visible.value.push(rows.value[i])
+    }
+  }
+
   onLoad(() => {
     loadPlans()
     const pending = getPendingImport()
@@ -213,6 +230,7 @@
       list.push(vm)
     }
     rows.value = list
+    loadMore()
   })
 
   const doConfirm = async () => {
@@ -457,11 +475,18 @@
     font-size: 26rpx;
     color: $n-text3;
   }
+  .list-end {
+    font-size: 24rpx;
+    color: $n-text3;
+    text-align: center;
+    padding: 24rpx 0;
+  }
   .footer {
     padding: 24rpx;
     background-color: transparent;
   }
-  .neo-card-sm.btn {
+  /* 主操作按钮（同 plan/detail save-btn：黄底、轻圆角、居中粗体） */
+  .btn {
     background-color: $n-yellow;
     border-width: 0rpx;
     padding: 24rpx 0;
@@ -469,7 +494,7 @@
   }
   .btn-text {
     color: $n-ink;
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: bold;
   }
 </style>

@@ -62,19 +62,19 @@
       </view>
       <view class="overview-line"></view>
       <view class="stats-row">
-        <view class="stat">
+        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learning')">
           <text class="stat-num num-blue">{{ learningCount }}</text>
           <text class="stat-label">在学</text>
         </view>
-        <view class="stat">
+        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learned')">
           <text class="stat-num num-green">{{ learnedCount }}</text>
           <text class="stat-label">已学</text>
         </view>
-        <view class="stat">
+        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('todayReview')">
           <text class="stat-num num-red">{{ todayReviewCount }}</text>
           <text class="stat-label">今日复习</text>
         </view>
-        <view class="stat">
+        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('all')">
           <text class="stat-num">{{ totalCount }}</text>
           <text class="stat-label">总词数</text>
         </view>
@@ -208,6 +208,10 @@
   }
   const go = (url: string) => {
     uni.navigateTo({ url: url })
+  }
+  // 统计条下钻：learning 在学 / learned 已学 / todayReview 今日复习 / all 计划全部
+  const goStats = (type: string) => {
+    uni.navigateTo({ url: '/pages/index/stats?type=' + type })
   }
 </script>
 

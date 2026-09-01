@@ -1,5 +1,41 @@
 # 文件修改日志
 
+## 导入预览分页渲染与确认按钮修复（2026-09-01）
+
+### pages/plan/import.uvue + pages/index/stats.uvue
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 导入预览逐条确认列表改分页渲染：新增 visible 切片（PAGE_SIZE=50）+ scroll-view @scrolltolower 追加，rows 保持全量（确认导入仍按全量提交），行内档位切换与多候选点选改为直接传 vm 对象（不再依赖全局下标）；底部补「已全部加载」提示；「确认导入」按钮修复：模板原为 `neo-card btn` 而样式定义在 `.neo-card-sm.btn` 上选择器不匹配导致黄底主按钮样式从未生效，统一为 `neo-card-sm btn` + `.btn`（黄底、无边框、居中粗体 28rpx，同 plan/detail save-btn）；stats 页 v-for 补齐 index 写法与全项目同构 | 大词单导入时一次性渲染全部行导致卡顿；确认按钮样式在 Aurora 改版时因选择器笔误未生效（显示为白卡片） |
+
+## 首页统计条下钻词单页（2026-09-01）
+
+### pages/index/index.uvue + pages/index/stats.uvue + pages.json
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改/新增 | 首页统计条「在学 / 已学 / 今日复习 / 总词数」四块加按压反馈与点击跳转（pressable-soft + goStats）；新增 stats 页（URL 参数 type 区分四种口径，搜索 + 分页滚动 + word-row 列表，形式同词库页，动态设导航标题）；pages.json 注册 pages/index/stats | 用户要求统计条各数字可点入查看对应条件的单词列表 |
+
+### repos/planRepo.uts + repos/sqlite/planRepoImpl.uts + services/today.uts
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | PlanRepo 新增 listStatsWords / countStatsWords（learning=learning+reviewing、learned=有 state 行、all=计划全部按 sort 序、todayReview=今日 review_log 去重按最近复习倒序；均支持关键词 LIKE 过滤与 LIMIT/OFFSET 分页，FROM..WHERE 片段 list/count 共用）；today.uts 新增 listStatsWordPage / countStatsWords 服务封装（无激活计划返回空） | 支撑统计条下钻列表，口径与 buildTodaySummary 保持一致 |
+
+## 贴底按钮触控失灵修复（2026-09-01）
+
+### uni.scss + pages/word/detail.uvue + pages/word/chain.uvue
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 卡片柔影收敛：$n-shadow 由 16rpx/44rpx 改为 6rpx/18rpx、$n-shadow-sm 由 8rpx/24rpx 改为 4rpx/12rpx；词卡详情页头与链式记忆主卡的页面级阴影同步收敛为 6rpx/18rpx；uni.scss 补注释说明约束 | Aurora 改版后大模糊阴影（偏移+模糊 ≈ 60rpx）在 App-Android 上把外扩区算进视图触控边界，后置兄弟卡片的外扩帧吃掉前一张卡片底部条带，导致词卡「+ 添加例句 / + 添加笔记」与链式记忆「+ 笔记」等贴底按钮点击无响应（编辑/修改/筛选 chips 等非贴底按钮正常可反证）；收敛后外扩量小于卡片间 margin（24~28rpx），条带被间距完全吸收 |
+
+### DESIGN.md
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 「协作与工程备忘」踩坑清单新增坑⑫：App-Android 带模糊半径的 box-shadow 会把阴影外扩区计入视图触控边界，后置兄弟卡片外扩帧吃掉前一张卡片底部条带的点击；附本次案例与「偏移+模糊 < 卡片间 margin」约束 | 用户要求将本次踩坑沉淀到 DESIGN.md 踩坑记录 |
+
 ## Aurora Editorial 全项目 UI 分支改造（2026-09-01）
 
 ### uni.scss + static/aurora-bg.png

@@ -141,10 +141,13 @@ $n-text2: #5f5965;
 $n-text3: #8b8490;
 $n-cream: #eee7da;
 
-/* 轻边界与柔和悬浮层，替代 Neo 的黑描边和硬投影。 */
+/* 轻边界与柔和悬浮层，替代 Neo 的黑描边和硬投影。
+ * 注意：App-Android 上带模糊半径的 box-shadow 会把阴影外扩区算进视图的
+ * 触控边界，后置兄弟卡片的外扩帧会吃掉前一张卡片底部条带的点击。
+ * 因此偏移+模糊须收敛到小于卡片间 margin（24~28rpx），杜绝贴底按钮失灵。 */
 $n-bw: 1rpx;
-$n-shadow: 0rpx 16rpx 44rpx $a-shadow;
-$n-shadow-sm: 0rpx 8rpx 24rpx rgba(57, 48, 73, 0.09);
+$n-shadow: 0rpx 6rpx 18rpx $a-shadow;
+$n-shadow-sm: 0rpx 4rpx 12rpx rgba(57, 48, 73, 0.09);
 
 $n-r: 30rpx;
 $n-r-sm: 22rpx;

@@ -14,6 +14,12 @@
 			}
 		},
 		{
+			"path": "pages/index/stats",
+			"style": {
+				"navigationBarTitleText": "词单"
+			}
+		},
+		{
 			"path": "pages/study/study",
 			"style": {
 				"navigationBarTitleText": "背词"

@@ -706,7 +706,7 @@
     background-image: linear-gradient(135deg, #f4dba0 0%, #efb28e 55%, #b8cbe0 100%);
     border-width: 0rpx;
     border-radius: 40rpx;
-    box-shadow: 0rpx 18rpx 48rpx rgba(71, 55, 72, 0.14);
+    box-shadow: 0rpx 6rpx 18rpx rgba(71, 55, 72, 0.14);
     padding: 36rpx;
     margin-bottom: 24rpx;
   }

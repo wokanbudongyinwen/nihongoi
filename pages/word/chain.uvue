@@ -354,7 +354,7 @@
     background-image: linear-gradient(140deg, #d8cee9 0%, #b8acd6 50%, #a9c7df 100%);
     border-width: 0rpx;
     border-radius: 40rpx;
-    box-shadow: 0rpx 20rpx 54rpx rgba(65, 54, 83, 0.15);
+    box-shadow: 0rpx 6rpx 18rpx rgba(65, 54, 83, 0.15);
     padding: 36rpx;
     margin: 24rpx;
   }

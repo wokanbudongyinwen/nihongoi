@@ -56,6 +56,11 @@ function rowToJoinWord(r: Array<string>): Word {
 
 const JOIN_WORD_COLS: string = 'w.id, w.term, w.reading, w.romaji, w.accent, w.pos, w.meaning, w.verb_type, w.extra_json, w.created_at, w.updated_at'
 
+// LIKE 关键词转义（同 wordRepoImpl：% _ \ 前加反斜杠）
+function likeEscape(kw: string): string {
+  return kw.split('\\').join('\\\\').split('%').join('\\%').split('_').join('\\_')
+}
+
 class SqlitePlanRepo implements PlanRepo {
   private client(): SqlClient {
     const c = getClient()
@@ -316,6 +321,57 @@ class SqlitePlanRepo implements PlanRepo {
       return null
     }
     return rowToJoinWord(rows[0])
+  }
+
+  // ---------- 首页统计条下钻（learning / learned / all / todayReview） ----------
+
+  // 统一构造 FROM..WHERE 片段（list 与 count 共用；keyword 为空时无词匹配条件）
+  private statsFrom(type: string, planId: number, dayStart: number, keyword: string): string {
+    let kw = ''
+    if (keyword.length > 0) {
+      const pat = sqlStr('%' + likeEscape(keyword) + '%')
+      const esc = " ESCAPE '\\'"
+      kw = ' AND (w.term LIKE ' + pat + esc + ' OR w.reading LIKE ' + pat + esc +
+        ' OR w.romaji LIKE ' + pat + esc + ' OR w.meaning LIKE ' + pat + esc + ')'
+    }
+    if (type == 'todayReview') {
+      // 今日已复习（与 countTodayReviewed 同口径：is_first=0，按 word_id 去重）
+      return ' FROM review_log rl JOIN word w ON w.id = rl.word_id' +
+        ' WHERE rl.plan_id = ' + sqlNum(planId) + ' AND rl.is_first = 0 AND rl.reviewed_at >= ' + sqlNum(dayStart) + kw
+    }
+    if (type == 'learning' || type == 'learned') {
+      // 在学（learning+reviewing）/ 已学（有 state 行且 status != new）
+      const cond = type == 'learning' ? " IN ('learning','reviewing')" : " != 'new'"
+      return ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
+        ' JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
+        ' WHERE pi.plan_id = ' + sqlNum(planId) + ' AND ws.status' + cond + kw
+    }
+    // all：计划全部词
+    return ' FROM plan_item pi JOIN word w ON w.id = pi.word_id WHERE pi.plan_id = ' + sqlNum(planId) + kw
+  }
+
+  async listStatsWords(planId: number, type: string, dayStart: number, keyword: string, limit: number, offset: number): Promise<Array<Word>> {
+    const from = this.statsFrom(type, planId, dayStart, keyword)
+    let groupOrder = ' ORDER BY pi.sort, pi.id'
+    if (type == 'todayReview') {
+      groupOrder = ' GROUP BY rl.word_id ORDER BY MAX(rl.reviewed_at) DESC'
+    }
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + JOIN_WORD_COLS + from + groupOrder + ' LIMIT ' + sqlNum(limit) + ' OFFSET ' + sqlNum(offset))
+    const list: Array<Word> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToJoinWord(rows[i]))
+    }
+    return list
+  }
+
+  async countStatsWords(planId: number, type: string, dayStart: number, keyword: string): Promise<number> {
+    const sel = type == 'todayReview' ? 'SELECT COUNT(DISTINCT rl.word_id)' : 'SELECT COUNT(*)'
+    const rows = await this.client().select(DB_NAME, sel + this.statsFrom(type, planId, dayStart, keyword))
+    if (rows.length == 0) {
+      return 0
+    }
+    return toNum(rows[0][0])
   }
 }
 

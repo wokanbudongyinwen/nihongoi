@@ -47,5 +47,11 @@ export interface PlanRepo {
   // 实现上需联表 word_state，接口语义由 sqlite 实现保证
   pickTodayNewWords(planId: number, limit: number): Promise<Array<Word>>,
   // 链式记忆：随机取一个「已学且无任何自由关联」的孤单词（全部串完返回 null）
-  pickLonelyWord(planId: number): Promise<Word | null>
+  pickLonelyWord(planId: number): Promise<Word | null>,
+
+  // 首页统计条下钻词列表（关键词 + 分页；口径与 buildTodaySummary 一致）
+  // type: 'learning' 在学(learning+reviewing) / 'learned' 已学(有 state 行) / 'all' 计划全部 / 'todayReview' 今日已复习(去重，按最近复习倒序)
+  // dayStart 仅 todayReview 使用（其余类型传 0 即可）
+  listStatsWords(planId: number, type: string, dayStart: number, keyword: string, limit: number, offset: number): Promise<Array<Word>>,
+  countStatsWords(planId: number, type: string, dayStart: number, keyword: string): Promise<number>
 }

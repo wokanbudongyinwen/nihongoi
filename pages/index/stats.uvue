@@ -1,0 +1,263 @@
+<template>
+  <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
+    <view class="neo-card search-bar">
+      <input class="search-input" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onInput" />
+      <text class="count">{{ countText() }}</text>
+    </view>
+
+    <scroll-view class="list" scroll-y="true" show-scrollbar="false" @scrolltolower="loadMore">
+      <view class="neo-card-sm word-row pressable" hover-class="press" v-for="(w, i) in results" :key="w.id" @click="goDetail(w)">
+        <view class="word-main">
+          <view class="word-line">
+            <text class="word-term">{{ w.term }}</text>
+            <text class="word-reading">{{ w.reading }}</text>
+          </view>
+          <text class="word-meaning">{{ w.meaning }}</text>
+        </view>
+        <text class="word-pos">{{ w.pos }}</text>
+      </view>
+      <view class="loading" v-if="loading">
+        <text class="loading-text">加载中…</text>
+      </view>
+      <text class="list-end" v-if="!loading && results.length > 0 && results.length >= total">— 已全部加载（{{ results.length }} / {{ total }}）—</text>
+      <view class="empty" v-if="!loading && results.length == 0">
+        <text class="empty-text">{{ emptyText() }}</text>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { listStatsWordPage, countStatsWords } from '../../services/today.uts'
+  import { Word } from '../../domain/types.uts'
+
+  const PAGE_SIZE = 50
+
+  // 与首页统计条口径对应的下钻类型（URL 参数 type）
+  const TYPE_LEARNING = 'learning'
+  const TYPE_LEARNED = 'learned'
+  const TYPE_TODAY_REVIEW = 'todayReview'
+  const TYPE_ALL = 'all'
+
+  let statsType = TYPE_LEARNING
+
+  const keyword = ref('')
+  const results = ref<Array<Word>>([])
+  const total = ref(0)
+  const loading = ref(false)
+  let loadingMore = false // 防重入（loadMore 触发期间不重复请求）
+  let settledKeyword = '' // 已加载结果对应的关键词（输入抖动丢弃过期响应）
+
+  // 标题 / 空态文案（模板只能调本地函数）
+  const titleOf = (type: string): string => {
+    if (type == TYPE_LEARNED) {
+      return '已学单词'
+    }
+    if (type == TYPE_TODAY_REVIEW) {
+      return '今日复习'
+    }
+    if (type == TYPE_ALL) {
+      return '计划词单'
+    }
+    return '在学单词'
+  }
+
+  const countText = (): string => {
+    if (total.value == 0) {
+      return ''
+    }
+    if (keyword.value.length == 0) {
+      return '共 ' + total.value + ' 词'
+    }
+    return '匹配 ' + total.value + ' 词'
+  }
+
+  const emptyText = (): string => {
+    if (total.value > 0) {
+      return '无匹配词条'
+    }
+    if (statsType == TYPE_LEARNING) {
+      return '还没有在学的词'
+    }
+    if (statsType == TYPE_LEARNED) {
+      return '还没有学过的词'
+    }
+    if (statsType == TYPE_TODAY_REVIEW) {
+      return '今天还没有复习记录'
+    }
+    return '计划词单为空'
+  }
+
+  // 首屏 / 关键词变化：重置分页后加载第一页
+  const doSearch = async () => {
+    const kw = keyword.value
+    settledKeyword = kw
+    loading.value = true
+    try {
+      const cnt = await countStatsWords(statsType, kw)
+      if (settledKeyword != kw) {
+        return
+      }
+      total.value = cnt
+      const list = await listStatsWordPage(statsType, kw, PAGE_SIZE, 0)
+      if (settledKeyword != kw) {
+        return
+      }
+      results.value = list
+    } catch (e) {
+      console.error('统计词单查询失败', e)
+    }
+    loading.value = false
+  }
+
+  // 滚动到底：追加下一页
+  const loadMore = async () => {
+    if (loadingMore || loading.value) {
+      return
+    }
+    const kw = keyword.value
+    if (results.value.length >= total.value) {
+      return
+    }
+    loadingMore = true
+    loading.value = true
+    try {
+      const list = await listStatsWordPage(statsType, kw, PAGE_SIZE, results.value.length)
+      if (settledKeyword == kw && list.length > 0) {
+        // uts 数组追加：逐条 push（无 spread 合并）
+        for (let i = 0; i < list.length; i++) {
+          results.value.push(list[i])
+        }
+      }
+    } catch (e) {
+      console.error('统计词单分页加载失败', e)
+    }
+    loadingMore = false
+    loading.value = false
+  }
+
+  const onInput = (e: InputEvent) => {
+    keyword.value = e.detail.value
+    doSearch()
+  }
+
+  const goDetail = (w: Word) => {
+    uni.navigateTo({ url: '/pages/word/detail?id=' + w.id })
+  }
+
+  onLoad((options) => {
+    let t = ''
+    if (options != null) {
+      const v = options['type']
+      if (v != null) {
+        t = v
+      }
+    }
+    if (t == TYPE_LEARNED || t == TYPE_TODAY_REVIEW || t == TYPE_ALL) {
+      statsType = t
+    }
+    uni.setNavigationBarTitle({ title: titleOf(statsType) })
+    doSearch()
+  })
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    padding: 24rpx 28rpx 0;
+    background-color: $n-bg;
+    background-image: linear-gradient(180deg, #dfeaf2 0%, #f8f4ed 30%, #f4eee8 100%);
+  }
+  .search-bar {
+    padding: 24rpx;
+    margin-bottom: 20rpx;
+    background-color: rgba(255, 253, 249, 0.92);
+  }
+  .search-input {
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: $n-r-sm;
+    padding: 18rpx 22rpx;
+    font-size: 28rpx;
+    color: $n-ink;
+  }
+  .count {
+    font-size: 24rpx;
+    color: $n-text2;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+    margin-top: 14rpx;
+  }
+  .list {
+    flex: 1;
+    padding: 4rpx 2rpx 40rpx;
+  }
+  .word-row {
+    padding: 24rpx;
+    margin: 0 4rpx 18rpx 0;
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-main {
+    flex: 1;
+  }
+  .word-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-term {
+    font-size: 32rpx;
+    font-family: serif;
+    font-weight: 500;
+    color: $n-ink;
+  }
+  .word-reading {
+    font-size: 24rpx;
+    color: $a-blue-ink;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .word-meaning {
+    font-size: 26rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+  }
+  .word-pos {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+    margin-left: 16rpx;
+  }
+  .loading {
+    padding: 24rpx 0;
+    align-items: center;
+  }
+  .loading-text {
+    font-size: 24rpx;
+    color: $n-text3;
+  }
+  .list-end {
+    font-size: 24rpx;
+    color: $n-text3;
+    text-align: center;
+    padding: 24rpx 0;
+  }
+  .empty {
+    padding: 80rpx 0;
+    align-items: center;
+  }
+  .empty-text {
+    font-size: 26rpx;
+    color: $n-text3;
+  }
+</style>
