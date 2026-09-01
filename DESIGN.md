@@ -89,7 +89,7 @@
 7. ~~BackupService 导出/恢复~~（代码完成，待真机验证；导出全量 JSON 至 Android/data/<pkg>/files/backups/，恢复为单事务清库重灌）
 7b. ~~词库数据源管线（tools/build-db）~~（完成，2026-08-31：JMdict 常用 2 万 + Kanjium 音调 + 派生罗马音 + 近义/反义系统关联；base.db 已复制到 static/assets，待真机验证）
 8. 增强：词库升级合并（INSERT OR IGNORE）、听音/拼写题型、统计页、组件抽取（WordCard/RatingBar/RelationList/SentenceEditor）
-9. **UI/UX 打磨（主体完成，2026-09-01 MuMu 实机复验）**：二版方向为 Neobrutalism 软粗野主义（ui-ux-pro-max 辅助，用户要国外风/动画/多彩/扁平）。全页面已统一 $n-* 色彩体系（ink 黑 + 米白底 + 黄红蓝绿紫高饱和五色）、3rpx 黑边、20rpx 圆角与按压反馈；MuMu 480dpi 截图发现 px 投影被密度放大，最终收敛为主卡 2rpx/小卡 1rpx 轻硬投影，按压时位移并收起投影。已完成：首页、背词、词卡详情及评分栏、链式记忆、计划列表/详情/导入、词库、设置、开屏页；滚动区隐藏原生滚动条，导航/音频入口统一为描边文字图形，彩色底统一黑字。开屏动画已按 uvue 能力改为 transition + JS 切态，并在 MuMu 热编译链路运行；后续仅按使用反馈做细节动效和窄屏适配。
+9. **UI/UX Aurora 分支改造（主体完成，2026-09-01 MuMu 实机复验）**：`feat/aurora-editorial-ui` 采用 Aurora Editorial（氛围渐变编辑风），由 ui-ux-pro-max 的 Gradient Mesh / Aurora Evolved、Editorial Grid、Japanese Elegant 字体建议综合而来。视觉结构 = 暮橙/暖金/雾蓝/薰衣草柔焦色场 + 暖白高对比内容面板 + 日文衬线主标题 + 等宽微标签；主卡 1rpx 轻边界与柔影，按压只做轻微下沉。因 uvue Android 对复杂 CSS 渐变绘制不稳定，使用 ImageGen 生成的 `static/aurora-bg.png` 离线铺底，所有核心文字仍放在实色面板上。首页、背词、词卡详情/评分栏、链式记忆、计划列表/详情/导入、词库、设置、开屏页均已迁移并经 MuMu 走查；原 Neobrutalism 版本保留在 `feat/ui-polish` 分支。
 10. ~~单词档位功能（plan_item.priority 三档 + 已掌握快捷入口）~~（代码完成 2026-08-31，待真机验证：schema v3 迁移、行内/批量设档、导入 priority 字段、1档首考记得即掌握、2档两次记得掌握、「已掌握」按钮落库）
 11. ~~导入附加数据合并（例句/笔记/自由关联追加式合并）~~（代码完成 2026-08-31，待真机验证：命中词去重合并、关联目标自动匹配/新建、预览页附加数据摘要）
 12. ~~追加导入到已有计划（分课多次导入同一计划）~~（代码完成 2026-08-31，待真机验证：模式切换、计划 chips 选择、追加后 sort 接续/重复词跳过/附加数据仍合并、追加后新词队列继续往后取）

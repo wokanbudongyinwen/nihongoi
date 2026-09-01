@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <!-- 链路径（本次会话内存视图） -->
     <scroll-view class="chain-bar" scroll-x="true" show-scrollbar="false" v-if="chainWords.length > 0">
       <view class="chain-row">
@@ -314,15 +315,16 @@
   .page {
     flex: 1;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #e9e3f1 0%, #f8f4ed 34%, #edf2f4 100%);
   }
 
   /* ---------- 链路径 ---------- */
   .chain-bar {
     background-color: $n-cream;
     padding: 16rpx 24rpx;
-    border-bottom-width: 2rpx;
+    border-bottom-width: 1rpx;
     border-bottom-style: solid;
-    border-bottom-color: $n-ink;
+    border-bottom-color: $a-line;
   }
   .chain-row {
     flex-direction: row;
@@ -337,7 +339,7 @@
     color: $n-text2;
   }
   .chain-word-on {
-    color: $n-purple;
+    color: $a-purple-ink;
     font-weight: bold;
   }
   .chain-arrow {
@@ -348,8 +350,12 @@
 
   /* ---------- 主单词卡 ---------- */
   .main-card {
-    background-color: $n-purple;
-    padding: 32rpx;
+    background-color: #c8bde0;
+    background-image: linear-gradient(140deg, #d8cee9 0%, #b8acd6 50%, #a9c7df 100%);
+    border-width: 0rpx;
+    border-radius: 40rpx;
+    box-shadow: 0rpx 20rpx 54rpx rgba(65, 54, 83, 0.15);
+    padding: 36rpx;
     margin: 24rpx;
   }
   .main-row {
@@ -359,7 +365,8 @@
   .main-term {
     flex: 1;
     font-size: $c-fs-hero;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .speaker {
@@ -367,9 +374,9 @@
     height: 64rpx;
     border-radius: 999rpx;
     background-color: $n-yellow;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     font-size: 26rpx;
     font-weight: bold;
     color: $n-ink;
@@ -401,9 +408,9 @@
     font-size: $c-fs-xs;
     color: $n-ink;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 16rpx;
     font-weight: bold;
@@ -416,9 +423,9 @@
   .note-input {
     flex: 1;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 14rpx 20rpx;
     font-size: $c-fs-sm;
@@ -445,10 +452,10 @@
     height: 112rpx;
     border-radius: 999rpx;
     background-color: $n-green;
-    border-width: 3rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
-    box-shadow: $n-shadow;
+    border-color: rgba(37, 34, 43, 0.12);
+    box-shadow: $n-shadow-sm;
     font-size: 64rpx;
     color: $n-ink;
     font-weight: bold;
@@ -457,7 +464,8 @@
   }
   .empty-title {
     font-size: $c-fs-xl;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
     margin-top: 24rpx;
   }
@@ -480,21 +488,22 @@
   /* ---------- 选词区 ---------- */
   .pick-section {
     flex: 1;
-    background-color: $n-card;
+    background-color: rgba(255, 253, 249, 0.94);
     padding: 32rpx;
     margin: 0 24rpx;
   }
   .pick-title {
     font-size: $c-fs-sm;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 2rpx;
     color: $n-ink;
     margin-bottom: 16rpx;
   }
   .search {
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 14rpx 20rpx;
     font-size: $c-fs-sm;
@@ -503,9 +512,9 @@
 
   .confirm-box {
     background-color: $n-yellow;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: $n-r;
     padding: 24rpx;
     margin-bottom: 16rpx;
@@ -517,7 +526,8 @@
   }
   .confirm-a {
     font-size: $c-fs-lg;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .confirm-link {
@@ -527,14 +537,15 @@
   }
   .confirm-b {
     font-size: $c-fs-lg;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .reason-input {
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 14rpx 20rpx;
     font-size: $c-fs-sm;
@@ -577,7 +588,8 @@
   }
   .cand-term {
     font-size: $c-fs-md;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
     flex: 1;
   }
@@ -594,7 +606,7 @@
   }
   .cand-reading {
     font-size: $c-fs-xs;
-    color: $n-blue;
+    color: $a-blue-ink;
     margin-top: 4rpx;
   }
   .cand-meaning {
@@ -621,7 +633,7 @@
   /* ---------- 底部操作 ---------- */
   .bottom-bar {
     flex-direction: row;
-    background-color: $n-bg;
+    background-color: transparent;
     padding: 20rpx 24rpx 40rpx;
     margin-top: 24rpx;
   }

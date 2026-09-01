@@ -109,61 +109,70 @@ $c-r-sm: 12rpx;
 $c-r-md: 20rpx;
 $c-r-lg: 28rpx;
 
-/* ===== Neo 设计 token（UI 2026-08-31 二版，Neubrutalism 软粗野主义）=====
- * 灵感：国外流行 app 风（Gumroad/Duolingo 脉络）——高饱和多彩 + 黑描边 +
- * 硬投影（无渐变无拟物，纯扁平）+ 按压位移动画。
- * 规则：卡片 = 底色 + 3rpx 黑边 + 2rpx 轻硬投影 + 20rpx 圆角；
- *       可点元素配 hover-class="press"（基类加 transition-transform）；
- *       彩色底一律配黑字（非白字），对比更好。
- * 旧 $c-* 保留给未改版页面，逐步迁移到 $n-*。
+/* ===== Aurora Editorial 设计 token（UI 2026-09-01 三版）=====
+ * 设计语言：柔焦氛围渐变 + 编辑式排版 + 瑞士网格。
+ * 页面保留高对比正文与清晰信息层；渐变只承担氛围，不承载长文本。
+ * 为降低迁移风险，旧页面继续复用 $n-* token 和 neo-card 类名，视觉语义已切换。
  */
-$n-ink: #1f1f1f;           // 描边/投影/主文字（黑）
-$n-bg: #faf6ee;            // 页面背景（米白）
-$n-card: #ffffff;          // 卡片
-$n-yellow: #ffd93d;        // 主品牌 / CTA / 学新词
-$n-red: #ff6b6b;           // 复习 / 提醒
-$n-blue: #4d96ff;          // 学习中 / 链接
-$n-green: #6bcb77;         // 已掌握 / 成功
-$n-purple: #b98ce8;        // 链式记忆 / 特色
-$n-text2: #5a5a5a;         // 次文字
-$n-text3: #9c9c9c;         // 弱文字
-$n-cream: #f1ead9;         // 浅米（未学/占位）
+$a-ink: #25222b;
+$a-bg: #f7f2ea;
+$a-surface: #fffdf9;
+$a-line: #d9d2c8;
+$a-peach: #f4a080;
+$a-gold: #f2cf79;
+$a-sky: #8fb8dc;
+$a-sage: #8eb99c;
+$a-lilac: #b4a6d5;
+$a-blue-ink: #466b8b;
+$a-green-ink: #4e7459;
+$a-red-ink: #955043;
+$a-purple-ink: #675b80;
+$a-shadow: rgba(57, 48, 73, 0.12);
 
-/* 描边与投影（Neo 卡片灵魂）
- * uni-app x 中 px 会按设备 density 放大；MuMu 480dpi 下 4px 会呈现为约 12 物理像素，
- * 因此统一回到 rpx，保证不同宽度/密度设备上的视觉重量一致。 */
-$n-bw: 3rpx;                        // 黑边宽度
-$n-shadow: 2rpx 2rpx 0rpx $n-ink;   // 主卡：克制的右下硬投影
-$n-shadow-sm: 1rpx 1rpx 0rpx $n-ink;// 小卡/按钮投影
+$n-ink: $a-ink;
+$n-bg: $a-bg;
+$n-card: $a-surface;
+$n-yellow: #f5d991;
+$n-red: #f2a089;
+$n-blue: #9bbde0;
+$n-green: #9ac2a5;
+$n-purple: #b9abd8;
+$n-text2: #5f5965;
+$n-text3: #8b8490;
+$n-cream: #eee7da;
 
-/* 圆角 */
-$n-r: 20rpx;
-$n-r-sm: 14rpx;
+/* 轻边界与柔和悬浮层，替代 Neo 的黑描边和硬投影。 */
+$n-bw: 1rpx;
+$n-shadow: 0rpx 16rpx 44rpx $a-shadow;
+$n-shadow-sm: 0rpx 8rpx 24rpx rgba(57, 48, 73, 0.09);
 
-/* 按压态（配合 hover-class="press"）：向投影方向位移，视觉上「按进去」 */
+$n-r: 30rpx;
+$n-r-sm: 22rpx;
+
+/* 移动端按压只做轻微下沉与透明度反馈，不改变布局。 */
 .press {
-  transform: translate(3rpx, 3rpx);
-  box-shadow: 0rpx 0rpx 0rpx $n-ink;
+  transform: translateY(2rpx);
+  opacity: 0.9;
+  box-shadow: 0rpx 6rpx 18rpx rgba(57, 48, 73, 0.08);
 }
 .pressable {
-  transition-property: transform;
-  transition-duration: 120ms;
+  transition-property: transform, opacity, box-shadow;
+  transition-duration: 180ms;
 }
 .press-soft {
-  opacity: 0.72;
+  opacity: 0.68;
 }
 .pressable-soft {
   transition-property: opacity;
-  transition-duration: 120ms;
+  transition-duration: 160ms;
 }
 
-/* Neo 通用卡片类（各页 @import 后直接挂 class 用；背景色/圆角可在页面类中覆盖——
- * 页面类定义在 import 之后，同名属性按级联顺序覆盖 */
+/* 类名为兼容旧模板保留，实际为 Aurora surface。 */
 .neo-card {
   background-color: $n-card;
   border-width: $n-bw;
   border-style: solid;
-  border-color: $n-ink;
+  border-color: rgba(37, 34, 43, 0.1);
   border-radius: $n-r;
   box-shadow: $n-shadow;
 }
@@ -171,7 +180,30 @@ $n-r-sm: 14rpx;
   background-color: $n-card;
   border-width: $n-bw;
   border-style: solid;
-  border-color: $n-ink;
+  border-color: rgba(37, 34, 43, 0.1);
   border-radius: $n-r-sm;
   box-shadow: $n-shadow-sm;
+}
+
+.editorial-title {
+  font-family: serif;
+  font-weight: 500;
+  letter-spacing: -1rpx;
+}
+.micro-label {
+  font-family: monospace;
+  letter-spacing: 3rpx;
+}
+
+/* uvue 在 Android 上不会稳定绘制复杂 CSS 渐变，统一用离线位图作为氛围层。 */
+.aurora-bg {
+  position: absolute;
+  left: 0rpx;
+  top: 0rpx;
+  width: 750rpx;
+  height: 100%;
+  opacity: 0.46;
+}
+.aurora-bg-strong {
+  opacity: 0.78;
 }

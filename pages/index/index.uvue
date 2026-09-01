@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <!-- 头部：日期 + 计划胶囊 + 问候 -->
     <view class="neo-card hero">
       <view class="hero-top">
@@ -194,19 +195,24 @@
 <style lang="scss">
   @import '../../uni.scss';
 
-  /* ===== Neo 风格（Neubrutalism：黑边 + 硬投影 + 高饱和色块 + 按压动画） ===== */
+  /* ===== Aurora Editorial：氛围渐变 + 编辑式层级 + 轻质感面板 ===== */
 
   .page {
     flex: 1;
     padding: 32rpx 32rpx 48rpx;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #f7eee5 0%, #faf7f1 54%, #f0edf5 100%);
   }
 
-  /* ---------- 头部：黄色 hero 块（neo-card 打底，覆盖黄底） ---------- */
+  /* ---------- 头部：暮色渐变承担氛围，正文仍保持深色对比 ---------- */
   .hero {
-    background-color: $n-yellow;
-    padding: 36rpx 32rpx;
-    margin-bottom: 28rpx;
+    background-color: #f4c58e;
+    background-image: linear-gradient(135deg, #f6db9b 0%, #f3a181 48%, #a8c4df 100%);
+    border-width: 0rpx;
+    border-radius: 42rpx;
+    box-shadow: 0rpx 22rpx 54rpx rgba(87, 63, 78, 0.16);
+    padding: 42rpx 36rpx 48rpx;
+    margin-bottom: 30rpx;
   }
   .hero-top {
     flex-direction: row;
@@ -214,57 +220,58 @@
   }
   .hero-date {
     flex: 1;
-    font-size: $c-fs-sm;
+    font-size: $c-fs-xs;
     color: $n-ink;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 3rpx;
   }
   .plan-chip {
-    background-color: $n-card;
-    border-width: 2rpx;
+    background-color: rgba(255, 253, 249, 0.82);
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
-    padding: 6rpx 20rpx;
+    padding: 8rpx 20rpx;
   }
   .plan-chip-text {
     font-size: $c-fs-xs;
     color: $n-ink;
-    font-weight: bold;
+    font-weight: 500;
   }
   .hero-hello {
-    font-size: $c-fs-xl;
-    font-weight: bold;
+    font-size: 46rpx;
+    font-family: serif;
+    font-weight: 500;
+    line-height: 62rpx;
     color: $n-ink;
-    margin-top: 16rpx;
+    margin-top: 36rpx;
   }
 
-  /* ---------- 三色进度条：白底黑边外壳（neo-card 打底） ---------- */
+  /* ---------- 三色进度条：连续柔和色带 ---------- */
   .panel {
     padding: 32rpx;
-    margin-bottom: 28rpx;
+    margin-bottom: 30rpx;
   }
   .bar {
     flex-direction: row;
     align-items: stretch;
-    height: 24rpx;
+    height: 18rpx;
     border-radius: 999rpx;
     overflow: hidden;
     background-color: $n-card;
-    border-width: 2rpx;
-    border-style: solid;
-    border-color: $n-ink;
+    border-width: 0rpx;
   }
   .bar-ok {
-    height: 24rpx;
+    height: 18rpx;
     background-color: $n-green;
   }
   .bar-learning {
-    height: 24rpx;
+    height: 18rpx;
     background-color: $n-blue;
   }
   .bar-rest {
     flex: 1;
-    height: 24rpx;
+    height: 18rpx;
     background-color: $n-cream;
   }
   .legend {
@@ -277,13 +284,11 @@
     margin-right: 32rpx;
   }
   .dot {
-    width: 16rpx;
-    height: 16rpx;
+    width: 14rpx;
+    height: 14rpx;
     border-radius: 999rpx;
     margin-right: 8rpx;
-    border-width: 2rpx;
-    border-style: solid;
-    border-color: $n-ink;
+    border-width: 0rpx;
   }
   .dot-ok {
     background-color: $n-green;
@@ -297,34 +302,38 @@
   .legend-text {
     font-size: $c-fs-xs;
     color: $n-text2;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 1rpx;
   }
 
-  /* ---------- 两大入口：红（复习）/ 黄（学新词），neo-card 打底覆盖色 ---------- */
+  /* ---------- 两大入口：像杂志信息块一样清晰分栏 ---------- */
   .entries {
     flex-direction: row;
     margin-bottom: 28rpx;
   }
   .entry {
     flex: 1;
-    padding: 36rpx 0;
+    padding: 38rpx 0 34rpx;
     align-items: center;
+    border-width: 0rpx;
   }
-  .entry-review {
+  .neo-card.entry-review {
     background-color: $n-red;
   }
-  .entry-new {
+  .neo-card.entry-new {
     background-color: $n-yellow;
     margin-left: 24rpx;
   }
   .entry-title {
     font-size: $c-fs-md;
     color: $n-ink;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 2rpx;
   }
   .entry-num {
     font-size: 72rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
     margin-top: 8rpx;
   }
@@ -332,7 +341,7 @@
     font-size: $c-fs-xs;
     color: $n-ink;
     opacity: 0.75;
-    font-weight: bold;
+    letter-spacing: 1rpx;
   }
 
   /* ---------- 统计条：彩色数字 ---------- */
@@ -345,7 +354,8 @@
   }
   .stat-num {
     font-size: $c-fs-xl;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .num-blue {
@@ -361,16 +371,17 @@
     font-size: $c-fs-xs;
     color: $n-text3;
     margin-top: 8rpx;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 1rpx;
   }
 
-  /* ---------- 底部入口：四色块（neo-card-sm 打底覆盖色） ---------- */
+  /* ---------- 底部入口：低饱和功能索引 ---------- */
   .nav-row {
     flex-direction: row;
   }
   .nav {
     flex: 1;
-    padding: 24rpx 0;
+    padding: 26rpx 0 24rpx;
     align-items: center;
     margin-right: 16rpx;
   }
@@ -388,19 +399,20 @@
     height: 54rpx;
     border-radius: 999rpx;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.14);
     font-size: 32rpx;
     color: $n-ink;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     text-align: center;
     line-height: 54rpx;
   }
   .nav-text {
     font-size: $c-fs-xs;
     color: $n-ink;
-    font-weight: bold;
+    font-weight: 500;
     margin-top: 8rpx;
   }
 </style>

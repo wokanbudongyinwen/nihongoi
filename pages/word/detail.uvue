@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+  <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
   <scroll-view class="body" scroll-y="true" show-scrollbar="false">
     <!-- 头部：表记 + 读音（音调核） + 词性 + 状态徽章 -->
     <view class="neo-card header">
@@ -655,18 +656,19 @@
   .page {
     flex: 1;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #f3dfd6 0%, #f8f4ed 28%, #eef2f5 100%);
   }
   .body {
     flex: 1;
     padding: 28rpx 28rpx 48rpx;
-    background-color: $n-bg;
+    background-color: transparent;
   }
   .rate-bar {
     flex-direction: row;
-    background-color: $n-bg;
-    border-top-width: 2rpx;
+    background-color: rgba(247, 242, 234, 0.96);
+    border-top-width: 1rpx;
     border-top-style: solid;
-    border-top-color: $n-ink;
+    border-top-color: $a-line;
     padding: 20rpx 24rpx 40rpx;
   }
   .rate-btn {
@@ -675,16 +677,16 @@
     margin: 0 8rpx;
     align-items: center;
   }
-  .rate-again {
+  .neo-card-sm.rate-again {
     background-color: $n-red;
   }
-  .rate-hard {
+  .neo-card-sm.rate-hard {
     background-color: $n-yellow;
   }
-  .rate-good {
+  .neo-card-sm.rate-good {
     background-color: $n-green;
   }
-  .rate-master {
+  .neo-card-sm.rate-master {
     background-color: $n-blue;
   }
   .rate-master-text {
@@ -700,8 +702,12 @@
     height: 140rpx;
   }
   .header {
-    background-color: $n-yellow;
-    padding: 32rpx;
+    background-color: #f0c895;
+    background-image: linear-gradient(135deg, #f4dba0 0%, #efb28e 55%, #b8cbe0 100%);
+    border-width: 0rpx;
+    border-radius: 40rpx;
+    box-shadow: 0rpx 18rpx 48rpx rgba(71, 55, 72, 0.14);
+    padding: 36rpx;
     margin-bottom: 24rpx;
   }
   .header-row {
@@ -711,7 +717,8 @@
   }
   .term {
     font-size: 56rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     flex: 1;
     color: $n-ink;
   }
@@ -719,15 +726,16 @@
     font-size: 22rpx;
     color: $n-ink;
     background-color: $n-green;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 14rpx;
     margin-left: 16rpx;
   }
   .reading {
     font-size: 30rpx;
+    font-family: serif;
     color: $n-ink;
   }
   .romaji {
@@ -741,9 +749,9 @@
     height: 54rpx;
     border-radius: 999rpx;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     font-size: 22rpx;
     font-weight: bold;
     color: $n-ink;
@@ -764,9 +772,9 @@
     font-size: 26rpx;
     color: $n-ink;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 16rpx;
     font-weight: bold;
@@ -788,7 +796,8 @@
   }
   .section-title {
     font-size: 30rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     margin-bottom: 16rpx;
     color: $n-ink;
   }
@@ -803,7 +812,7 @@
   }
   .link {
     font-size: 28rpx;
-    color: $n-blue;
+    color: $a-blue-ink;
     font-weight: bold;
   }
   .empty-tip {
@@ -821,30 +830,30 @@
   }
   .action {
     font-size: 24rpx;
-    color: $n-blue;
+    color: $a-blue-ink;
     font-weight: bold;
     margin-right: 24rpx;
   }
   .danger {
-    color: $n-red;
+    color: $a-red-ink;
   }
   .add {
     font-size: 26rpx;
     color: $n-ink;
     background-color: $n-yellow;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 8rpx 18rpx;
     font-weight: bold;
     margin-top: 12rpx;
   }
   .add-form {
-    background-color: $n-cream;
-    border-width: 2rpx;
+    background-color: #f3eee5;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 20rpx;
     margin-top: 16rpx;
@@ -858,7 +867,8 @@
     width: 140rpx;
     font-size: 26rpx;
     color: $n-text2;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 1rpx;
   }
   .form-value {
     flex: 1;
@@ -866,9 +876,9 @@
   }
   .form-input {
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 12rpx 20rpx;
     font-size: 26rpx;
@@ -879,9 +889,9 @@
   }
   .form-textarea {
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 12rpx 20rpx;
     font-size: 26rpx;
@@ -914,15 +924,15 @@
   .rel-result {
     border-radius: $n-r-sm;
     background-color: $n-card;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     padding: 14rpx 16rpx;
     margin-bottom: 10rpx;
   }
   .cand-on {
     font-size: 24rpx;
-    color: $n-green;
+    color: $a-green-ink;
   }
   .rel-term {
     font-size: 26rpx;

@@ -1,5 +1,31 @@
 # 文件修改日志
 
+## Aurora Editorial 全项目 UI 分支改造（2026-09-01）
+
+### uni.scss + static/aurora-bg.png
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改/新增 | 设计 token 从 Neo 硬描边体系切换为 Aurora Editorial：暖白纸张底、暮橙/暖金/雾蓝/鼠尾草/薰衣草低饱和色、1rpx 轻边界、柔和悬浮影、衬线标题与等宽微标签；使用内置 ImageGen 生成 9:16 柔焦色场并作为全页面离线氛围层 | 复现参考图的 Gradient Mesh / Aurora Evolved 氛围，同时绕开 uvue Android 不稳定绘制复杂 CSS 渐变的问题 |
+
+### pages/index/index.uvue + pages/splash/splash.uvue + pages/study/study.uvue + pages/word/detail.uvue
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 首页改为编辑式日期/计划/统计网格与暮橙、暖金主入口；开屏改为柔焦封面式字章；背词页改为大留白纸张词卡；词卡详情改为暮色页头、实色阅读分区和轻量评分底栏 | 优先建立每日入口、沉浸学习与详情阅读三个核心体验样板，并保持文字高对比 |
+
+### pages/word/chain.uvue + pages/plan/list.uvue + pages/plan/detail.uvue + pages/plan/import.uvue + pages/library/library.uvue + pages/settings/settings.uvue
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 链式记忆、计划、导入、词库与设置统一迁移到氛围底图 + 暖白内容面板；标题采用衬线层级，标签采用等宽层级，输入框/状态/主操作改为轻边界和低饱和语义色 | 完成全项目视觉一致性，信息密集页不让渐变直接承载长文本 |
+
+### AGENTS.md + DESIGN.md
+
+| 时间 | 操作 | 说明 | 修改原因 |
+|------|------|------|------|
+| 2026-09-01 | 修改 | 记录 Aurora 分支的设计语言、离线背景实现、实机约束与原 Neo 分支保留位置 | 防止后续开发混用两套视觉规范 |
+
 ## Git 首次建仓忽略规则（2026-09-01）
 
 ### .gitignore

@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <scroll-view class="body" scroll-y="true" show-scrollbar="false" @scrolltolower="onLoadMore">
       <!-- 参数 -->
       <view class="neo-card section">
@@ -532,11 +533,12 @@
   .page {
     flex: 1;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #e5edf3 0%, #f8f4ed 30%, #f1edf3 100%);
   }
   .body {
     flex: 1;
     padding: 28rpx 28rpx 48rpx;
-    background-color: $n-bg;
+    background-color: transparent;
   }
   .section {
     padding: 32rpx;
@@ -549,7 +551,8 @@
   }
   .title {
     font-size: 34rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
     flex: 1;
   }
@@ -557,9 +560,9 @@
     font-size: 22rpx;
     color: $n-ink;
     background-color: $n-green;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 14rpx;
     font-weight: bold;
@@ -573,7 +576,8 @@
     width: 200rpx;
     font-size: 26rpx;
     color: $n-text2;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 1rpx;
   }
   .value {
     flex: 1;
@@ -583,9 +587,9 @@
   .input {
     width: 200rpx;
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 10rpx 20rpx;
     font-size: 28rpx;
@@ -616,7 +620,7 @@
     flex-direction: row;
     align-items: center;
     padding: 16rpx 0;
-    border-bottom-width: 2rpx;
+    border-bottom-width: 1rpx;
     border-bottom-color: $n-cream;
   }
   .word-no {
@@ -633,12 +637,13 @@
   }
   .word-term {
     font-size: 30rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .word-reading {
     font-size: 24rpx;
-    color: $n-blue;
+    color: $a-blue-ink;
     font-weight: bold;
     margin-left: 16rpx;
   }
@@ -665,9 +670,9 @@
   }
   .search {
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 14rpx 20rpx;
     font-size: 26rpx;
@@ -681,9 +686,9 @@
     font-size: 24rpx;
     color: $n-ink;
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: 999rpx;
     padding: 8rpx 24rpx;
     margin-right: 16rpx;
@@ -747,9 +752,9 @@
     font-size: 26rpx;
     color: $n-ink;
     background-color: $n-purple;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 16rpx;
     font-weight: bold;
@@ -766,7 +771,7 @@
   }
   .select-action {
     font-size: 24rpx;
-    color: $n-blue;
+    color: $a-blue-ink;
     font-weight: bold;
     margin-left: 24rpx;
   }
@@ -774,9 +779,9 @@
     width: 36rpx;
     height: 36rpx;
     border-radius: 999rpx;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     align-items: center;
     justify-content: center;
     margin-right: 16rpx;
@@ -791,7 +796,7 @@
   }
   .manage-bar {
     flex-direction: row;
-    background-color: $n-bg;
+    background-color: transparent;
     padding: 20rpx 24rpx 40rpx;
   }
   .manage-btn {

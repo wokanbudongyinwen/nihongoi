@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <view class="neo-card plan pressable" hover-class="press" :class="p.isActive ? 'plan-on' : ''" v-for="(p, i) in plans" :key="p.id" @click="goDetail(p)">
       <view class="plan-main">
         <text class="plan-name">{{ p.name }}</text>
@@ -105,6 +106,7 @@
     flex: 1;
     padding: 28rpx 28rpx 48rpx;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #e6edf4 0%, #f8f4ed 38%, #f2edf4 100%);
   }
   .plan {
     padding: 32rpx;
@@ -113,14 +115,17 @@
     align-items: center;
   }
   .plan-on {
-    background-color: $n-yellow;
+    background-color: #f2d99d;
+    background-image: linear-gradient(135deg, #f4dfaa 0%, #edc98a 55%, #c5d5e5 100%);
+    border-width: 0rpx;
   }
   .plan-main {
     flex: 1;
   }
   .plan-name {
     font-size: 32rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .plan-sub {
@@ -132,22 +137,24 @@
     font-size: 22rpx;
     color: $n-ink;
     background-color: $n-green;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.12);
     border-radius: 999rpx;
     padding: 6rpx 14rpx;
     font-weight: bold;
   }
-  .import-btn {
+  .neo-card.import-btn {
     padding: 28rpx 32rpx;
     background-color: $n-blue;
+    border-width: 0rpx;
     align-items: center;
   }
   .import-text {
     font-size: 28rpx;
     color: $n-ink;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 2rpx;
   }
   .empty {
     padding: 80rpx 28rpx;

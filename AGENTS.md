@@ -120,6 +120,6 @@
 
 ## 规范
 
-- **UI 设计系统（2026-09-01 MuMu 实机调优）**：Neobrutalism 软粗野主义——uni.scss 的 $n-* Neo token（ink 黑 #1f1f1f / 米白底 #faf6ee / 黄 #ffd93d·红 #ff6b6b·蓝 #4d96ff·绿 #6bcb77·紫 #b98ce8 高饱和五色）；卡片 = 底色 + 3rpx 黑边 + 主卡 2rpx/小卡 1rpx 轻硬投影 + 20rpx 圆角，彩色底一律黑字；可点元素加 `pressable` 类 + `hover-class="press"`，按压时位移并收起投影。全部页面已迁移到 $n-* 色彩体系，滚动区隐藏原生滚动条，导航/音频图标统一用描边文字图形；旧 $c-* 颜色 token 仅为兼容保留。
+- **UI 设计系统（`feat/aurora-editorial-ui` 分支，2026-09-01 MuMu 实机调优）**：Aurora Editorial 氛围渐变编辑风——柔焦暮橙/暖金/雾蓝/薰衣草色场 + 暖白纸张面板 + 编辑式衬线标题/等宽微标签；`static/aurora-bg.png` 作为离线全屏氛围层（uvue Android 不稳定绘制复杂 CSS 渐变），长文本始终落在高对比实色面板上。`uni.scss` 保留 `$n-*` 与 `neo-card` 旧名作模板兼容，实际已切换为 1rpx 轻边界、柔和悬浮影、30rpx/22rpx 圆角与低饱和五色；按压仅轻微下沉/透明度反馈。全部页面已迁移，滚动区隐藏原生滚动条，导航/音频入口继续使用统一文字图形。原 Neo 版本保留在 `feat/ui-polish` 分支。
 - 样式优先使用 UnoCSS 原子化类
 - 所有文件修改需记录到 log.md

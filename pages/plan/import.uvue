@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <!-- 计划参数 -->
     <view class="neo-card meta">
       <view class="mode-row">
@@ -268,6 +269,7 @@
   .page {
     flex: 1;
     background-color: $n-bg;
+    background-image: linear-gradient(180deg, #f1e4dc 0%, #f8f4ed 32%, #e8eef4 100%);
   }
   .meta {
     padding: 24rpx;
@@ -281,9 +283,9 @@
     font-size: 26rpx;
     color: $n-ink;
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: 999rpx;
     padding: 10rpx 28rpx;
     margin-right: 16rpx;
@@ -302,9 +304,9 @@
     font-size: 24rpx;
     color: $n-ink;
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: 999rpx;
     padding: 8rpx 24rpx;
     margin-right: 16rpx;
@@ -324,14 +326,15 @@
     width: 140rpx;
     font-size: 28rpx;
     color: $n-text2;
-    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 1rpx;
   }
   .meta-input {
     flex: 1;
     background-color: $n-cream;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     border-radius: $n-r-sm;
     padding: 12rpx 20rpx;
     font-size: 28rpx;
@@ -382,7 +385,8 @@
   .row-term {
     flex: 1;
     font-size: 30rpx;
-    font-weight: bold;
+    font-family: serif;
+    font-weight: 500;
     color: $n-ink;
   }
   .row-meaning {
@@ -393,7 +397,7 @@
   }
   .row-extra {
     font-size: 22rpx;
-    color: $n-green;
+    color: $a-green-ink;
     font-weight: bold;
     margin-top: 6rpx;
     margin-left: 48rpx;
@@ -417,7 +421,7 @@
   }
   .hit {
     font-size: 26rpx;
-    color: $n-green;
+    color: $a-green-ink;
     margin-top: 8rpx;
     margin-left: 48rpx;
   }
@@ -427,14 +431,14 @@
   }
   .cand {
     border-radius: $n-r-sm;
-    border-width: 2rpx;
+    border-width: 1rpx;
     border-style: solid;
-    border-color: $n-ink;
+    border-color: $a-line;
     padding: 16rpx;
     margin-bottom: 12rpx;
   }
   .cand-on {
-    border-color: $n-ink;
+    border-color: rgba(37, 34, 43, 0.14);
     background-color: $n-yellow;
   }
   .cand-term {
@@ -455,10 +459,11 @@
   }
   .footer {
     padding: 24rpx;
-    background-color: $n-bg;
+    background-color: transparent;
   }
-  .btn {
+  .neo-card-sm.btn {
     background-color: $n-yellow;
+    border-width: 0rpx;
     padding: 24rpx 0;
     align-items: center;
   }
