@@ -1,120 +1,178 @@
 <template>
   <view class="page">
-    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
-    <!-- 头部：以留白和排版建立编辑感，不再套用大卡片 -->
-    <view class="hero">
-      <view class="hero-top">
-        <text class="hero-date">{{ todayText() }}</text>
-        <view class="plan-chip" v-if="planName != ''">
-          <text class="plan-chip-text">{{ planName }}</text>
-        </view>
-      </view>
-      <text class="hero-kicker">TODAY'S STUDY</text>
-      <text class="hero-hello">{{ helloText() }}</text>
-      <text class="hero-note">一点一点，让今天的词留下来。</text>
-    </view>
+    <view :style="'height:' + safeTop + 'px'"></view>
+    <swiper class="home-swiper" :current="currentPage" :autoplay="false" :circular="false"
+      :indicator-dots="false" @change="onPageChange">
+      <swiper-item>
+        <view class="sheet-shell">
+          <view class="sheet">
+            <image class="sheet-wash" src="/static/aurora-bg.png" mode="aspectFill"></image>
+            <scroll-view class="sheet-scroll" :scroll-y="true" :show-scrollbar="false">
+              <view class="sheet-content">
+                <view class="folio">
+                  <text class="folio-label">NIHONGO / DAILY</text>
+                  <text class="folio-date">{{ todayText() }}</text>
+                </view>
+                <view class="hero">
+                  <text class="eyebrow">TODAY'S STUDY</text>
+                  <text class="hero-title">{{ helloText() }}</text>
+                  <text class="hero-note">一点一点，让今天的词留下来。</text>
+                  <view class="plan-line" v-if="planName != ''">
+                    <text class="plan-label">正在学习</text>
+                    <text class="plan-name">{{ planName }}</text>
+                  </view>
+                </view>
 
-    <view class="section-heading">
-      <text class="section-kicker">TODAY</text>
-      <text class="section-title">今日任务</text>
-    </view>
+                <view class="section-heading">
+                  <text class="section-title">今日任务</text>
+                  <text class="section-meta">01 / PRACTICE</text>
+                </view>
+                <view class="entries">
+                  <view class="entry entry-review pressable-soft" hover-class="press-soft" @click="goStudy('review')">
+                    <text class="entry-kicker">REVIEW</text>
+                    <text class="entry-title">复习</text>
+                    <text class="entry-num">{{ dueCount }}</text>
+                    <text class="entry-unit">个到期</text>
+                    <text class="entry-action">开始复习</text>
+                  </view>
+                  <view class="entry entry-new pressable-soft" hover-class="press-soft" @click="goStudy('new')">
+                    <text class="entry-kicker">NEW WORDS</text>
+                    <text class="entry-title">学新词</text>
+                    <text class="entry-num">{{ todayNewCount }}</text>
+                    <text class="entry-unit">今日已学</text>
+                    <text class="entry-action">继续学习</text>
+                  </view>
+                </view>
 
-    <!-- 今日主任务：采用不对称编辑网格，突出优先复习 -->
-    <view class="entries">
-      <view class="neo-card entry entry-review pressable" hover-class="press" @click="goStudy('review')">
-        <text class="entry-kicker">REVIEW</text>
-        <text class="entry-title">复习</text>
-        <text class="entry-num">{{ dueCount }}</text>
-        <text class="entry-unit">个到期</text>
-      </view>
-      <view class="neo-card entry entry-new pressable" hover-class="press" @click="goStudy('new')">
-        <text class="entry-kicker">NEW WORDS</text>
-        <text class="entry-title">学新词</text>
-        <text class="entry-num">{{ todayNewCount }}</text>
-        <text class="entry-unit">今日已学</text>
-      </view>
-    </view>
+                <view class="overview" v-if="planName != ''">
+                  <view class="section-heading">
+                    <text class="section-title">学习进度</text>
+                    <text class="overview-total">{{ learnedCount }} / {{ totalCount }}</text>
+                  </view>
+                  <view class="bar" v-if="totalCount > 0">
+                    <view class="bar-ok" :style="'width:' + masterPct() + '%'"></view>
+                    <view class="bar-learning" :style="'width:' + learningPct() + '%'"></view>
+                    <view class="bar-rest"></view>
+                  </view>
+                  <view class="legend" v-if="totalCount > 0">
+                    <view class="legend-item"><view class="dot dot-ok"></view><text class="legend-text">掌握 {{ masteredCount }}</text></view>
+                    <view class="legend-item"><view class="dot dot-learning"></view><text class="legend-text">学习 {{ learningCount }}</text></view>
+                    <view class="legend-item"><view class="dot dot-rest"></view><text class="legend-text">未学 {{ restCount() }}</text></view>
+                  </view>
+                  <view class="stats-row">
+                    <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learning')">
+                      <text class="stat-num num-blue">{{ learningCount }}</text><text class="stat-label">在学</text>
+                    </view>
+                    <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learned')">
+                      <text class="stat-num num-green">{{ learnedCount }}</text><text class="stat-label">已学</text>
+                    </view>
+                    <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('todayReview')">
+                      <text class="stat-num num-red">{{ todayReviewCount }}</text><text class="stat-label">今日复习</text>
+                    </view>
+                    <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('all')">
+                      <text class="stat-num">{{ totalCount }}</text><text class="stat-label">总词数</text>
+                    </view>
+                  </view>
+                </view>
+                <view class="empty-plan pressable-soft" v-else hover-class="press-soft" @click="go('/pages/plan/list')">
+                  <text class="section-title">从一份计划开始</text>
+                  <text class="hero-note">还没有激活计划，点此选择或导入词单。</text>
+                </view>
+              </view>
+            </scroll-view>
+            <view class="sheet-footer">
+              <text class="footer-note">ゆっくり、着実に。</text>
+              <text class="footer-page">01 / 02</text>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
 
-    <!-- 进度与统计合并为一张信息面板，减少卡片堆叠 -->
-    <view class="neo-card panel overview" v-if="planName != ''">
-      <view class="overview-head">
-        <text class="overview-label">LEARNING PROGRESS</text>
-        <text class="overview-total">{{ learnedCount }} / {{ totalCount }}</text>
+      <swiper-item>
+        <view class="sheet-shell">
+          <view class="sheet">
+            <image class="sheet-wash tools-wash" src="/static/aurora-bg.png" mode="aspectFill"></image>
+            <scroll-view class="sheet-scroll" :scroll-y="true" :show-scrollbar="false">
+              <view class="sheet-content">
+                <view class="folio">
+                  <text class="folio-label">NIHONGO / COLLECTION</text>
+                  <text class="folio-date">CONTENTS</text>
+                </view>
+                <view class="hero tools-hero">
+                  <text class="eyebrow">YOUR LEARNING SPACE</text>
+                  <text class="hero-title">学习工具</text>
+                  <text class="hero-note">整理词语，也整理自己的学习节奏。</text>
+                </view>
+                <view class="tool-list">
+                  <view class="tool-row pressable-soft" hover-class="press-soft" @click="go('/pages/word/chain')">
+                    <text class="tool-index tool-purple">01</text>
+                    <view class="tool-copy"><text class="tool-title">链式记忆</text><text class="tool-desc">让孤单的词，在关联中留下来。</text></view>
+                    <view class="tool-mark mark-purple"></view>
+                  </view>
+                  <view class="tool-row pressable-soft" hover-class="press-soft" @click="go('/pages/plan/list')">
+                    <text class="tool-index tool-blue">02</text>
+                    <view class="tool-copy"><text class="tool-title">学习计划</text><text class="tool-desc">选择词单，安排自己的进度。</text></view>
+                    <view class="tool-mark mark-blue"></view>
+                  </view>
+                  <view class="tool-row pressable-soft" hover-class="press-soft" @click="go('/pages/library/library')">
+                    <text class="tool-index tool-green">03</text>
+                    <view class="tool-copy"><text class="tool-title">我的词库</text><text class="tool-desc">查找、编辑，积累每一个表达。</text></view>
+                    <view class="tool-mark mark-green"></view>
+                  </view>
+                  <view class="tool-row pressable-soft" hover-class="press-soft" @click="go('/pages/settings/settings')">
+                    <text class="tool-index tool-red">04</text>
+                    <view class="tool-copy"><text class="tool-title">设置与备份</text><text class="tool-desc">调整复习周期，保存学习积累。</text></view>
+                    <view class="tool-mark mark-red"></view>
+                  </view>
+                </view>
+                <text class="tools-note">把每个词，放进自己的语境。</text>
+              </view>
+            </scroll-view>
+            <view class="sheet-footer">
+              <text class="footer-note">言葉を、つなぐ。</text>
+              <text class="footer-page">02 / 02</text>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="pager">
+      <view class="pager-tab pressable-soft" hover-class="press-soft" @click="selectPage(0)">
+        <view class="pager-line" :class="currentPage == 0 ? 'pager-line-active' : ''"></view>
+        <text class="pager-label" :class="currentPage == 0 ? 'pager-label-active' : ''">学习</text>
       </view>
-      <view class="bar" v-if="totalCount > 0">
-        <view class="bar-ok" :style="'width:' + masterPct() + '%'"></view>
-        <view class="bar-learning" :style="'width:' + learningPct() + '%'"></view>
-        <view class="bar-rest"></view>
-      </view>
-      <view class="legend" v-if="totalCount > 0">
-        <view class="legend-item">
-          <view class="dot dot-ok"></view>
-          <text class="legend-text">掌握 {{ masteredCount }}</text>
-        </view>
-        <view class="legend-item">
-          <view class="dot dot-learning"></view>
-          <text class="legend-text">学习 {{ learningCount }}</text>
-        </view>
-        <view class="legend-item legend-last">
-          <view class="dot dot-rest"></view>
-          <text class="legend-text">未学 {{ restCount() }}</text>
-        </view>
-      </view>
-      <view class="overview-line"></view>
-      <view class="stats-row">
-        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learning')">
-          <text class="stat-num num-blue">{{ learningCount }}</text>
-          <text class="stat-label">在学</text>
-        </view>
-        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('learned')">
-          <text class="stat-num num-green">{{ learnedCount }}</text>
-          <text class="stat-label">已学</text>
-        </view>
-        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('todayReview')">
-          <text class="stat-num num-red">{{ todayReviewCount }}</text>
-          <text class="stat-label">今日复习</text>
-        </view>
-        <view class="stat pressable-soft" hover-class="press-soft" @click="goStats('all')">
-          <text class="stat-num">{{ totalCount }}</text>
-          <text class="stat-label">总词数</text>
-        </view>
+      <text class="pager-hint">左右滑动</text>
+      <view class="pager-tab pressable-soft" hover-class="press-soft" @click="selectPage(1)">
+        <view class="pager-line" :class="currentPage == 1 ? 'pager-line-active' : ''"></view>
+        <text class="pager-label" :class="currentPage == 1 ? 'pager-label-active' : ''">工具</text>
       </view>
     </view>
-
-    <view class="section-heading tools-heading">
-      <text class="section-kicker">EXPLORE</text>
-      <text class="section-title">学习工具</text>
-    </view>
-
-    <!-- 文字目录式导航：编号承担识别，不使用不统一的伪图标 -->
-    <view class="nav-row">
-      <view class="nav nav-purple pressable" hover-class="press" @click="go('/pages/word/chain')">
-        <text class="nav-index">01</text>
-        <text class="nav-text">链式记忆</text>
-        <text class="nav-desc">建立关联</text>
-      </view>
-      <view class="nav nav-blue pressable" hover-class="press" @click="go('/pages/plan/list')">
-        <text class="nav-index">02</text>
-        <text class="nav-text">计划</text>
-        <text class="nav-desc">学习节奏</text>
-      </view>
-      <view class="nav nav-green pressable" hover-class="press" @click="go('/pages/library/library')">
-        <text class="nav-index">03</text>
-        <text class="nav-text">词库</text>
-        <text class="nav-desc">浏览检索</text>
-      </view>
-      <view class="nav nav-neutral nav-right pressable" hover-class="press" @click="go('/pages/settings/settings')">
-        <text class="nav-index">04</text>
-        <text class="nav-text">设置</text>
-        <text class="nav-desc">周期备份</text>
-      </view>
-    </view>
+    <view :style="'height:' + safeBottom + 'px'"></view>
   </view>
 </template>
 
 <script setup lang="uts">
   import { buildTodaySummary } from '../../services/today.uts'
   import { awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
+
+  // 原生 swiper 负责横滑；可点击分页同时提供不依赖手势的入口。
+  const currentPage = ref(0)
+  const safeTop = ref(uni.getWindowInfo().statusBarHeight)
+  const safeBottom = ref(uni.getWindowInfo().safeAreaInsets.bottom)
+
+  const onPageChange = (event: UniSwiperChangeEvent) => {
+    currentPage.value = event.detail.current
+  }
+  const selectPage = (index: number) => {
+    currentPage.value = index
+  }
+  const updateSafeArea = () => {
+    const info = uni.getWindowInfo()
+    safeTop.value = info.statusBarHeight
+    safeBottom.value = info.safeAreaInsets.bottom
+  }
+  onReady(() => { updateSafeArea() })
+  onResize(() => { updateSafeArea() })
 
   const planName = ref('')
   const dueCount = ref(0)
@@ -218,296 +276,88 @@
 <style lang="scss">
   @import '../../uni.scss';
 
-  /* ===== Aurora Editorial：首页采用编辑封面 + 不对称任务网格 + 目录式导航 ===== */
-
-  .page {
+  /* 每个横滑页面仅保留一张整页纸卡；内部用分区和色块，而非多层投影。 */
+  .page { flex: 1; background-color: #eee8df; }
+  .home-swiper { flex: 1; }
+  .sheet-shell { height: 100%; padding: 18rpx 24rpx 10rpx; }
+  .sheet {
     flex: 1;
-    padding: 32rpx 32rpx 48rpx;
-    background-color: $n-bg;
-    background-image: linear-gradient(180deg, #f7eee5 0%, #faf7f1 54%, #f0edf5 100%);
-  }
-
-  /* ---------- 头部：去除容器感，让留白、日期和标题形成封面节奏 ---------- */
-  .hero {
-    padding: 22rpx 6rpx 42rpx;
-  }
-  .hero-top {
-    flex-direction: row;
-    align-items: center;
-  }
-  .hero-date {
-    flex: 1;
-    font-size: $c-fs-xs;
-    color: $n-ink;
-    font-family: monospace;
-    letter-spacing: 2rpx;
-  }
-  .plan-chip {
-    background-color: rgba(255, 253, 249, 0.72);
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.12);
-    border-radius: 999rpx;
-    padding: 8rpx 20rpx;
-  }
-  .plan-chip-text {
-    font-size: $c-fs-xs;
-    color: $n-ink;
-    font-weight: 500;
-  }
-  .hero-kicker {
-    font-size: 20rpx;
-    color: $a-red-ink;
-    font-family: monospace;
-    letter-spacing: 5rpx;
-    margin-top: 48rpx;
-  }
-  .hero-hello {
-    font-size: 50rpx;
-    font-family: serif;
-    font-weight: 500;
-    line-height: 62rpx;
-    color: $n-ink;
-    margin-top: 12rpx;
-  }
-  .hero-note {
-    font-size: $c-fs-sm;
-    color: $n-text2;
-    margin-top: 12rpx;
-    letter-spacing: 1rpx;
-  }
-
-  /* ---------- 分区标题 ---------- */
-  .section-heading {
-    flex-direction: row;
-    align-items: center;
-    margin: 0rpx 4rpx 18rpx;
-  }
-  .section-kicker {
-    font-size: 20rpx;
-    color: $n-text3;
-    font-family: monospace;
-    letter-spacing: 4rpx;
-  }
-  .section-title {
-    font-size: $c-fs-md;
-    color: $n-ink;
-    font-family: serif;
-    margin-left: 18rpx;
-  }
-
-  /* ---------- 进度面板：进度、图例和统计整合在同一信息块 ---------- */
-  .panel {
-    padding: 28rpx 30rpx 26rpx;
-    margin-bottom: 34rpx;
-  }
-  .overview-head {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 16rpx;
-  }
-  .overview-label {
-    flex: 1;
-    font-size: 20rpx;
-    color: $n-text3;
-    font-family: monospace;
-    letter-spacing: 3rpx;
-  }
-  .overview-total {
-    font-size: $c-fs-sm;
-    color: $n-ink;
-    font-family: monospace;
-  }
-  .bar {
-    flex-direction: row;
-    align-items: stretch;
-    height: 14rpx;
-    border-radius: 999rpx;
+    background-color: $a-surface;
+    border: 1rpx solid rgba(37, 34, 43, 0.1);
+    border-radius: 40rpx;
     overflow: hidden;
-    background-color: $n-card;
-    border-width: 0rpx;
   }
-  .bar-ok {
-    height: 14rpx;
-    background-color: $n-green;
-  }
-  .bar-learning {
-    height: 14rpx;
-    background-color: $n-blue;
-  }
-  .bar-rest {
-    flex: 1;
-    height: 14rpx;
-    background-color: $n-cream;
-  }
-  .legend {
-    flex-direction: row;
-    margin-top: 16rpx;
-  }
-  .legend-item {
-    flex-direction: row;
-    align-items: center;
-    margin-right: 24rpx;
-  }
-  .legend-last {
-    margin-right: 0rpx;
-  }
-  .dot {
-    width: 14rpx;
-    height: 14rpx;
-    border-radius: 999rpx;
-    margin-right: 8rpx;
-    border-width: 0rpx;
-  }
-  .dot-ok {
-    background-color: $n-green;
-  }
-  .dot-learning {
-    background-color: $n-blue;
-  }
-  .dot-rest {
-    background-color: $n-cream;
-  }
-  .legend-text {
-    font-size: $c-fs-xs;
-    color: $n-text2;
-    font-family: monospace;
-    letter-spacing: 0rpx;
-  }
-  .overview-line {
-    height: 1rpx;
-    background-color: rgba(37, 34, 43, 0.09);
-    margin: 24rpx 0 22rpx;
-  }
-
-  /* ---------- 今日任务：主次不对称，更接近编辑版面而非按钮宫格 ---------- */
-  .entries {
-    flex-direction: row;
-    align-items: stretch;
-    margin-bottom: 26rpx;
-  }
-  .entry {
-    min-height: 230rpx;
-    padding: 28rpx 26rpx 24rpx;
-    border-width: 0rpx;
-  }
-  .neo-card.entry-review {
-    flex: 1.18;
-    background-color: $n-red;
-  }
-  .neo-card.entry-new {
-    flex: 0.82;
-    background-color: $n-yellow;
-    margin-left: 24rpx;
-  }
-  .entry-kicker {
-    font-size: 19rpx;
-    color: $n-ink;
-    font-family: monospace;
-    letter-spacing: 3rpx;
-    opacity: 0.58;
-  }
-  .entry-title {
-    font-size: $c-fs-md;
-    color: $n-ink;
-    font-family: serif;
-    margin-top: 10rpx;
-  }
-  .entry-num {
-    font-size: 78rpx;
-    font-family: serif;
-    font-weight: 500;
-    color: $n-ink;
-    margin-top: 20rpx;
-  }
-  .entry-unit {
-    font-size: $c-fs-xs;
-    color: $n-ink;
-    opacity: 0.75;
-    letter-spacing: 1rpx;
-  }
-
-  /* ---------- 紧凑统计条 ---------- */
-  .stats-row {
-    flex-direction: row;
-  }
-  .stat {
-    flex: 1;
-    align-items: center;
-  }
-  .stat-num {
-    font-size: $c-fs-lg;
-    font-family: serif;
-    font-weight: 500;
-    color: $n-ink;
-  }
-  .num-blue {
-    color: $n-blue;
-  }
-  .num-green {
-    color: $n-green;
-  }
-  .num-red {
-    color: $n-red;
-  }
-  .stat-label {
-    font-size: $c-fs-xs;
-    color: $n-text3;
-    margin-top: 4rpx;
-    font-family: monospace;
-    letter-spacing: 1rpx;
-  }
-
-  /* ---------- 底部入口：无图标的编辑目录，编号提供稳定识别 ---------- */
-  .tools-heading {
-    margin-top: 0rpx;
-  }
-  .nav-row {
-    flex-direction: row;
-    margin-bottom: 0rpx;
-  }
-  .nav {
-    flex: 1;
-    min-height: 112rpx;
-    padding: 16rpx 12rpx 14rpx;
-    margin-right: 12rpx;
-    border-top-width: 2rpx;
-    border-top-style: solid;
-    border-top-color: rgba(37, 34, 43, 0.32);
-    background-color: rgba(255, 253, 249, 0.42);
-  }
-  .nav-purple {
-    border-top-color: $a-purple-ink;
-  }
-  .nav-blue {
-    border-top-color: $a-blue-ink;
-  }
-  .nav-green {
-    border-top-color: $a-green-ink;
-  }
-  .nav-neutral {
-    border-top-color: $a-red-ink;
-  }
-  .nav-right {
-    margin-right: 0rpx;
-  }
-  .nav-index {
-    font-size: 19rpx;
-    color: $n-text3;
-    font-family: monospace;
-    letter-spacing: 2rpx;
-  }
-  .nav-text {
-    font-size: $c-fs-sm;
-    color: $n-ink;
-    font-family: serif;
-    font-weight: 500;
-    margin-top: 8rpx;
-  }
-  .nav-desc {
-    font-size: 18rpx;
-    color: $n-text2;
-    margin-top: 4rpx;
-    letter-spacing: 1rpx;
-  }
+  .sheet-wash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.44; }
+  .tools-wash { opacity: 0.3; transform: rotate(180deg); }
+  .sheet-scroll { flex: 1; }
+  .sheet-content { padding: 32rpx 34rpx 20rpx; }
+  .folio { flex-direction: row; justify-content: space-between; align-items: center; }
+  .folio-label, .folio-date { font-size: 18rpx; font-family: monospace; color: $n-text2; letter-spacing: 1rpx; }
+  .hero { margin-top: 40rpx; margin-bottom: 36rpx; }
+  .eyebrow { font-size: 20rpx; font-family: monospace; letter-spacing: 4rpx; color: $a-red-ink; }
+  .hero-title { font-size: 52rpx; line-height: 70rpx; font-family: serif; font-weight: 500; color: $a-ink; margin-top: 14rpx; }
+  .hero-note { font-size: 24rpx; line-height: 36rpx; color: $n-text2; margin-top: 12rpx; }
+  .plan-line { margin-top: 30rpx; padding-left: 18rpx; border-left: 2rpx solid $a-red-ink; }
+  .plan-label { font-size: 18rpx; color: $n-text2; letter-spacing: 2rpx; }
+  .plan-name { font-size: 24rpx; line-height: 34rpx; color: $a-ink; margin-top: 6rpx; }
+  .section-heading { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+  .section-title { font-size: 28rpx; font-family: serif; color: $a-ink; }
+  .section-meta { font-size: 18rpx; font-family: monospace; letter-spacing: 1rpx; color: $n-text2; }
+  .entries { flex-direction: row; }
+  .entry { flex: 1; padding: 24rpx; border-radius: 24rpx; }
+  .entry-review { background-color: #f3b7a0; }
+  .entry-new { background-color: #f2dba3; margin-left: 18rpx; }
+  .entry-kicker { font-size: 18rpx; font-family: monospace; letter-spacing: 2rpx; color: $a-ink; }
+  .entry-title { font-size: 30rpx; font-family: serif; color: $a-ink; margin-top: 8rpx; }
+  .entry-num { font-size: 84rpx; line-height: 100rpx; font-family: serif; color: $a-ink; margin-top: 20rpx; }
+  .entry-unit { font-size: 22rpx; color: $a-ink; }
+  .entry-action { font-size: 22rpx; color: $a-ink; margin-top: 20rpx; padding-top: 16rpx; border-top: 1rpx solid rgba(37, 34, 43, 0.15); }
+  .overview { margin-top: 28rpx; padding-top: 28rpx; border-top: 1rpx solid rgba(37, 34, 43, 0.15); }
+  .overview-total { font-size: 22rpx; font-family: monospace; color: $n-text2; }
+  .bar { flex-direction: row; height: 14rpx; border-radius: 10rpx; overflow: hidden; background-color: $n-cream; }
+  .bar-ok { height: 14rpx; background-color: $n-green; }
+  .bar-learning { height: 14rpx; background-color: $n-blue; }
+  .bar-rest { flex: 1; height: 14rpx; background-color: $n-cream; }
+  .legend { flex-direction: row; flex-wrap: wrap; margin-top: 16rpx; }
+  .legend-item { flex-direction: row; align-items: center; margin-right: 20rpx; margin-bottom: 8rpx; }
+  .dot { width: 12rpx; height: 12rpx; border-radius: 6rpx; margin-right: 8rpx; }
+  .dot-ok { background-color: $a-green-ink; }
+  .dot-learning { background-color: $a-blue-ink; }
+  .dot-rest { background-color: #b8afa2; }
+  .legend-text { font-size: 21rpx; color: $n-text2; }
+  .stats-row { flex-direction: row; margin-top: 12rpx; }
+  .stat { flex: 1; align-items: center; justify-content: center; min-height: 92rpx; }
+  .stat-num { font-size: 36rpx; font-family: serif; color: $a-ink; }
+  .num-blue { color: $a-blue-ink; }
+  .num-green { color: $a-green-ink; }
+  .num-red { color: $a-red-ink; }
+  .stat-label { font-size: 20rpx; color: $n-text2; margin-top: 8rpx; }
+  .empty-plan { margin-top: 40rpx; padding: 28rpx 0; border-top: 1rpx solid $a-line; }
+  .sheet-footer { flex-direction: row; justify-content: space-between; align-items: center; padding: 22rpx 34rpx 28rpx; }
+  .footer-note { font-size: 20rpx; font-family: serif; color: $n-text2; letter-spacing: 2rpx; }
+  .footer-page { font-size: 18rpx; font-family: monospace; color: $n-text2; letter-spacing: 2rpx; }
+  .tools-hero { margin-top: 74rpx; margin-bottom: 58rpx; }
+  .tool-list { border-top: 1rpx solid rgba(37, 34, 43, 0.2); }
+  .tool-row { flex-direction: row; align-items: center; min-height: 104rpx; padding: 22rpx 0; border-bottom: 1rpx solid rgba(37, 34, 43, 0.15); }
+  .tool-index { width: 58rpx; font-size: 22rpx; font-family: monospace; align-self: flex-start; margin-top: 6rpx; }
+  .tool-copy { flex: 1; }
+  .tool-title { font-size: 34rpx; font-family: serif; color: $a-ink; }
+  .tool-desc { font-size: 22rpx; line-height: 32rpx; color: $n-text2; margin-top: 10rpx; }
+  .tool-mark { width: 14rpx; height: 14rpx; border-radius: 7rpx; margin-left: 16rpx; }
+  .tool-purple { color: $a-purple-ink; }
+  .tool-blue { color: $a-blue-ink; }
+  .tool-green { color: $a-green-ink; }
+  .tool-red { color: $a-red-ink; }
+  .mark-purple { background-color: $a-lilac; }
+  .mark-blue { background-color: $a-sky; }
+  .mark-green { background-color: $a-sage; }
+  .mark-red { background-color: $a-peach; }
+  .tools-note { font-size: 26rpx; font-family: serif; line-height: 38rpx; color: $n-text2; margin-top: 42rpx; }
+  .pager { flex-direction: row; align-items: center; justify-content: center; height: 96rpx; }
+  .pager-tab { min-width: 150rpx; height: 96rpx; align-items: center; justify-content: center; }
+  .pager-line { width: 18rpx; height: 4rpx; border-radius: 2rpx; background-color: #c7beb4; margin-bottom: 10rpx; }
+  .pager-line-active { width: 44rpx; background-color: $a-ink; }
+  .pager-label { font-size: 22rpx; color: $n-text2; }
+  .pager-label-active { color: $a-ink; font-weight: 600; }
+  .pager-hint { font-size: 18rpx; color: $n-text2; letter-spacing: 2rpx; margin: 0 26rpx; }
 </style>
