@@ -1,0 +1,294 @@
+{
+  "planName": "标日初级上 第4课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "部屋",
+      "reading": "へや",
+      "meaning": "房间，屋子",
+      "pos": "名词"
+    },
+    {
+      "term": "庭",
+      "reading": "にわ",
+      "meaning": "院子",
+      "pos": "名词"
+    },
+    {
+      "term": "家",
+      "reading": "いえ",
+      "meaning": "家",
+      "pos": "名词"
+    },
+    {
+      "term": "居間",
+      "reading": "いま",
+      "meaning": "起居室",
+      "pos": "名词"
+    },
+    {
+      "term": "冷蔵庫",
+      "reading": "れいぞうこ",
+      "meaning": "冰箱",
+      "pos": "名词"
+    },
+    {
+      "term": "壁",
+      "reading": "かべ",
+      "meaning": "墙壁",
+      "pos": "名词"
+    },
+    {
+      "term": "スイッチ",
+      "reading": "スイッチ",
+      "meaning": "开关",
+      "pos": "名词"
+    },
+    {
+      "term": "本棚",
+      "reading": "ほんだな",
+      "meaning": "书架",
+      "pos": "名词"
+    },
+    {
+      "term": "ベッド",
+      "reading": "ベッド",
+      "meaning": "床",
+      "pos": "名词"
+    },
+    {
+      "term": "猫",
+      "reading": "ねこ",
+      "meaning": "猫",
+      "pos": "名词"
+    },
+    {
+      "term": "犬",
+      "reading": "いぬ",
+      "meaning": "狗",
+      "pos": "名词"
+    },
+    {
+      "term": "箱",
+      "reading": "はこ",
+      "meaning": "盒子，箱子",
+      "pos": "名词"
+    },
+    {
+      "term": "眼鏡",
+      "reading": "めがね",
+      "meaning": "眼镜",
+      "pos": "名词"
+    },
+    {
+      "term": "ビデオ",
+      "reading": "ビデオ",
+      "meaning": "录像机",
+      "pos": "名词"
+    },
+    {
+      "term": "サッカーボール",
+      "reading": "サッカーボール",
+      "meaning": "足球",
+      "pos": "名词"
+    },
+    {
+      "term": "ビール",
+      "reading": "ビール",
+      "meaning": "啤酒",
+      "pos": "名词"
+    },
+    {
+      "term": "ウイスキー",
+      "reading": "ウイスキー",
+      "meaning": "威士忌",
+      "pos": "名词"
+    },
+    {
+      "term": "子供",
+      "reading": "こども",
+      "meaning": "孩子，小孩",
+      "pos": "名词"
+    },
+    {
+      "term": "兄弟",
+      "reading": "きょうだい",
+      "meaning": "兄弟姐妹",
+      "pos": "名词"
+    },
+    {
+      "term": "両親",
+      "reading": "りょうしん",
+      "meaning": "父母，双亲",
+      "pos": "名词"
+    },
+    {
+      "term": "妹",
+      "reading": "いもうと",
+      "meaning": "妹妹",
+      "pos": "名词"
+    },
+    {
+      "term": "男",
+      "reading": "おとこ",
+      "meaning": "男",
+      "pos": "名词"
+    },
+    {
+      "term": "女",
+      "reading": "おんな",
+      "meaning": "女",
+      "pos": "名词"
+    },
+    {
+      "term": "生徒",
+      "reading": "せいと",
+      "meaning": "学生",
+      "pos": "名词"
+    },
+    {
+      "term": "上",
+      "reading": "うえ",
+      "meaning": "上面",
+      "pos": "名词"
+    },
+    {
+      "term": "外",
+      "reading": "そと",
+      "meaning": "外面",
+      "pos": "名词"
+    },
+    {
+      "term": "中",
+      "reading": "なか",
+      "meaning": "里面，内部，中间",
+      "pos": "名词"
+    },
+    {
+      "term": "下",
+      "reading": "した",
+      "meaning": "下面",
+      "pos": "名词"
+    },
+    {
+      "term": "前",
+      "reading": "まえ",
+      "meaning": "前，前面",
+      "pos": "名词"
+    },
+    {
+      "term": "後ろ",
+      "reading": "うしろ",
+      "meaning": "后，后面",
+      "pos": "名词"
+    },
+    {
+      "term": "近く",
+      "reading": "ちかく",
+      "meaning": "附近，近旁",
+      "pos": "名词"
+    },
+    {
+      "term": "場所",
+      "reading": "ばしょ",
+      "meaning": "所在地，地方，场所",
+      "pos": "名词"
+    },
+    {
+      "term": "教室",
+      "reading": "きょうしつ",
+      "meaning": "教室",
+      "pos": "名词"
+    },
+    {
+      "term": "会議室",
+      "reading": "かいぎしつ",
+      "meaning": "会议室",
+      "pos": "名词"
+    },
+    {
+      "term": "図書室",
+      "reading": "としょしつ",
+      "meaning": "图书室",
+      "pos": "名词"
+    },
+    {
+      "term": "公園",
+      "reading": "こうえん",
+      "meaning": "公园",
+      "pos": "名词"
+    },
+    {
+      "term": "花屋",
+      "reading": "はなや",
+      "meaning": "花店",
+      "pos": "名词"
+    },
+    {
+      "term": "売店",
+      "reading": "ばいてん",
+      "meaning": "小卖店，售货亭",
+      "pos": "名词"
+    },
+    {
+      "term": "駅",
+      "reading": "えき",
+      "meaning": "车站",
+      "pos": "名词"
+    },
+    {
+      "term": "地下鉄",
+      "reading": "ちかてつ",
+      "meaning": "地铁",
+      "pos": "名词"
+    },
+    {
+      "term": "木",
+      "reading": "き",
+      "meaning": "树，树木",
+      "pos": "名词"
+    },
+    {
+      "term": "一人暮らし",
+      "reading": "ひとりぐらし",
+      "meaning": "单身生活",
+      "pos": "名词"
+    },
+    {
+      "term": "ある",
+      "reading": "ある",
+      "meaning": "有，在(非意志者)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "いる",
+      "reading": "いる",
+      "meaning": "有，在(具意志者)",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "ええと",
+      "reading": "ええと",
+      "meaning": "啊，嗯",
+      "pos": "叹词"
+    },
+    {
+      "term": "横浜",
+      "reading": "よこはま",
+      "meaning": "横滨",
+      "pos": "专有名词"
+    },
+    {
+      "term": "名古屋",
+      "reading": "なごや",
+      "meaning": "名古屋",
+      "pos": "专有名词"
+    },
+    {
+      "term": "大阪",
+      "reading": "おおさか",
+      "meaning": "大阪",
+      "pos": "专有名词"
+    }
+  ]
+}

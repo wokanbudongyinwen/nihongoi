@@ -1,0 +1,388 @@
+{
+  "planName": "标日初级下 第41课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "小鳥",
+      "reading": "ことり",
+      "meaning": "小鸟，鸟儿",
+      "pos": "名词"
+    },
+    {
+      "term": "万博",
+      "reading": "ばんぱく",
+      "meaning": "世博会，万国博览会",
+      "pos": "名词"
+    },
+    {
+      "term": "遺跡",
+      "reading": "いせき",
+      "meaning": "遗迹，遗址",
+      "pos": "名词"
+    },
+    {
+      "term": "上司",
+      "reading": "じょうし",
+      "meaning": "上司",
+      "pos": "名词"
+    },
+    {
+      "term": "すり",
+      "reading": "すり",
+      "meaning": "扒手，小偷",
+      "pos": "名词"
+    },
+    {
+      "term": "世代",
+      "reading": "せだい",
+      "meaning": "世代；一代",
+      "pos": "名词"
+    },
+    {
+      "term": "市場",
+      "reading": "しじょう",
+      "meaning": "市场",
+      "pos": "名词"
+    },
+    {
+      "term": "調査",
+      "reading": "ちょうさ",
+      "meaning": "调查",
+      "pos": "名词"
+    },
+    {
+      "term": "出荷",
+      "reading": "しゅっか",
+      "meaning": "上市，运出货物",
+      "pos": "名词"
+    },
+    {
+      "term": "成長",
+      "reading": "せいちょう",
+      "meaning": "成长",
+      "pos": "名词"
+    },
+    {
+      "term": "嵐",
+      "reading": "あらし",
+      "meaning": "暴风雨，风暴",
+      "pos": "名词"
+    },
+    {
+      "term": "ダイナマイト",
+      "reading": "ダイナマイト",
+      "meaning": "炸药",
+      "pos": "名词"
+    },
+    {
+      "term": "ネーミング",
+      "reading": "ネーミング",
+      "meaning": "名称，命名，取名",
+      "pos": "名词"
+    },
+    {
+      "term": "コストダウン",
+      "reading": "コストダウン",
+      "meaning": "降低成本",
+      "pos": "名词"
+    },
+    {
+      "term": "低価格",
+      "reading": "ていかかく",
+      "meaning": "低价(格)",
+      "pos": "名词"
+    },
+    {
+      "term": "牛肉",
+      "reading": "ぎゅうにく",
+      "meaning": "牛肉",
+      "pos": "名词"
+    },
+    {
+      "term": "一昨年",
+      "reading": "いっさくねん",
+      "meaning": "前年",
+      "pos": "名词"
+    },
+    {
+      "term": "昨年",
+      "reading": "さくねん",
+      "meaning": "去年",
+      "pos": "名词"
+    },
+    {
+      "term": "今後",
+      "reading": "こんご",
+      "meaning": "今后",
+      "pos": "名词"
+    },
+    {
+      "term": "すべて",
+      "reading": "すべて",
+      "meaning": "全部，所有",
+      "pos": "名词"
+    },
+    {
+      "term": "びしょぬれ",
+      "reading": "びしょぬれ",
+      "meaning": "落汤鸡，湿透，濡湿",
+      "pos": "名词"
+    },
+    {
+      "term": "魅力",
+      "reading": "みりょく",
+      "meaning": "吸引力，魅力",
+      "pos": "名词"
+    },
+    {
+      "term": "汚職事件",
+      "reading": "おしょくじけん",
+      "meaning": "贪污事件",
+      "pos": "名词"
+    },
+    {
+      "term": "市場調査",
+      "reading": "しじょうちょうさ",
+      "meaning": "市场调查",
+      "pos": "名词"
+    },
+    {
+      "term": "交通事情",
+      "reading": "こうつじじょう",
+      "meaning": "交通状况",
+      "pos": "名词"
+    },
+    {
+      "term": "合弁会社",
+      "reading": "ごうべんがいしゃ",
+      "meaning": "合资公司",
+      "pos": "名词"
+    },
+    {
+      "term": "しかる",
+      "reading": "しかる",
+      "meaning": "训，责备，斥责",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "かむ",
+      "reading": "かむ",
+      "meaning": "咬，嚼",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "誘う",
+      "reading": "さそう",
+      "meaning": "邀请，约请",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "巻き込む",
+      "reading": "まきこむ",
+      "meaning": "卷入，卷进",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "至る",
+      "reading": "いたる",
+      "meaning": "到达，达到",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "見つかる",
+      "reading": "みつかる",
+      "meaning": "找到，发现",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "踏む",
+      "reading": "ふむ",
+      "meaning": "踩，踏",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "図る",
+      "reading": "はかる",
+      "meaning": "谋求；考虑",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "見込む",
+      "reading": "みこむ",
+      "meaning": "预料，估计",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "盗む",
+      "reading": "ぬすむ",
+      "meaning": "盗取，偷盗",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "起こす",
+      "reading": "おこす",
+      "meaning": "叫醒，唤醒",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "ほめる",
+      "reading": "ほめる",
+      "meaning": "表扬，赞扬",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "求める",
+      "reading": "もとめる",
+      "meaning": "要求；追求，寻求",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "いじめる",
+      "reading": "いじめる",
+      "meaning": "欺负，折磨，欺侮",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "ぶつける",
+      "reading": "ぶつける",
+      "meaning": "碰上，撞上；扔，投，掷",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "発見",
+      "reading": "はっけん",
+      "meaning": "发现",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "辞職",
+      "reading": "じしょく",
+      "meaning": "辞职",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "創立",
+      "reading": "そうりつ",
+      "meaning": "成立，创立",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "依頼",
+      "reading": "いらい",
+      "meaning": "委托，请求",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "発売",
+      "reading": "はつばい",
+      "meaning": "上市，发售，出售",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "開発",
+      "reading": "かいはつ",
+      "meaning": "开发",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "製造",
+      "reading": "せいぞう",
+      "meaning": "生产，制造",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "管理",
+      "reading": "かんり",
+      "meaning": "管理",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "実現",
+      "reading": "じつげん",
+      "meaning": "实现",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "洗練",
+      "reading": "せんれん",
+      "meaning": "精炼，洗练",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "放送",
+      "reading": "ほうそう",
+      "meaning": "广播，播送",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "生産",
+      "reading": "せいさん",
+      "meaning": "生产",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "翻訳",
+      "reading": "ほんやく",
+      "meaning": "翻译，笔译",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "発明",
+      "reading": "はつめい",
+      "meaning": "发明",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "幅広い",
+      "reading": "はばひろい",
+      "meaning": "广泛，宽广，辽阔",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "大幅",
+      "reading": "おおはば",
+      "meaning": "大幅(度)，广泛",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "大量",
+      "reading": "たいりょう",
+      "meaning": "大量",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "最も",
+      "reading": "もっとも",
+      "meaning": "最",
+      "pos": "副词"
+    },
+    {
+      "term": "いやあ",
+      "reading": "いやあ",
+      "meaning": "哎呀",
+      "pos": "叹词"
+    },
+    {
+      "term": "ニュートン",
+      "reading": "ニュートン",
+      "meaning": "牛顿",
+      "pos": "专有名词"
+    },
+    {
+      "term": "オーストラリア",
+      "reading": "オーストラリア",
+      "meaning": "澳大利亚",
+      "pos": "专有名词"
+    },
+    {
+      "term": "参りました",
+      "reading": "まいりました",
+      "meaning": "真糟糕，真倒霉"
+    },
+    {
+      "term": "万有引力の法則",
+      "reading": "ばんゆういんりょくのほうそく",
+      "meaning": "万有引力定律"
+    }
+  ]
+}

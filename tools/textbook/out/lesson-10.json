@@ -1,0 +1,317 @@
+{
+  "planName": "标日初级上 第10课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "紅葉",
+      "reading": "もみじ",
+      "meaning": "红叶",
+      "pos": "名词"
+    },
+    {
+      "term": "故郷",
+      "reading": "こきょう",
+      "meaning": "故乡",
+      "pos": "名词"
+    },
+    {
+      "term": "通り",
+      "reading": "とおり",
+      "meaning": "大街",
+      "pos": "名词"
+    },
+    {
+      "term": "町",
+      "reading": "まち",
+      "meaning": "城市，街道",
+      "pos": "名词"
+    },
+    {
+      "term": "所",
+      "reading": "ところ",
+      "meaning": "场所",
+      "pos": "名词"
+    },
+    {
+      "term": "お店",
+      "reading": "おみせ",
+      "meaning": "餐馆；商店",
+      "pos": "名词"
+    },
+    {
+      "term": "人形",
+      "reading": "にんぎょう",
+      "meaning": "玩偶",
+      "pos": "名词"
+    },
+    {
+      "term": "作品",
+      "reading": "さくひん",
+      "meaning": "作品",
+      "pos": "名词"
+    },
+    {
+      "term": "彫刻",
+      "reading": "ちょうこく",
+      "meaning": "雕刻",
+      "pos": "名词"
+    },
+    {
+      "term": "自動車",
+      "reading": "じどうしゃ",
+      "meaning": "汽车",
+      "pos": "名词"
+    },
+    {
+      "term": "道具",
+      "reading": "どうぐ",
+      "meaning": "工具",
+      "pos": "名词"
+    },
+    {
+      "term": "魚",
+      "reading": "さかな",
+      "meaning": "鱼",
+      "pos": "名词"
+    },
+    {
+      "term": "お菓子",
+      "reading": "おかし",
+      "meaning": "点心",
+      "pos": "名词"
+    },
+    {
+      "term": "物",
+      "reading": "もの",
+      "meaning": "物品，东西",
+      "pos": "名词"
+    },
+    {
+      "term": "シーズン",
+      "reading": "シーズン",
+      "meaning": "季节",
+      "pos": "名词"
+    },
+    {
+      "term": "修学旅行",
+      "reading": "しゅうがくりょこう",
+      "meaning": "修学旅行",
+      "pos": "名词"
+    },
+    {
+      "term": "観光客",
+      "reading": "かんこうきゃく",
+      "meaning": "游客",
+      "pos": "名词"
+    },
+    {
+      "term": "作家",
+      "reading": "さっか",
+      "meaning": "作家",
+      "pos": "名词"
+    },
+    {
+      "term": "部長",
+      "reading": "ぶちょう",
+      "meaning": "部长",
+      "pos": "名词"
+    },
+    {
+      "term": "平日",
+      "reading": "へいじつ",
+      "meaning": "平日，非休息日",
+      "pos": "名词"
+    },
+    {
+      "term": "日",
+      "reading": "ひ",
+      "meaning": "日子",
+      "pos": "名词"
+    },
+    {
+      "term": "生活",
+      "reading": "せいかつ",
+      "meaning": "生活",
+      "pos": "名词"
+    },
+    {
+      "term": "世界",
+      "reading": "せかい",
+      "meaning": "世界",
+      "pos": "名词"
+    },
+    {
+      "term": "晴れ",
+      "reading": "はれ",
+      "meaning": "晴天",
+      "pos": "名词"
+    },
+    {
+      "term": "雨",
+      "reading": "あめ",
+      "meaning": "雨，下雨",
+      "pos": "名词"
+    },
+    {
+      "term": "曇り",
+      "reading": "くもり",
+      "meaning": "阴天",
+      "pos": "名词"
+    },
+    {
+      "term": "雪",
+      "reading": "ゆき",
+      "meaning": "雪",
+      "pos": "名词"
+    },
+    {
+      "term": "汚い",
+      "reading": "きたない",
+      "meaning": "脏",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "きれい",
+      "reading": "きれい",
+      "meaning": "漂亮，干净",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "有名",
+      "reading": "ゆうめい",
+      "meaning": "有名",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "にぎやか",
+      "reading": "にぎやか",
+      "meaning": "热闹，繁华",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "静か",
+      "reading": "しずか",
+      "meaning": "安静",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "暇",
+      "reading": "ひま",
+      "meaning": "空闲",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "親切",
+      "reading": "しんせつ",
+      "meaning": "热情",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "好き",
+      "reading": "すき",
+      "meaning": "喜欢",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "嫌い",
+      "reading": "きらい",
+      "meaning": "讨厌",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "便利",
+      "reading": "べんり",
+      "meaning": "方便",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "不便",
+      "reading": "ふべん",
+      "meaning": "不方便",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "元気",
+      "reading": "げんき",
+      "meaning": "健康，有精神",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "簡単",
+      "reading": "かんたん",
+      "meaning": "简单",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "ハンサム",
+      "reading": "ハンサム",
+      "meaning": "英俊，帅气",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "どんな",
+      "reading": "どんな",
+      "meaning": "什么样的，怎样的",
+      "pos": "疑问词"
+    },
+    {
+      "term": "どう",
+      "reading": "どう",
+      "meaning": "怎样，如何",
+      "pos": "副词"
+    },
+    {
+      "term": "いかが",
+      "reading": "いかが",
+      "meaning": "如何",
+      "pos": "副词"
+    },
+    {
+      "term": "いろいろ",
+      "reading": "いろいろ",
+      "meaning": "各种各样",
+      "pos": "副词"
+    },
+    {
+      "term": "でも",
+      "reading": "でも",
+      "meaning": "可是,不过",
+      "pos": "接续词"
+    },
+    {
+      "term": "そして",
+      "reading": "そして",
+      "meaning": "而且，于是",
+      "pos": "接续词"
+    },
+    {
+      "term": "ところで",
+      "reading": "ところで",
+      "meaning": "(转换话题)哎",
+      "pos": "接续词"
+    },
+    {
+      "term": "あれえ",
+      "reading": "あれえ",
+      "meaning": "咦",
+      "pos": "叹词"
+    },
+    {
+      "term": "奈良",
+      "reading": "なら",
+      "meaning": "奈良",
+      "pos": "专有名词"
+    },
+    {
+      "term": "富士山",
+      "reading": "ふじさん",
+      "meaning": "富士山",
+      "pos": "专有名词"
+    },
+    {
+      "term": "もう少し",
+      "reading": "もうすこし",
+      "meaning": "再～一点"
+    }
+  ]
+}

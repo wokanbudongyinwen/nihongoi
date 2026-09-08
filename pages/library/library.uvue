@@ -3,6 +3,12 @@
     <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
     <view class="neo-card search-bar">
       <input class="search-input" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onInput" />
+      <view class="chips">
+        <text class="chip" :class="filter == '' ? 'chip-on' : ''" @click="setFilter('')">全部</text>
+        <text class="chip" :class="filter == 'new' ? 'chip-on' : ''" @click="setFilter('new')">未学习</text>
+        <text class="chip" :class="filter == 'learning' ? 'chip-on' : ''" @click="setFilter('learning')">学习中</text>
+        <text class="chip" :class="filter == 'mastered' ? 'chip-on' : ''" @click="setFilter('mastered')">已掌握</text>
+      </view>
       <text class="count">{{ countText() }}</text>
     </view>
 
@@ -35,11 +41,12 @@
   const PAGE_SIZE = 50
 
   const keyword = ref('')
+  const filter = ref('') // ''=全部 / 'new' 未学习 / 'learning' 学习中 / 'mastered' 已掌握（跨计划）
   const results = ref<Array<Word>>([])
   const total = ref(0)
   const loading = ref(false)
   let loadingMore = false // 防重入（loadMore 触发期间不重复请求）
-  let settledKeyword = '' // 已加载结果对应的关键词（输入抖动丢弃过期响应）
+  let settledKeyword = '' // 已加载结果对应的关键词+筛选（输入抖动丢弃过期响应）
 
   // 总数文案（模板只能调本地函数）
   const countText = (): string => {
@@ -52,19 +59,21 @@
     return '匹配 ' + total.value + ' 词'
   }
 
-  // 首屏 / 关键词变化：重置分页后加载第一页
+  // 首屏 / 关键词或筛选变化：重置分页后加载第一页
   const doSearch = async () => {
     const kw = keyword.value
-    settledKeyword = kw
+    const f = filter.value
+    const settledKey = kw + '|' + f
+    settledKeyword = settledKey
     loading.value = true
     try {
-      const cnt = await countWords(kw)
-      if (settledKeyword != kw) {
+      const cnt = await countWords(kw, f)
+      if (settledKeyword != settledKey) {
         return
       }
       total.value = cnt
-      const list = await listWordPage(kw, PAGE_SIZE, 0)
-      if (settledKeyword != kw) {
+      const list = await listWordPage(kw, f, PAGE_SIZE, 0)
+      if (settledKeyword != settledKey) {
         return
       }
       results.value = list
@@ -74,20 +83,30 @@
     loading.value = false
   }
 
+  // 筛选切换：重置分页后重新加载（须在 doSearch 之后声明——坑④）
+  const setFilter = (f: string) => {
+    if (filter.value == f) {
+      return
+    }
+    filter.value = f
+    doSearch()
+  }
+
   // 滚动到底：追加下一页
   const loadMore = async () => {
     if (loadingMore || loading.value) {
       return
     }
     const kw = keyword.value
+    const f = filter.value
     if (results.value.length >= total.value) {
       return
     }
     loadingMore = true
     loading.value = true
     try {
-      const list = await listWordPage(kw, PAGE_SIZE, results.value.length)
-      if (settledKeyword == kw && list.length > 0) {
+      const list = await listWordPage(kw, f, PAGE_SIZE, results.value.length)
+      if (settledKeyword == kw + '|' + f && list.length > 0) {
         // uts 数组追加：逐条 push（无 spread 合并）
         for (let i = 0; i < list.length; i++) {
           results.value.push(list[i])
@@ -144,6 +163,26 @@
     font-family: monospace;
     letter-spacing: 2rpx;
     margin-top: 14rpx;
+  }
+  .chips {
+    flex-direction: row;
+    margin-top: 16rpx;
+  }
+  .chip {
+    font-size: 24rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: 999rpx;
+    padding: 8rpx 24rpx;
+    margin-right: 16rpx;
+  }
+  .chip-on {
+    color: $n-ink;
+    background-color: $n-yellow;
+    font-weight: bold;
   }
   .list {
     flex: 1;

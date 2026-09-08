@@ -1,0 +1,244 @@
+{
+  "planName": "标日初级下 第32课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "列車",
+      "reading": "れっしゃ",
+      "meaning": "火车，列车",
+      "pos": "名词"
+    },
+    {
+      "term": "高速～",
+      "reading": "こうそくバス",
+      "meaning": "走高速的公共汽车",
+      "pos": "名词"
+    },
+    {
+      "term": "出発時刻",
+      "reading": "しゅっぱつじこく",
+      "meaning": "出发时间",
+      "pos": "名词"
+    },
+    {
+      "term": "旅行予定",
+      "reading": "りょこうよてい",
+      "meaning": "旅行计划",
+      "pos": "名词"
+    },
+    {
+      "term": "天気予報",
+      "reading": "てんきよほう",
+      "meaning": "天气预报",
+      "pos": "名词"
+    },
+    {
+      "term": "台風",
+      "reading": "たいふう",
+      "meaning": "台风",
+      "pos": "名词"
+    },
+    {
+      "term": "うわさ",
+      "reading": "うわさ",
+      "meaning": "传说，风言风语",
+      "pos": "名词"
+    },
+    {
+      "term": "宣伝",
+      "reading": "せんでん",
+      "meaning": "宣传",
+      "pos": "名词"
+    },
+    {
+      "term": "番組",
+      "reading": "ばんぐみ",
+      "meaning": "节目",
+      "pos": "名词"
+    },
+    {
+      "term": "新型",
+      "reading": "しんがた",
+      "meaning": "新型",
+      "pos": "名词"
+    },
+    {
+      "term": "ボーナス",
+      "reading": "ボーナス",
+      "meaning": "奖金",
+      "pos": "名词"
+    },
+    {
+      "term": "ラーメン",
+      "reading": "ラーメン",
+      "meaning": "面条",
+      "pos": "名词"
+    },
+    {
+      "term": "牛乳",
+      "reading": "ぎゅうにゅう",
+      "meaning": "牛奶",
+      "pos": "名词"
+    },
+    {
+      "term": "餃子～",
+      "reading": "ギョーザパーティー",
+      "meaning": "饺子宴",
+      "pos": "名词"
+    },
+    {
+      "term": "正月休み",
+      "reading": "しょうがつやすみ",
+      "meaning": "新年假日",
+      "pos": "名词"
+    },
+    {
+      "term": "スポーツようひん",
+      "reading": "スポーツようひん",
+      "meaning": "体育用品",
+      "pos": "名词"
+    },
+    {
+      "term": "インフルエンザ",
+      "reading": "インフルエンザ",
+      "meaning": "流感，流行性感冒",
+      "pos": "名词"
+    },
+    {
+      "term": "支店",
+      "reading": "してん",
+      "meaning": "分店，分公司",
+      "pos": "名词"
+    },
+    {
+      "term": "小学校",
+      "reading": "しょうがっこう",
+      "meaning": "小学",
+      "pos": "名词"
+    },
+    {
+      "term": "遊園地",
+      "reading": "ゆうえんち",
+      "meaning": "游乐园",
+      "pos": "名词"
+    },
+    {
+      "term": "首相",
+      "reading": "しゅしょう",
+      "meaning": "首相",
+      "pos": "名词"
+    },
+    {
+      "term": "歴史",
+      "reading": "れきし",
+      "meaning": "历史",
+      "pos": "名词"
+    },
+    {
+      "term": "彼女",
+      "reading": "かのじょ",
+      "meaning": "她",
+      "pos": "代词"
+    },
+    {
+      "term": "行う",
+      "reading": "おこなう",
+      "meaning": "开，举行",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "上がる",
+      "reading": "あがる",
+      "meaning": "提高，涨",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "乗り換える",
+      "reading": "のりかえる",
+      "meaning": "换乘",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "辞める",
+      "reading": "やめる",
+      "meaning": "辞去",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "留学",
+      "reading": "りゅうがく",
+      "meaning": "留学",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "入学",
+      "reading": "にゅうがく",
+      "meaning": "入学",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "流行",
+      "reading": "りゅうこう",
+      "meaning": "流行",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "入院",
+      "reading": "にゅういん",
+      "meaning": "住院",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "お邪魔する",
+      "reading": "おじゃまする",
+      "meaning": "打扰，拜访",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "担当",
+      "reading": "たんとう",
+      "meaning": "承担",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "強い",
+      "reading": "つよい",
+      "meaning": "强，坚强",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "気さく",
+      "reading": "きさく",
+      "meaning": "爽快，坦率",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "いろんな",
+      "reading": "いろんな",
+      "meaning": "各种各样的",
+      "pos": "连体词"
+    },
+    {
+      "term": "ずっと",
+      "reading": "ずっと",
+      "meaning": "一直，始终",
+      "pos": "副词"
+    },
+    {
+      "term": "タイ",
+      "reading": "タイ",
+      "meaning": "泰国",
+      "pos": "专有名词"
+    },
+    {
+      "term": "お邪魔しました",
+      "reading": "おじゃましました",
+      "meaning": "打扰了"
+    },
+    {
+      "term": "風が強い",
+      "reading": "かぜがつよい",
+      "meaning": "风大"
+    }
+  ]
+}

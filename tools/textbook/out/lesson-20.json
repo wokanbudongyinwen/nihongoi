@@ -1,0 +1,245 @@
+{
+  "planName": "标日初级上 第20课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "趣味",
+      "reading": "しゅみ",
+      "meaning": "爱好",
+      "pos": "名词"
+    },
+    {
+      "term": "特技",
+      "reading": "とくぎ",
+      "meaning": "特长，拿手的技术",
+      "pos": "名词"
+    },
+    {
+      "term": "興味",
+      "reading": "きょうみ",
+      "meaning": "兴趣",
+      "pos": "名词"
+    },
+    {
+      "term": "夢",
+      "reading": "ゆめ",
+      "meaning": "梦；理想",
+      "pos": "名词"
+    },
+    {
+      "term": "ギター",
+      "reading": "ギター",
+      "meaning": "吉他",
+      "pos": "名词"
+    },
+    {
+      "term": "胡弓",
+      "reading": "こきゅう",
+      "meaning": "胡琴",
+      "pos": "名词"
+    },
+    {
+      "term": "書道",
+      "reading": "しょどう",
+      "meaning": "书法",
+      "pos": "名词"
+    },
+    {
+      "term": "釣り",
+      "reading": "つり",
+      "meaning": "钓鱼",
+      "pos": "名词"
+    },
+    {
+      "term": "ドライブ",
+      "reading": "ドライブ",
+      "meaning": "兜风，　开汽车远游",
+      "pos": "名词"
+    },
+    {
+      "term": "編み物",
+      "reading": "あみもの",
+      "meaning": "编织；编织品",
+      "pos": "名词"
+    },
+    {
+      "term": "手作り",
+      "reading": "てづくり",
+      "meaning": "手工做，自己做，手制",
+      "pos": "名词"
+    },
+    {
+      "term": "中華街",
+      "reading": "ちゅうかがい",
+      "meaning": "中华街",
+      "pos": "名词"
+    },
+    {
+      "term": "中華料理",
+      "reading": "ちゅうかりょうり",
+      "meaning": "中国菜",
+      "pos": "名词"
+    },
+    {
+      "term": "餃子",
+      "reading": "ギョーザ",
+      "meaning": "饺子",
+      "pos": "名词"
+    },
+    {
+      "term": "皮",
+      "reading": "かわ",
+      "meaning": "皮",
+      "pos": "名词"
+    },
+    {
+      "term": "春節",
+      "reading": "しゅんせつ",
+      "meaning": "春节",
+      "pos": "名词"
+    },
+    {
+      "term": "獅子舞",
+      "reading": "ししまい",
+      "meaning": "狮子舞",
+      "pos": "名词"
+    },
+    {
+      "term": "寮",
+      "reading": "りょう",
+      "meaning": "宿舍",
+      "pos": "名词"
+    },
+    {
+      "term": "洗濯機",
+      "reading": "せんたくき",
+      "meaning": "洗衣机",
+      "pos": "名词"
+    },
+    {
+      "term": "シャワー",
+      "reading": "シャワー",
+      "meaning": "淋浴",
+      "pos": "名词"
+    },
+    {
+      "term": "おなか",
+      "reading": "おなか",
+      "meaning": "肚子",
+      "pos": "名词"
+    },
+    {
+      "term": "授業",
+      "reading": "じゅぎょう",
+      "meaning": "授课，上课",
+      "pos": "名词"
+    },
+    {
+      "term": "資料",
+      "reading": "しりょう",
+      "meaning": "资料",
+      "pos": "名词"
+    },
+    {
+      "term": "フランスご",
+      "reading": "フランスご",
+      "meaning": "法语",
+      "pos": "名词"
+    },
+    {
+      "term": "小説",
+      "reading": "しょうせつ",
+      "meaning": "小说",
+      "pos": "名词"
+    },
+    {
+      "term": "海岸",
+      "reading": "かいがん",
+      "meaning": "海岸",
+      "pos": "名词"
+    },
+    {
+      "term": "冬休み",
+      "reading": "ふゆやすみ",
+      "meaning": "寒假",
+      "pos": "名词"
+    },
+    {
+      "term": "キャンプ",
+      "reading": "キャンプ",
+      "meaning": "野营",
+      "pos": "名词"
+    },
+    {
+      "term": "みんな",
+      "reading": "みんな",
+      "meaning": "大家",
+      "pos": "名词"
+    },
+    {
+      "term": "自分",
+      "reading": "じぶん",
+      "meaning": "自己",
+      "pos": "名词"
+    },
+    {
+      "term": "全員",
+      "reading": "ぜんいん",
+      "meaning": "全员",
+      "pos": "名词"
+    },
+    {
+      "term": "弾く",
+      "reading": "ひく",
+      "meaning": "弹",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "すく",
+      "reading": "すく",
+      "meaning": "(肚子)饿，空",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "登る",
+      "reading": "のぼる",
+      "meaning": "登，上",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "集める",
+      "reading": "あつめる",
+      "meaning": "收集",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "浴びる",
+      "reading": "あびる",
+      "meaning": "淋；浇",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "ごちそう",
+      "reading": "ごちそう",
+      "meaning": "请客，摆盛宴",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "帰国",
+      "reading": "きこく",
+      "meaning": "回国",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "特に",
+      "reading": "とくに",
+      "meaning": "特别",
+      "pos": "副词"
+    },
+    {
+      "term": "おなかがすきます",
+      "reading": "おなかがすきます",
+      "meaning": "肚子饿"
+    }
+  ]
+}

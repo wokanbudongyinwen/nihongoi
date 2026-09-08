@@ -1,0 +1,327 @@
+{
+  "planName": "标日初级上 第11课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "歌",
+      "reading": "うた",
+      "meaning": "歌，歌曲",
+      "pos": "名词"
+    },
+    {
+      "term": "カラオケ",
+      "reading": "カラオケ",
+      "meaning": "卡拉OK",
+      "pos": "名词"
+    },
+    {
+      "term": "ロック",
+      "reading": "ロック",
+      "meaning": "摇滚乐",
+      "pos": "名词"
+    },
+    {
+      "term": "ポップス",
+      "reading": "ポップス",
+      "meaning": "流行音乐",
+      "pos": "名词"
+    },
+    {
+      "term": "クラシック",
+      "reading": "クラシック",
+      "meaning": "西方古典音乐",
+      "pos": "名词"
+    },
+    {
+      "term": "ピアノ",
+      "reading": "ピアノ",
+      "meaning": "钢琴",
+      "pos": "名词"
+    },
+    {
+      "term": "絵",
+      "reading": "え",
+      "meaning": "画儿",
+      "pos": "名词"
+    },
+    {
+      "term": "英語",
+      "reading": "えいご",
+      "meaning": "英语",
+      "pos": "名词"
+    },
+    {
+      "term": "スペインご",
+      "reading": "スペインご",
+      "meaning": "西班牙语",
+      "pos": "名词"
+    },
+    {
+      "term": "スポーツ",
+      "reading": "スポーツ",
+      "meaning": "体育，运动",
+      "pos": "名词"
+    },
+    {
+      "term": "水泳",
+      "reading": "すいえい",
+      "meaning": "游泳",
+      "pos": "名词"
+    },
+    {
+      "term": "ゴルフ",
+      "reading": "ゴルフ",
+      "meaning": "高尔夫球",
+      "pos": "名词"
+    },
+    {
+      "term": "運転",
+      "reading": "うんてん",
+      "meaning": "开车",
+      "pos": "名词"
+    },
+    {
+      "term": "飲み物",
+      "reading": "のみもの",
+      "meaning": "饮料",
+      "pos": "名词"
+    },
+    {
+      "term": "お酒",
+      "reading": "おさけ",
+      "meaning": "酒，酒类",
+      "pos": "名词"
+    },
+    {
+      "term": "肉",
+      "reading": "にく",
+      "meaning": "肉",
+      "pos": "名词"
+    },
+    {
+      "term": "野菜",
+      "reading": "やさい",
+      "meaning": "蔬菜",
+      "pos": "名词"
+    },
+    {
+      "term": "果物",
+      "reading": "くだもの",
+      "meaning": "水果",
+      "pos": "名词"
+    },
+    {
+      "term": "ヒマワリ",
+      "reading": "ヒマワリ",
+      "meaning": "向日葵",
+      "pos": "名词"
+    },
+    {
+      "term": "バラ",
+      "reading": "バラ",
+      "meaning": "蔷薇，玫瑰",
+      "pos": "名词"
+    },
+    {
+      "term": "コンピュータ",
+      "reading": "コンピュータ",
+      "meaning": "计算机，电脑",
+      "pos": "名词"
+    },
+    {
+      "term": "窓",
+      "reading": "まど",
+      "meaning": "窗，窗户",
+      "pos": "名词"
+    },
+    {
+      "term": "結婚式",
+      "reading": "けっこんしき",
+      "meaning": "结婚典礼",
+      "pos": "名词"
+    },
+    {
+      "term": "写真展",
+      "reading": "しゃしんてん",
+      "meaning": "摄影展",
+      "pos": "名词"
+    },
+    {
+      "term": "旅館",
+      "reading": "りょかん",
+      "meaning": "旅馆，旅店",
+      "pos": "名词"
+    },
+    {
+      "term": "別荘",
+      "reading": "べっそう",
+      "meaning": "别墅",
+      "pos": "名词"
+    },
+    {
+      "term": "寄木細工",
+      "reading": "よせぎざいく",
+      "meaning": "木片儿拼花工艺品",
+      "pos": "名词"
+    },
+    {
+      "term": "模様",
+      "reading": "もよう",
+      "meaning": "花纹，纹案",
+      "pos": "名词"
+    },
+    {
+      "term": "外国",
+      "reading": "がいこく",
+      "meaning": "外国",
+      "pos": "名词"
+    },
+    {
+      "term": "会議",
+      "reading": "かいぎ",
+      "meaning": "会议",
+      "pos": "名词"
+    },
+    {
+      "term": "脚",
+      "reading": "あし",
+      "meaning": "腿",
+      "pos": "名词"
+    },
+    {
+      "term": "ぼく",
+      "reading": "ぼく",
+      "meaning": "我(男性自称)",
+      "pos": "代词"
+    },
+    {
+      "term": "分かる",
+      "reading": "わかる",
+      "meaning": "懂，明白",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "迷う",
+      "reading": "まよう",
+      "meaning": "犹豫，难以决定",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "できる",
+      "reading": "できる",
+      "meaning": "会；能；完成",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "閉める",
+      "reading": "しめる",
+      "meaning": "关闭，关门",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "疲れる",
+      "reading": "つかれる",
+      "meaning": "疲倦，疲惫",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "散歩",
+      "reading": "さんぽ",
+      "meaning": "散步",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "怖い",
+      "reading": "こわい",
+      "meaning": "害怕，恐怖",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "赤い",
+      "reading": "あかい",
+      "meaning": "红",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "痛い",
+      "reading": "いたい",
+      "meaning": "疼，疼痛",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "上手",
+      "reading": "じょうず",
+      "meaning": "擅长，高明，水平高",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "下手",
+      "reading": "へた",
+      "meaning": "不高明，水平低",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "苦手",
+      "reading": "にがて",
+      "meaning": "不擅长，不善于",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "時々",
+      "reading": "ときどき",
+      "meaning": "有时，时不时",
+      "pos": "副词"
+    },
+    {
+      "term": "よく",
+      "reading": "よく",
+      "meaning": "经常，常常",
+      "pos": "副词"
+    },
+    {
+      "term": "たまに",
+      "reading": "たまに",
+      "meaning": "偶尔，很少",
+      "pos": "副词"
+    },
+    {
+      "term": "また",
+      "reading": "また",
+      "meaning": "还，再，又",
+      "pos": "副词"
+    },
+    {
+      "term": "どうして",
+      "reading": "どうして",
+      "meaning": "为什么",
+      "pos": "副词"
+    },
+    {
+      "term": "だから",
+      "reading": "だから",
+      "meaning": "所以，因此",
+      "pos": "接续词"
+    },
+    {
+      "term": "うーん",
+      "reading": "うーん",
+      "meaning": "嗯……，这个……",
+      "pos": "叹词"
+    },
+    {
+      "term": "結構です",
+      "reading": "けっこうです",
+      "meaning": "不用，不要"
+    },
+    {
+      "term": "気に入ります",
+      "reading": "きにいります",
+      "meaning": "中意，喜欢"
+    },
+    {
+      "term": "など",
+      "reading": "など",
+      "meaning": "等等"
+    }
+  ]
+}

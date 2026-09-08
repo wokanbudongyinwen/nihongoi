@@ -1,5 +1,76 @@
 # 文件修改日志
 
+## 链路径改横向 + 链条单词列表页（2026-09-02）
+
+- `pages/word/chainList.uvue`（新增）：链条单词列表页——URL ids 逗号串传参，逐 id 查库，按链顺序（旧→新）以词库同款行样式展示（序号/表记/读音/释义/词性），最后一行紫色高亮 +「当前主词」标，点行进词卡；pages.json 注册。
+- `pages/word/chain.uvue`：链路径按用户澄清恢复**横向滚动**（词→词箭头，当前主词高亮）+ 底部「链条 N 词 · 点击查看列表 ▸」提示，点击整条链（pressable-soft）进入 chainList 页；移除上一版纵向折叠实现（chainFull/shownChain/firstShownNo/CHAIN_PREVIEW 及相关样式）；自动存档机制不变。
+- `AGENTS.md`：链式记忆描述的链路径部分改为横向 + 列表页方案。
+
+## 计划详情筛选下拉编译修复（2026-09-02）
+
+- `pages/plan/detail.uvue`：picker 组件 @change 的事件类型（PickerChangeEvent）在 uts→kotlin 编译不存在（error18），下拉改为「胶囊按钮（pressable-soft）+ uni.showActionSheet」实现（success.res.tapIndex 取选中项），交互与复合筛选逻辑不变；胶囊样式从 .filter-picker 合并到 .filter-value。
+- `DESIGN.md`：踩坑清单新增坑⑬（picker 事件类型不可用，改 showActionSheet 方案）。
+
+## 链式记忆：自动存档续链 + 链路径纵向折叠（2026-09-02）
+
+- `pages/word/chain.uvue`：新增链自动存档——链变化（新起点/每次建立关联）即把链上 wordId 序列存 KV `chain_draft`（逗号分隔），进入页面有档先恢复（逐 id 查库回填，词条被删则跳过，全失效视为无档自动开新局），仅「跳过/换一个孤单词」重开新局（完成/返回不清档）；链路径由横向单行滚动改为纵向折叠列表——旧→新从上往下排（等宽序号 + 词 + 当前主单词紫色高亮带「当前」标），超过 5 词默认只显示最新 5 个并提示折叠数，点头部行展开/收起全部（列表区 max-height 内部滚动），点任意词进词卡详情。
+- `AGENTS.md`：链式记忆定稿描述补自动存档与折叠链机制。
+
+## 计划词单管理模式整行点击勾选（2026-09-02）
+
+- `pages/plan/detail.uvue`：词单行 @click 由 word-main 提升到整行（word-row）——管理模式下点行内任意位置（含序号、空白、圆点）即勾选/取消，圆点仅作选中状态展示（原圆点 @click 移除，避免冒泡双触发抵消）；非管理模式行为不变（整行进词卡）；行内档位标签改 @click.stop，避免管理模式点档位时冒泡到行导致同时勾选。
+
+## 计划详情：复合筛选下拉 + 从计划移除 + 删除计划（2026-09-02）
+
+- `repos/planRepo.uts` + `repos/sqlite/planRepoImpl.uts`：新增 `removePlanItems(planId, wordIds)`——单事务删 plan_item + 该计划 word_state/review_log（word_state 必须同删，否则孤儿行持续进全局复习队列；review_log 同删与 deletePlan 对称）；词库词条/例句/笔记/关联保留。
+- `pages/plan/detail.uvue`：词单筛选由状态 chips 升级为两个 picker 下拉（状态：全部/未学习/学习中/已掌握 + 档位：全部/①/②/③），与关键词三条件复合过滤（applyFilter 内存过滤，statusIdx/prIdx 替代 filterMode/setFilter）；管理模式批量条新增红色「从计划移除」按钮（确认弹窗说明影响面，移除后重新 load）；参数卡底部新增红色「删除计划」按钮（deletePlan 已有实现，确认弹窗含计划名，成功 toast 后 navigateBack）。
+- `AGENTS.md`：更新词单筛选、批量状态管理（补从计划移除）条目，新增删除计划入口描述。
+
+## 计划详情新增激活切换按钮（2026-09-02）
+
+- `pages/plan/detail.uvue`：参数卡「保存参数」上方新增绿色主按钮「设为激活计划」（未激活时显示，已激活时隐藏并沿用标题旁「激活中」徽章）；doActivate 调用已有 activatePlan（先全部置 0 再置目标，同 planId 隔离），成功后本地刷新 isActive + toast。用户指出此前缺少切换激活的入口。
+
+## 链式记忆全局取词 + 词库学习状态筛选（2026-09-02）
+
+- `repos/planRepo.uts` + `repos/sqlite/planRepoImpl.uts`：`pickLonelyWord` 去 planId 参数，SQL 改为全局——`word JOIN word_state`（跨所有计划 status != 'new'，含已掌握）且无 custom 关联，随机取 1。
+- `pages/word/chain.uvue`：去掉激活计划依赖（activePlanId 变量、无激活计划 toast、getActivePlan 预取），无激活计划也可使用链式记忆。
+- `repos/wordRepo.uts` + `repos/sqlite/wordRepoImpl.uts`：`listPage`/`countWords` 增加 filter 参数（''=全部 / 'new' 未学习 / 'learning' 学习中 / 'mastered' 已掌握），新增模块级 `stateFilterCond` 生成 EXISTS/NOT EXISTS word_state 子查询（跨计划判断），关键词 OR 组合加整体括号后 AND 状态条件。
+- `services/wordEditor.uts`：`listWordPage`/`countWords` 透传 filter。
+- `pages/library/library.uvue`：搜索栏下新增四档筛选 chips（样式同 plan/detail），setFilter 切换重置分页；抖动保护键由 keyword 扩展为 keyword|filter；setFilter 声明在 doSearch 之后（坑④）。
+- `AGENTS.md`：链式记忆定稿描述更新为全局口径；新增「词库页学习状态筛选」条目（注明与 stats 页激活计划范围的口径差异）。
+- 用户确认的口径：词库四档同款（全部/未学习/学习中/已掌握）；链式记忆包含已掌握词。
+
+## 标日初级单词表转换管线（2026-09-02）
+
+- `tools/textbook/build-biaori.mjs`：新增转换脚本——从 biaori 项目（MIT 协议，smartsl/biaori）的 words.json/lessons.json 解析标日初级 48 课官方词表，转换为 App 导入格式（IMPORT.md）。核心规则：动词ます形还原辞书形（动1 五段い段→う段 / 动2 去ます+る / 动3 优先名词形以命中词库 suru 词条、未命中回退「～する」形，します→する、きます→くる）；[专] 未命中词库的人名丢弃（81 个）；meaning='/' 表记行跳过；脏数据清洗（行尾误混词性、斜杠/〳 并列表记取前者、全半角词性标签归一化）。
+- `tools/textbook/cache/words.json`、`lessons.json`：数据源缓存（fetch 下载）。
+- `tools/textbook/out/lesson-01.json ~ lesson-48.json`（48 个分课文件）+ `standard-japanese-primary-full.json`（全册 2043 词，按首现去重）：导入 JSON 产物。
+- 验证：base.db 三层匹配模拟（与 importer 分层一致），命中率 85.4%（精确 1549 + 仅 term 11 + 仅 reading 185；未命中 298 为寒暄表达/教材组合词，属正常新建词条）。
+
+## 单片词卡「ご」扁平 Logo（2026-09-02）
+
+- `static/icons/flat-go/icon-72.png`、`icon-96.png`、`icon-144.png`、`icon-192.png`：新增新版四尺寸透明底 RGBA PNG，使用单片浅色词卡与风格化「ご」，同源等比缩小并保留 alpha，取消旧版叠层与多色渐变底图。
+- `design-assets/app-icon/flat-go-master.png`、`nihongoi-flat-go-icons.zip`、`flat-go.md`：保存新版 1254px 原图、四尺寸压缩包、生成提示词和导出说明；`README.md` 增加新版入口，原有「あ」资产、压缩包及用户解压目录不覆盖。
+- `manifest.json`：只将当前 `app-android.distribute.icons` 的四个旧版绝对路径替换为新版项目相对路径；保持用户最新的兼容 app 图标字段空值、应用名等其他修改。
+- `DESIGN.md`：更新当前图标风格、路径与透明通道说明。
+- 验证：72/96/144/192px 目视确认字形和两笔浊点；PNG 格式/尺寸/透明角落、四处路径与 ZIP 内容检查。未打包、安装或提交 Git。
+
+## Aurora Editorial App 图标（2026-09-02）
+
+- `static/icons/aurora/icon-72.png`、`icon-96.png`、`icon-144.png`、`icon-192.png`：新增四种正方形 PNG，使用同一入选原图高质量等比缩小；暖色柔焦渐变、半透明词卡与深色「あ」，完整不透明背景，无预制外层圆角。
+- `design-assets/app-icon/aurora-master.png`、`nihongoi-aurora-icons.zip`、`README.md`：保存 1254px 原图、仅含四尺寸的下载包及内置图像生成最终提示词/导出说明。
+- `manifest.json`：仅填入现有 `app-android.distribute.icons` 与兼容 `app.distribute.icons.android` 的四个密度路径，保留此前已有的 NihonGoi 名称、Web 配置和格式改动；不替换旧 logo。
+- `DESIGN.md`：记录图标视觉规则、资源位置与打包边界。
+- 验证：四尺寸 PNG 实际尺寸/格式、不透明性、ZIP 条目与八处配置路径一致性检查；72/96/144/192px 原尺寸目视检查通过。未重新构建或安装发行 APK。
+
+## 词卡半透明手札（2026-09-02）
+
+- `pages/study/study.uvue`：正面词卡改为暖白半透明整页手札，微标签/档位置顶、大词居中、轻触提示置底；发音改为足尺寸文字胶囊，完成/空态同步。脚本和 4 个点击绑定保持不变。
+- `pages/word/detail.uvue`：词头、释义、例句、笔记、关联及评分栏统一半透明暖白面板与细高光边，去除外扩投影；拆开读音/音调/罗马音，编辑表单纵向排布，按钮最小触区 44px（评分 48px），评分区不再保留冗余滚动占位。保留原 37 个点击/输入绑定，关联未选词也可取消；读取前补 awaitDatabase 守卫，修复热重载直接恢复详情时的初始化竞态空白。
+- `DESIGN.md`：记录两面词卡的色面、排版、触控与数据边界。
+- 验证：HBuilderX 5.24 Android 编译通过；MuMu 正面→详情、长释义/例句换行、词条编辑与取消、例句/笔记展开与取消、未选词关联取消入口、动词自他关联/九种活用表滚动、热重载恢复有内容均通过。未点击评分、保存或建立关联，未改变学习记录。四按钮布局按 320/360px 宽度复核，未用实际评分验证会话提交。
+- 可读性：按当前背景图全像素合成复核，压深词头微标签/音调与状态字色后最低对比度分别为 5.31:1 / 5.42:1；正文保持全不透明。`git diff --check` 通过。
+
 ## 首页半透明卡片（2026-09-02）
 
 - `pages/index/index.uvue`：保留双页结构，仅调整样式；学习入口改为桃色/暖金半透明色面，进度区和工具目录加入暖白半透明卡片与细高光边，增强底图透色，文字不透明。避免背景滤镜与外扩投影，保持触控边界稳定。

@@ -1,0 +1,287 @@
+{
+  "planName": "标日初级下 第33课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "スーツケース",
+      "reading": "スーツケース",
+      "meaning": "旅行箱",
+      "pos": "名词"
+    },
+    {
+      "term": "トランク",
+      "reading": "トランク",
+      "meaning": "后备箱；手提箱，皮箱",
+      "pos": "名词"
+    },
+    {
+      "term": "スーツ",
+      "reading": "スーツ",
+      "meaning": "西服，女套装",
+      "pos": "名词"
+    },
+    {
+      "term": "ズボン",
+      "reading": "ズボン",
+      "meaning": "裤子",
+      "pos": "名词"
+    },
+    {
+      "term": "Ｔ～",
+      "reading": "ティーシャツ",
+      "meaning": "Ｔ恤衫",
+      "pos": "名词"
+    },
+    {
+      "term": "サンダル",
+      "reading": "サンダル",
+      "meaning": "凉鞋",
+      "pos": "名词"
+    },
+    {
+      "term": "帽子",
+      "reading": "ぼうし",
+      "meaning": "帽子",
+      "pos": "名词"
+    },
+    {
+      "term": "腕時計",
+      "reading": "うでどけい",
+      "meaning": "手表",
+      "pos": "名词"
+    },
+    {
+      "term": "小物",
+      "reading": "こもの",
+      "meaning": "小东西，细小的附件",
+      "pos": "名词"
+    },
+    {
+      "term": "運転手",
+      "reading": "うんてんしゅ",
+      "meaning": "司机",
+      "pos": "名词"
+    },
+    {
+      "term": "空",
+      "reading": "から",
+      "meaning": "空",
+      "pos": "名词"
+    },
+    {
+      "term": "運動会",
+      "reading": "うんどうかい",
+      "meaning": "运动会",
+      "pos": "名词"
+    },
+    {
+      "term": "チーム",
+      "reading": "チーム",
+      "meaning": "队，团体",
+      "pos": "名词"
+    },
+    {
+      "term": "最後",
+      "reading": "さいご",
+      "meaning": "最后",
+      "pos": "名词"
+    },
+    {
+      "term": "再会",
+      "reading": "さいかい",
+      "meaning": "重逢，再会",
+      "pos": "名词"
+    },
+    {
+      "term": "久しぶり",
+      "reading": "ひさしぶり",
+      "meaning": "好久不见",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "カキ",
+      "reading": "カキ",
+      "meaning": "柿子",
+      "pos": "名词"
+    },
+    {
+      "term": "清涼飲料水",
+      "reading": "せいりょういんりょうすい",
+      "meaning": "清凉饮料",
+      "pos": "名词"
+    },
+    {
+      "term": "閉まる",
+      "reading": "しまる",
+      "meaning": "关闭，关",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "壊す",
+      "reading": "こわす",
+      "meaning": "弄坏",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "割る",
+      "reading": "わる",
+      "meaning": "割开，打破，打坏",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "付く",
+      "reading": "つく",
+      "meaning": "附带，附加",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "掛かる",
+      "reading": "かかる",
+      "meaning": "挂，悬挂",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "汚す",
+      "reading": "よごす",
+      "meaning": "弄脏",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "やむ",
+      "reading": "やむ",
+      "meaning": "停，停息，停止",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "建つ",
+      "reading": "たつ",
+      "meaning": "盖，建",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "並ぶ",
+      "reading": "ならぶ",
+      "meaning": "排队，排，列队",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "着く",
+      "reading": "つく",
+      "meaning": "到，到达",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "かぶる",
+      "reading": "かぶる",
+      "meaning": "戴",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "はく",
+      "reading": "はく",
+      "meaning": "穿(鞋、裤子)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "飼う",
+      "reading": "かう",
+      "meaning": "饲养",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "消える",
+      "reading": "きえる",
+      "meaning": "熄灭，消失",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "掛ける",
+      "reading": "かける",
+      "meaning": "挂",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "落ちる",
+      "reading": "おちる",
+      "meaning": "落下，掉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "割れる",
+      "reading": "われる",
+      "meaning": "裂开，破裂",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "建てる",
+      "reading": "たてる",
+      "meaning": "盖，建造",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "負ける",
+      "reading": "まける",
+      "meaning": "输，败",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "汚れる",
+      "reading": "よごれる",
+      "meaning": "脏",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "偉い",
+      "reading": "えらい",
+      "meaning": "了不起，伟大",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "楽",
+      "reading": "らく",
+      "meaning": "容易，简单；快乐，轻松",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "残念",
+      "reading": "ざんねん",
+      "meaning": "可惜，遗憾",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "急に",
+      "reading": "きゅうに",
+      "meaning": "突然",
+      "pos": "副词"
+    },
+    {
+      "term": "全部",
+      "reading": "ぜんぶ",
+      "meaning": "全部",
+      "pos": "副词"
+    },
+    {
+      "term": "相変わらず",
+      "reading": "あいかわらず",
+      "meaning": "照旧，依然",
+      "pos": "副词"
+    },
+    {
+      "term": "うっかり",
+      "reading": "うっかり",
+      "meaning": "不留神，不注意",
+      "pos": "副词"
+    },
+    {
+      "term": "それにしても",
+      "reading": "それにしても",
+      "meaning": "即便那样，话虽如此",
+      "pos": "接续词"
+    },
+    {
+      "term": "お久しぶりです",
+      "reading": "おひさしぶりです",
+      "meaning": "好久不见"
+    }
+  ]
+}

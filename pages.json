@@ -38,6 +38,12 @@
 			}
 		},
 		{
+			"path": "pages/word/chainList",
+			"style": {
+				"navigationBarTitleText": "链条单词"
+			}
+		},
+		{
 			"path": "pages/plan/list",
 			"style": {
 				"navigationBarTitleText": "计划"

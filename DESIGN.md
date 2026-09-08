@@ -102,6 +102,19 @@
 - 左右滑动与底部“学习 / 工具”点击切换并存，无自动轮播、不循环。返回工具页时保留当前分页。
 - 半透明层（2026-09-02）：学习入口使用桃色/暖金 58% 不透明色面，进度与工具目录采用暖白 72% 不透明面板 + 细高光边；背景柔焦图略增强以显露通透感，文字保持全不透明。不引入背景滤镜及外扩投影，保留一页一张手札的整体轮廓。
 
+### 词卡半透明手札（2026-09-02）
+
+- 正面背词页延续整页单卡：暖白 76% 不透明面板、顶端微标签/档位、中间日文大词与音调、底部轻触提示；发音使用文字胶囊，完成/空态同属一套样式。
+- 词卡详情保留原生返回导航与纵向滚动。词头采用 52% 暖白透色面，将表记、读音/音调、罗马音拆行；释义 88%、例句/笔记/关联约 82% 不透明度，长文始终保持深色高对比。半透明只施加到背景，不降低文字不透明度。
+- 所有词卡分区采用细白边、无外扩阴影，不使用背景滤镜。编辑、添加、删除等关键触控区域至少 44px；三/四按钮评分栏为滚动区外的半透明托盘，按钮至少 48px 高，不再添加冗余正文占位。
+- 保留词条/例句/笔记/关联的原有保存事件、档位与评分回传规则；关联搜索未选词时也能取消。详情读取前等待数据库就绪，避免热重载或直接恢复详情时短暂初始化竞态导致空白。
+
+### App 图标（2026-09-02）
+
+- NihonGoi 图标二版按用户要求转为扁平 Logo：单片清浅词卡、透明底、风格化深色「ご」，取消「あ」叠层、多色光晕与明显立体光影。字形采用粗线条和斜切细节，两笔浊点须在小尺寸下保持分离。
+- 四种 1:1 RGBA PNG 为同源缩小的 72/96/144/192px，位于 `static/icons/flat-go/`，对应 Android hdpi/xhdpi/xxhdpi/xxxhdpi；仅更新当前 `app-android.distribute.icons`，保留用户将兼容 app 图标字段留空及其他已有设置。
+- 新版原图、四尺寸 ZIP 和提示词说明存于 `design-assets/app-icon/flat-go-master.png`、`nihongoi-flat-go-icons.zip`、`flat-go.md`；透明通道保留，卡面为浅色填充。旧 Aurora 图标与 `static/logo.png` 均保留。只完成资源与打包配置，发行 APK 尚未重新构建或安装。
+
 ## 六、遗留决策点（未定，需与用户讨论）
 
 1. ~~基础词库数据源~~（已定稿 2026-08-31：套餐一 = JMdict 常用 2 万 + Kanjium 音调 + 派生罗马音 + 近义/反义关联；同日 tomoshi 开放层补齐中文释义/自他对/JLPT/词频，中文释义方案随之解决）
@@ -115,7 +128,7 @@
 
 - 所有文件修改必须记录 log.md（按文件分组、同文件倒序）；重要结构变更同步 AGENTS.md 与本文档
 - uts 强类型：慎用 TS 特性（解构、字面量联合类型等）；domain 层改动需真机编译验证
-- 已趟平的 uts→kotlin 编译坑：①被闭包捕获/模块级的可变变量判空后不能 smart cast，一律先存 const 局部副本；②页面生命周期回调（onLoad 等）不支持 async（error17），异步逻辑放到独立 async 函数中调用；③java 原生数组（如 AssetManager.list 返回 String[]）在 uts 中无 .length/join、下标须 Int、需判空——用 `names.size` + `for (let i: Int = 0; ...)` 遍历；④setup 内 const 箭头函数必须**先声明后引用**（同 Kotlin 词法顺序），互相调用的函数注意排列顺序；⑤冷启动竞态：首页 onLoad 早于 onLaunch 异步 initDatabase 完成，访问数据库前须 `await awaitDatabase()`；⑥模板插值不能直接调用**模块导入**的函数（仅 setup 本地函数可调），导入函数须包一层本地无参函数；⑦`UTSAndroid.getDispatcher(...).async` 的回调参数须为可空类型（`any | null`），非空 `any` 报 Function1 参数不匹配；⑧**uni-app x 不自动注入 uni.scss 的 scss 变量**（与 vue2/3 不同），页面 `<style lang="scss">` 顶部须显式 `@import '相对路径/uni.scss';`，否则 vite:css 报 Undefined variable；⑨**uts 对象字面量必须显式标注类型**（`const out: MyType = {...}`），无注解会被编译为 UTSJSONObject——赋给/返回给具体 type 时编译不报错但**运行时 ClassCastException**，且会被上层 catch 吞成误导性报错（2026-08-31 案例：导入报「JSON 解析失败」，真凶是 parseExtras 返回值漏注解）；⑩**uvue 样式不支持 @keyframes 与 animation-\* 属性**（app-uvue-css 报 ERROR: Selector `0%` is not supported / animation-name not standard），动画实现 = transition-property(duration/timing-function) + JS 定时器切换状态类（开屏页范式：logo 弹入/标题上浮/三色点轮换）；⑪**模板表达式里函数必须显式调用**（`accentText() != ''`），裸函数名与字符串比较报 kotlin `Operator '!=' cannot be applied to 'Function0<String>' and 'String'`；⑫**App-Android 上带模糊半径的 box-shadow 会把阴影外扩区计入视图的触控边界**——后置兄弟卡片的外扩帧会盖住前一张卡片底部条带、吃掉贴底按钮的点击（2026-09-01 案例：Aurora 柔影 0/16/44rpx 致词卡「+ 添加例句 / + 添加笔记」与链式记忆「+ 笔记」完全无响应，而同页卡片顶部/中部的「编辑 / 修改 / 筛选 chips」正常；旧版 2rpx 硬影外扩可忽略故无此问题）；约束=阴影偏移+模糊半径须小于卡片间 margin（token 已收敛为 $n-shadow 6/18rpx、$n-shadow-sm 4/12rpx，见 uni.scss 注释）
+- 已趟平的 uts→kotlin 编译坑：①被闭包捕获/模块级的可变变量判空后不能 smart cast，一律先存 const 局部副本；②页面生命周期回调（onLoad 等）不支持 async（error17），异步逻辑放到独立 async 函数中调用；③java 原生数组（如 AssetManager.list 返回 String[]）在 uts 中无 .length/join、下标须 Int、需判空——用 `names.size` + `for (let i: Int = 0; ...)` 遍历；④setup 内 const 箭头函数必须**先声明后引用**（同 Kotlin 词法顺序），互相调用的函数注意排列顺序；⑤冷启动竞态：首页 onLoad 早于 onLaunch 异步 initDatabase 完成，访问数据库前须 `await awaitDatabase()`；⑥模板插值不能直接调用**模块导入**的函数（仅 setup 本地函数可调），导入函数须包一层本地无参函数；⑦`UTSAndroid.getDispatcher(...).async` 的回调参数须为可空类型（`any | null`），非空 `any` 报 Function1 参数不匹配；⑧**uni-app x 不自动注入 uni.scss 的 scss 变量**（与 vue2/3 不同），页面 `<style lang="scss">` 顶部须显式 `@import '相对路径/uni.scss';`，否则 vite:css 报 Undefined variable；⑨**uts 对象字面量必须显式标注类型**（`const out: MyType = {...}`），无注解会被编译为 UTSJSONObject——赋给/返回给具体 type 时编译不报错但**运行时 ClassCastException**，且会被上层 catch 吞成误导性报错（2026-08-31 案例：导入报「JSON 解析失败」，真凶是 parseExtras 返回值漏注解）；⑩**uvue 样式不支持 @keyframes 与 animation-\* 属性**（app-uvue-css 报 ERROR: Selector `0%` is not supported / animation-name not standard），动画实现 = transition-property(duration/timing-function) + JS 定时器切换状态类（开屏页范式：logo 弹入/标题上浮/三色点轮换）；⑪**模板表达式里函数必须显式调用**（`accentText() != ''`），裸函数名与字符串比较报 kotlin `Operator '!=' cannot be applied to 'Function0<String>' and 'String'`；⑫**App-Android 上带模糊半径的 box-shadow 会把阴影外扩区计入视图的触控边界**——后置兄弟卡片的外扩帧会盖住前一张卡片底部条带、吃掉贴底按钮的点击（2026-09-01 案例：Aurora 柔影 0/16/44rpx 致词卡「+ 添加例句 / + 添加笔记」与链式记忆「+ 笔记」完全无响应，而同页卡片顶部/中部的「编辑 / 修改 / 筛选 chips」正常；旧版 2rpx 硬影外扩可忽略故无此问题）；约束=阴影偏移+模糊半径须小于卡片间 margin（token 已收敛为 $n-shadow 6/18rpx、$n-shadow-sm 4/12rpx，见 uni.scss 注释）；⑬**picker 组件的 @change 事件类型名（PickerChangeEvent 等）在 uts→kotlin 编译不存在**（2026-09-02 案例：计划详情筛选下拉报「找不到名称 PickerChangeEvent/detail」，error18）——下拉选择改用「胶囊按钮 + uni.showActionSheet(itemList, success.res.tapIndex)」实现，类型全部可用
 - pages.json 的 path 与 navigateTo URL **不带 .uvue 后缀**（本工程模板约定）
 - meibao-Sqlite 无参数绑定：SQL 拼接必须走 meibaoClient 的 sqlStr/sqlNum；行值取数用 toNum；**executeSql 的 insertId 恒为 -1**，取新行 id 用插入后 `SELECT last_insert_rowid()`（同连接顺序 await，安全）
 - 首启底库复制机制（assetCopy.uts）：dev 标准基座运行时 static 资源由 HBuilderX 同步到**设备文件系统**（用官方 `UTSAndroid.getResourcePath('/static/...')` 解析，不在 APK assets）；正式打包后在 APK `assets/apps/<appid>/www/static/...`。三层定位 + 失败诊断

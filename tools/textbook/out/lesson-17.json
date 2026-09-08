@@ -1,0 +1,186 @@
+{
+  "planName": "标日初级上 第17课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "洋服",
+      "reading": "ようふく",
+      "meaning": "西服",
+      "pos": "名词"
+    },
+    {
+      "term": "セーター",
+      "reading": "セーター",
+      "meaning": "毛衣",
+      "pos": "名词"
+    },
+    {
+      "term": "ノートパソコン",
+      "reading": "ノートパソコン",
+      "meaning": "笔记本电脑",
+      "pos": "名词"
+    },
+    {
+      "term": "バイク",
+      "reading": "バイク",
+      "meaning": "摩托车",
+      "pos": "名词"
+    },
+    {
+      "term": "お汁粉",
+      "reading": "おしるこ",
+      "meaning": "年糕小豆汤",
+      "pos": "名词"
+    },
+    {
+      "term": "天ぷら",
+      "reading": "てんぷら",
+      "meaning": "天麸罗",
+      "pos": "名词"
+    },
+    {
+      "term": "初詣",
+      "reading": "はつもうで",
+      "meaning": "新年后首次参拜",
+      "pos": "名词"
+    },
+    {
+      "term": "健康",
+      "reading": "けんこう",
+      "meaning": "健康",
+      "pos": "名词"
+    },
+    {
+      "term": "恋愛",
+      "reading": "れんあい",
+      "meaning": "恋爱",
+      "pos": "名词"
+    },
+    {
+      "term": "ドラマ",
+      "reading": "ドラマ",
+      "meaning": "连续剧",
+      "pos": "名词"
+    },
+    {
+      "term": "相手",
+      "reading": "あいて",
+      "meaning": "对象，对方",
+      "pos": "名词"
+    },
+    {
+      "term": "恋人",
+      "reading": "こいびと",
+      "meaning": "恋人",
+      "pos": "名词"
+    },
+    {
+      "term": "先輩",
+      "reading": "せんぱい",
+      "meaning": "前辈",
+      "pos": "名词"
+    },
+    {
+      "term": "男性",
+      "reading": "だんせい",
+      "meaning": "男性",
+      "pos": "名词"
+    },
+    {
+      "term": "外国人",
+      "reading": "がいこくじん",
+      "meaning": "外国人",
+      "pos": "名词"
+    },
+    {
+      "term": "夏",
+      "reading": "なつ",
+      "meaning": "夏天",
+      "pos": "名词"
+    },
+    {
+      "term": "今年",
+      "reading": "ことし",
+      "meaning": "今年",
+      "pos": "名词"
+    },
+    {
+      "term": "始める",
+      "reading": "はじめる",
+      "meaning": "开始",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "連絡",
+      "reading": "れんらく",
+      "meaning": "联系",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "欲しい",
+      "reading": "ほしい",
+      "meaning": "想要",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "立派",
+      "reading": "りっぱ",
+      "meaning": "美观，杰出",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "今度",
+      "reading": "こんど",
+      "meaning": "下次；这回",
+      "pos": "副词"
+    },
+    {
+      "term": "ぜひ",
+      "reading": "ぜひ",
+      "meaning": "一定",
+      "pos": "副词"
+    },
+    {
+      "term": "そろそろ",
+      "reading": "そろそろ",
+      "meaning": "快要",
+      "pos": "副词"
+    },
+    {
+      "term": "まず",
+      "reading": "まず",
+      "meaning": "先，首先",
+      "pos": "副词"
+    },
+    {
+      "term": "ショパン",
+      "reading": "ショパン",
+      "meaning": "肖邦",
+      "pos": "专有名词"
+    },
+    {
+      "term": "故宮",
+      "reading": "こきゅう",
+      "meaning": "故宫",
+      "pos": "专有名词"
+    },
+    {
+      "term": "ヨーロッパ",
+      "reading": "ヨーロッパ",
+      "meaning": "欧洲",
+      "pos": "专有名词"
+    },
+    {
+      "term": "香港",
+      "reading": "ホンコン",
+      "meaning": "香港",
+      "pos": "专有名词"
+    },
+    {
+      "term": "スイス",
+      "reading": "スイス",
+      "meaning": "瑞士",
+      "pos": "专有名词"
+    }
+  ]
+}

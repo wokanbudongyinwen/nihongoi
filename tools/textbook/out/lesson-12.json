@@ -1,0 +1,197 @@
+{
+  "planName": "标日初级上 第12课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "季節",
+      "reading": "きせつ",
+      "meaning": "季节",
+      "pos": "名词"
+    },
+    {
+      "term": "冬",
+      "reading": "ふゆ",
+      "meaning": "冬天，冬季",
+      "pos": "名词"
+    },
+    {
+      "term": "春",
+      "reading": "はる",
+      "meaning": "春天，春季",
+      "pos": "名词"
+    },
+    {
+      "term": "日本料理",
+      "reading": "にほんりょうり",
+      "meaning": "日式饭菜",
+      "pos": "名词"
+    },
+    {
+      "term": "寿司",
+      "reading": "すし",
+      "meaning": "寿司",
+      "pos": "名词"
+    },
+    {
+      "term": "ナシ",
+      "reading": "ナシ",
+      "meaning": "梨",
+      "pos": "名词"
+    },
+    {
+      "term": "バナナ",
+      "reading": "バナナ",
+      "meaning": "香蕉",
+      "pos": "名词"
+    },
+    {
+      "term": "ミカン",
+      "reading": "ミカン",
+      "meaning": "橘子",
+      "pos": "名词"
+    },
+    {
+      "term": "焼酎",
+      "reading": "しょうちゅう",
+      "meaning": "烧酒",
+      "pos": "名词"
+    },
+    {
+      "term": "日本酒",
+      "reading": "にほんしゅ",
+      "meaning": "日本酒",
+      "pos": "名词"
+    },
+    {
+      "term": "紅茶",
+      "reading": "こうちゃ",
+      "meaning": "红茶",
+      "pos": "名词"
+    },
+    {
+      "term": "ウーロンちゃ",
+      "reading": "ウーロンちゃ",
+      "meaning": "乌龙茶",
+      "pos": "名词"
+    },
+    {
+      "term": "ジャスミンちゃ",
+      "reading": "ジャスミンちゃ",
+      "meaning": "茉莉花茶",
+      "pos": "名词"
+    },
+    {
+      "term": "緑茶",
+      "reading": "りょくちゃ",
+      "meaning": "绿茶",
+      "pos": "名词"
+    },
+    {
+      "term": "ジュース",
+      "reading": "ジュース",
+      "meaning": "果汁",
+      "pos": "名词"
+    },
+    {
+      "term": "人気",
+      "reading": "にんき",
+      "meaning": "声望，受欢迎",
+      "pos": "名词"
+    },
+    {
+      "term": "席",
+      "reading": "せき",
+      "meaning": "座位，席位",
+      "pos": "名词"
+    },
+    {
+      "term": "クラス",
+      "reading": "クラス",
+      "meaning": "班级",
+      "pos": "名词"
+    },
+    {
+      "term": "種類",
+      "reading": "しゅるい",
+      "meaning": "种类",
+      "pos": "名词"
+    },
+    {
+      "term": "背",
+      "reading": "せ",
+      "meaning": "个子",
+      "pos": "名词"
+    },
+    {
+      "term": "兄",
+      "reading": "あに",
+      "meaning": "哥哥，兄长",
+      "pos": "名词"
+    },
+    {
+      "term": "最近",
+      "reading": "さいきん",
+      "meaning": "最近，近来",
+      "pos": "名词"
+    },
+    {
+      "term": "降る",
+      "reading": "ふる",
+      "meaning": "下(雨，雪)，降(雨，雪)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "若い",
+      "reading": "わかい",
+      "meaning": "年轻",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "暖かい",
+      "reading": "あたたかい",
+      "meaning": "暖和，温暖",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "涼しい",
+      "reading": "すずしい",
+      "meaning": "凉爽",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "速い",
+      "reading": "はやい",
+      "meaning": "快",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "大好き",
+      "reading": "だいすき",
+      "meaning": "非常喜欢",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "いちばん",
+      "reading": "いちばん",
+      "meaning": "最，第一",
+      "pos": "副词"
+    },
+    {
+      "term": "ずっと",
+      "reading": "ずっと",
+      "meaning": "～得多",
+      "pos": "副词"
+    },
+    {
+      "term": "やはり／やっぱり",
+      "reading": "やはり／やっぱり",
+      "meaning": "仍然，还是",
+      "pos": "副词"
+    },
+    {
+      "term": "人気があります",
+      "reading": "にんきがあります",
+      "meaning": "受欢迎"
+    }
+  ]
+}

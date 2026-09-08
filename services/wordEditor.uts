@@ -22,13 +22,14 @@ export async function searchWords(keyword: string, limit: number): Promise<Array
 }
 
 // 词库分页浏览（词库页滚动加载）：返回一页词条
-export async function listWordPage(keyword: string, limit: number, offset: number): Promise<Array<Word>> {
-  return await getWordRepo().listPage(keyword, limit, offset)
+// filter：''=全部 / 'new' 未学习 / 'learning' 学习中 / 'mastered' 已掌握（跨计划）
+export async function listWordPage(keyword: string, filter: string, limit: number, offset: number): Promise<Array<Word>> {
+  return await getWordRepo().listPage(keyword, filter, limit, offset)
 }
 
-// 词库总词数（可带关键词过滤）
-export async function countWords(keyword: string): Promise<number> {
-  return await getWordRepo().countWords(keyword)
+// 词库总词数（可带关键词与学习状态过滤）
+export async function countWords(keyword: string, filter: string): Promise<number> {
+  return await getWordRepo().countWords(keyword, filter)
 }
 
 // 词卡详情展示用：关联行 + 对端词条摘要（避免页面再做 N 次 getById）

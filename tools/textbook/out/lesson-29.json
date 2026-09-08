@@ -1,0 +1,292 @@
+{
+  "planName": "标日初级下 第29课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "質問",
+      "reading": "しつもん",
+      "meaning": "提问，问题",
+      "pos": "名词"
+    },
+    {
+      "term": "場合",
+      "reading": "ばあい",
+      "meaning": "场合，情况",
+      "pos": "名词"
+    },
+    {
+      "term": "迷惑",
+      "reading": "めいわく",
+      "meaning": "麻烦",
+      "pos": "名词"
+    },
+    {
+      "term": "フジ",
+      "reading": "フジ",
+      "meaning": "紫藤",
+      "pos": "名词"
+    },
+    {
+      "term": "カササギ",
+      "reading": "カササギ",
+      "meaning": "喜鹊",
+      "pos": "名词"
+    },
+    {
+      "term": "鳥",
+      "reading": "とり",
+      "meaning": "鸟",
+      "pos": "名词"
+    },
+    {
+      "term": "マーク",
+      "reading": "マーク",
+      "meaning": "符号",
+      "pos": "名词"
+    },
+    {
+      "term": "標識",
+      "reading": "ひょうしき",
+      "meaning": "标记",
+      "pos": "名词"
+    },
+    {
+      "term": "横断禁止",
+      "reading": "おうだんきんし",
+      "meaning": "禁止横穿",
+      "pos": "名词"
+    },
+    {
+      "term": "スピード",
+      "reading": "スピード",
+      "meaning": "速度",
+      "pos": "名词"
+    },
+    {
+      "term": "免許証",
+      "reading": "めんきょしょう",
+      "meaning": "许可证，执照",
+      "pos": "名词"
+    },
+    {
+      "term": "企画書",
+      "reading": "きかくしょ",
+      "meaning": "计划书",
+      "pos": "名词"
+    },
+    {
+      "term": "野球場",
+      "reading": "やきゅうじょう",
+      "meaning": "棒球场",
+      "pos": "名词"
+    },
+    {
+      "term": "テーブル",
+      "reading": "テーブル",
+      "meaning": "桌子",
+      "pos": "名词"
+    },
+    {
+      "term": "テレビこうざ",
+      "reading": "テレビこうざ",
+      "meaning": "电视讲座",
+      "pos": "名词"
+    },
+    {
+      "term": "漢字",
+      "reading": "かんじ",
+      "meaning": "汉字",
+      "pos": "名词"
+    },
+    {
+      "term": "戦争",
+      "reading": "せんそう",
+      "meaning": "战争",
+      "pos": "名词"
+    },
+    {
+      "term": "警官",
+      "reading": "けいかん",
+      "meaning": "警察",
+      "pos": "名词"
+    },
+    {
+      "term": "年上",
+      "reading": "としうえ",
+      "meaning": "年长者",
+      "pos": "名词"
+    },
+    {
+      "term": "止まる",
+      "reading": "とまる",
+      "meaning": "停，停住",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "変わる",
+      "reading": "かわる",
+      "meaning": "变，转变",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "頑張る",
+      "reading": "がんばる",
+      "meaning": "拼命努力",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "謝る",
+      "reading": "あやまる",
+      "meaning": "道歉",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "サボる",
+      "reading": "サボる",
+      "meaning": "逃学，怠工",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "破る",
+      "reading": "やぶる",
+      "meaning": "爽约，打破",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "引く",
+      "reading": "ひく",
+      "meaning": "拉，抽",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "守る",
+      "reading": "まもる",
+      "meaning": "遵守，保护",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "答える",
+      "reading": "こたえる",
+      "meaning": "回答",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "逃げる",
+      "reading": "にげる",
+      "meaning": "逃跑",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "助ける",
+      "reading": "たすける",
+      "meaning": "救助，帮助",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "付ける",
+      "reading": "つける",
+      "meaning": "添加，附加",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "覚える",
+      "reading": "おぼえる",
+      "meaning": "记住，掌握",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "提出",
+      "reading": "ていしゅつ",
+      "meaning": "提交，提出",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "遠慮",
+      "reading": "えんりょ",
+      "meaning": "客气",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "シュート",
+      "reading": "シュート",
+      "meaning": "(足球)射门，投篮",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "注意",
+      "reading": "ちゅうい",
+      "meaning": "注意",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "親しい",
+      "reading": "したしい",
+      "meaning": "熟悉，亲切，亲密",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "乱暴",
+      "reading": "らんぼう",
+      "meaning": "粗暴",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "失礼",
+      "reading": "しつれい",
+      "meaning": "不礼貌",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "同じ",
+      "reading": "おなじ",
+      "meaning": "一样，相同",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "危険",
+      "reading": "きけん",
+      "meaning": "危险",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "そんな",
+      "reading": "そんな",
+      "meaning": "那样的",
+      "pos": "连体词"
+    },
+    {
+      "term": "丁寧に",
+      "reading": "ていねいに",
+      "meaning": "恭敬地；细心地",
+      "pos": "副词"
+    },
+    {
+      "term": "おい",
+      "reading": "おい",
+      "meaning": "哎，喂",
+      "pos": "叹词"
+    },
+    {
+      "term": "誠",
+      "reading": "まこと",
+      "meaning": "诚，阿诚",
+      "pos": "专有名词"
+    },
+    {
+      "term": "富士",
+      "reading": "ふじ",
+      "meaning": "富士",
+      "pos": "专有名词"
+    },
+    {
+      "term": "変わった",
+      "reading": "かわった",
+      "meaning": "怪"
+    },
+    {
+      "term": "風邪を引きます",
+      "reading": "かぜをひきます",
+      "meaning": "感冒"
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "planName": "标日初级上 第21课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "言葉",
+      "reading": "ことば",
+      "meaning": "语言",
+      "pos": "名词"
+    },
+    {
+      "term": "メールアドレス",
+      "reading": "メールアドレス",
+      "meaning": "邮件地址",
+      "pos": "名词"
+    },
+    {
+      "term": "連休",
+      "reading": "れんきゅう",
+      "meaning": "连休",
+      "pos": "名词"
+    },
+    {
+      "term": "ゴールデンウィーク",
+      "reading": "ゴールデンウィーク",
+      "meaning": "黄金周",
+      "pos": "名词"
+    },
+    {
+      "term": "終わり",
+      "reading": "おわり",
+      "meaning": "结束",
+      "pos": "名词"
+    },
+    {
+      "term": "休憩時間",
+      "reading": "きゅうけいじかん",
+      "meaning": "休息时间",
+      "pos": "名词"
+    },
+    {
+      "term": "京劇",
+      "reading": "きょうげき",
+      "meaning": "京剧",
+      "pos": "名词"
+    },
+    {
+      "term": "切符",
+      "reading": "きっぷ",
+      "meaning": "票(券)",
+      "pos": "名词"
+    },
+    {
+      "term": "体",
+      "reading": "からだ",
+      "meaning": "身体",
+      "pos": "名词"
+    },
+    {
+      "term": "地震",
+      "reading": "じしん",
+      "meaning": "地震",
+      "pos": "名词"
+    },
+    {
+      "term": "泥棒",
+      "reading": "どろぼう",
+      "meaning": "小偷，盗贼",
+      "pos": "名词"
+    },
+    {
+      "term": "駐車場",
+      "reading": "ちゅうしゃじょう",
+      "meaning": "停车场",
+      "pos": "名词"
+    },
+    {
+      "term": "渡す",
+      "reading": "わたす",
+      "meaning": "交给",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "遅れる",
+      "reading": "おくれる",
+      "meaning": "迟到",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "考える",
+      "reading": "かんがえる",
+      "meaning": "考虑",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "調べる",
+      "reading": "しらべる",
+      "meaning": "调查",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "着る",
+      "reading": "きる",
+      "meaning": "穿",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "予約",
+      "reading": "よやく",
+      "meaning": "预约，预定",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "感謝",
+      "reading": "かんしゃ",
+      "meaning": "感谢",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "運動",
+      "reading": "うんどう",
+      "meaning": "运动",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "洗濯",
+      "reading": "せんたく",
+      "meaning": "洗涤，洗",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "報告",
+      "reading": "ほうこく",
+      "meaning": "报告",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "危ない",
+      "reading": "あぶない",
+      "meaning": "危险",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "それとも",
+      "reading": "それとも",
+      "meaning": "还是，或者",
+      "pos": "接续词"
+    },
+    {
+      "term": "そんなに",
+      "reading": "そんなに",
+      "meaning": "那么"
+    }
+  ]
+}

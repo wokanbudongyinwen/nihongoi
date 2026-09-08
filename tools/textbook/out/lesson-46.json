@@ -1,0 +1,286 @@
+{
+  "planName": "标日初级下 第46课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "毛皮",
+      "reading": "けがわ",
+      "meaning": "毛皮",
+      "pos": "名词"
+    },
+    {
+      "term": "本物",
+      "reading": "ほんもの",
+      "meaning": "真货，真东西",
+      "pos": "名词"
+    },
+    {
+      "term": "柄",
+      "reading": "がら",
+      "meaning": "花纹，花样",
+      "pos": "名词"
+    },
+    {
+      "term": "レモン",
+      "reading": "レモン",
+      "meaning": "柠檬",
+      "pos": "名词"
+    },
+    {
+      "term": "みそ汁",
+      "reading": "みそしる",
+      "meaning": "酱汤",
+      "pos": "名词"
+    },
+    {
+      "term": "お祭り",
+      "reading": "おまつり",
+      "meaning": "祭日，节日",
+      "pos": "名词"
+    },
+    {
+      "term": "オートバイ",
+      "reading": "オートバイ",
+      "meaning": "摩托车",
+      "pos": "名词"
+    },
+    {
+      "term": "インタビュー",
+      "reading": "インタビュー",
+      "meaning": "采访",
+      "pos": "名词"
+    },
+    {
+      "term": "プラン",
+      "reading": "プラン",
+      "meaning": "计划",
+      "pos": "名词"
+    },
+    {
+      "term": "頭痛",
+      "reading": "ずつう",
+      "meaning": "头疼",
+      "pos": "名词"
+    },
+    {
+      "term": "寒気",
+      "reading": "さむけ",
+      "meaning": "寒气，寒战",
+      "pos": "名词"
+    },
+    {
+      "term": "吐き気",
+      "reading": "はきけ",
+      "meaning": "恶心，想要呕吐",
+      "pos": "名词"
+    },
+    {
+      "term": "家事",
+      "reading": "かじ",
+      "meaning": "家务活",
+      "pos": "名词"
+    },
+    {
+      "term": "面接",
+      "reading": "めんせつ",
+      "meaning": "面试",
+      "pos": "名词"
+    },
+    {
+      "term": "出来事",
+      "reading": "できごと",
+      "meaning": "事情，事件",
+      "pos": "名词"
+    },
+    {
+      "term": "意見",
+      "reading": "いけん",
+      "meaning": "意见",
+      "pos": "名词"
+    },
+    {
+      "term": "開設",
+      "reading": "かいせつ",
+      "meaning": "开设",
+      "pos": "名词"
+    },
+    {
+      "term": "候補地",
+      "reading": "こうほち",
+      "meaning": "候选地",
+      "pos": "名词"
+    },
+    {
+      "term": "周り",
+      "reading": "まわり",
+      "meaning": "一带，周围",
+      "pos": "名词"
+    },
+    {
+      "term": "明るさ",
+      "reading": "あかるさ",
+      "meaning": "明朗，快活",
+      "pos": "名词"
+    },
+    {
+      "term": "におい",
+      "reading": "におい",
+      "meaning": "味道，气味",
+      "pos": "名词"
+    },
+    {
+      "term": "せっけん",
+      "reading": "せっけん",
+      "meaning": "肥皂",
+      "pos": "名词"
+    },
+    {
+      "term": "香水",
+      "reading": "こうすい",
+      "meaning": "香水",
+      "pos": "名词"
+    },
+    {
+      "term": "ラン",
+      "reading": "ラン",
+      "meaning": "兰花",
+      "pos": "名词"
+    },
+    {
+      "term": "末",
+      "reading": "すえ",
+      "meaning": "末尾，末了",
+      "pos": "名词"
+    },
+    {
+      "term": "初め",
+      "reading": "はじめ",
+      "meaning": "最初",
+      "pos": "名词"
+    },
+    {
+      "term": "半月",
+      "reading": "はんつき",
+      "meaning": "半月，半个月",
+      "pos": "名词"
+    },
+    {
+      "term": "モデル",
+      "reading": "モデル",
+      "meaning": "模特儿",
+      "pos": "名词"
+    },
+    {
+      "term": "警察官",
+      "reading": "けいさつかん",
+      "meaning": "警察",
+      "pos": "名词"
+    },
+    {
+      "term": "お相撲さん",
+      "reading": "おすもうさん",
+      "meaning": "相扑选手",
+      "pos": "名词"
+    },
+    {
+      "term": "歌舞伎役者",
+      "reading": "かぶきやくしゃ",
+      "meaning": "歌舞伎演员",
+      "pos": "名词"
+    },
+    {
+      "term": "水泳選手",
+      "reading": "すいえいせんしゅ",
+      "meaning": "游泳选手",
+      "pos": "名词"
+    },
+    {
+      "term": "済む",
+      "reading": "すむ",
+      "meaning": "结束，完了",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "積もる",
+      "reading": "つもる",
+      "meaning": "堆积；积攒",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "過ごす",
+      "reading": "すごす",
+      "meaning": "度过；生活",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "ほほえむ",
+      "reading": "ほほえむ",
+      "meaning": "微笑",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "延ばす",
+      "reading": "のばす",
+      "meaning": "延长",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "済ませる",
+      "reading": "すませる",
+      "meaning": "搞完，办完",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "枯れる",
+      "reading": "かれる",
+      "meaning": "枯萎；干燥",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "発送",
+      "reading": "はっそう",
+      "meaning": "发送，寄送",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "緊張",
+      "reading": "きんちょう",
+      "meaning": "紧张",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "さわやか",
+      "reading": "さわやか",
+      "meaning": "清爽，爽快",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "まるで",
+      "reading": "まるで",
+      "meaning": "好像，就像",
+      "pos": "副词"
+    },
+    {
+      "term": "いかにも",
+      "reading": "いかにも",
+      "meaning": "典型的；实在；的确",
+      "pos": "副词"
+    },
+    {
+      "term": "沖縄",
+      "reading": "おきなわ",
+      "meaning": "冲绳",
+      "pos": "专有名词"
+    },
+    {
+      "term": "このごろ",
+      "reading": "このごろ",
+      "meaning": "最近，近来，最近时期"
+    },
+    {
+      "term": "事務所探し",
+      "reading": "じむしょさがし",
+      "meaning": "寻找事物所"
+    }
+  ]
+}

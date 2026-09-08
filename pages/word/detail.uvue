@@ -1,26 +1,33 @@
 <template>
   <view class="page">
-  <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
+  <image class="aurora-bg detail-wash" src="/static/aurora-bg.png" mode="aspectFill"></image>
   <scroll-view class="body" scroll-y="true" show-scrollbar="false">
+    <view class="page-content">
     <!-- 头部：表记 + 读音（音调核） + 词性 + 状态徽章 -->
-    <view class="neo-card header">
-      <view class="header-row" v-if="!editMode">
+    <view class="glass-card header">
+      <view class="header-top">
+        <text class="eyebrow">WORD NOTES</text>
+        <view class="header-actions" v-if="!editMode">
+          <view class="header-button pressable-soft" hover-class="press-soft" @click="playWord"><text class="header-button-text">发音</text></view>
+          <view class="header-button pressable-soft" hover-class="press-soft" @click="startEdit"><text class="header-button-text">编辑</text></view>
+        </view>
+        <text class="edit-caption" v-if="editMode">编辑词条</text>
+      </view>
+      <view class="word-heading" v-if="!editMode">
         <text class="term">{{ word.term }}</text>
-        <text class="edit-link pressable-soft" hover-class="press-soft" @click="startEdit">编辑</text>
-      </view>
-      <view class="header-row" v-if="!editMode">
-        <text class="reading">{{ word.reading }}</text>
+        <view class="reading-row">
+          <text class="reading" v-if="word.reading != ''">{{ word.reading }}</text>
+          <text class="accent" v-if="word.accent.length > 0">{{ accentText() }}</text>
+        </view>
         <text class="romaji" v-if="word.romaji != ''">{{ word.romaji }}</text>
-        <text class="accent" v-if="word.accent.length > 0">{{ accentText() }}</text>
-        <text class="speaker pressable-soft" hover-class="press-soft" @click="playWord">音</text>
       </view>
-      <view class="word-meta" v-if="!editMode">
-        <text class="pos">{{ word.pos }}</text>
+      <view class="word-meta" v-if="!editMode && (word.pos != '' || statusText != '')">
+        <text class="pos" v-if="word.pos != ''">{{ word.pos }}</text>
         <text class="badge" v-if="statusText != ''">{{ statusText }}</text>
       </view>
 
       <!-- 词条编辑表单 -->
-      <view v-if="editMode">
+      <view class="word-editor" v-if="editMode">
         <view class="form-row">
           <text class="form-label">表记</text>
           <input class="form-input" :value="editTerm" @input="onEditTerm" />
@@ -53,14 +60,14 @@
     </view>
 
     <!-- 释义 -->
-    <view class="neo-card section">
-      <text class="section-title">释义</text>
-      <text class="section-body">{{ word.meaning }}</text>
+    <view class="glass-card section meaning-card">
+      <view class="section-heading"><text class="section-title">释义</text><text class="section-index">MEANING</text></view>
+      <text class="meaning-body">{{ word.meaning }}</text>
     </view>
 
     <!-- 例句（增删改） -->
-    <view class="neo-card section">
-      <text class="section-title">例句</text>
+    <view class="glass-card section">
+      <view class="section-heading"><text class="section-title">例句</text><text class="section-index">EXAMPLES</text></view>
       <view class="sentence-item" v-for="(s, i) in sentences" :key="s.id">
         <text class="section-body">{{ s.text }}</text>
         <text class="section-sub" v-if="s.translation != ''">{{ s.translation }}</text>
@@ -69,7 +76,7 @@
           <text class="action danger" @click="doDeleteSentence(s)">删除</text>
         </view>
       </view>
-      <text class="empty-tip" v-if="sentences.length == 0">暂无例句</text>
+      <text class="empty-tip" v-if="sentences.length == 0">暂无例句，留下一句使用它的场景。</text>
 
       <view class="add-form" v-if="sentenceEditing">
         <input class="form-input" :value="sText" @input="onSText" placeholder="日文例句" />
@@ -79,19 +86,19 @@
           <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelSentence"><text class="mini-btn-text">取消</text></view>
         </view>
       </view>
-      <text class="add" v-if="!sentenceEditing" @click="startAddSentence">+ 添加例句</text>
+      <view class="add pressable-soft" hover-class="press-soft" v-if="!sentenceEditing" @click="startAddSentence"><text class="add-text">＋ 添加例句</text></view>
     </view>
 
     <!-- 笔记（时间线：追加式） -->
-    <view class="neo-card section">
-      <text class="section-title">笔记</text>
+    <view class="glass-card section note-card">
+      <view class="section-heading"><text class="section-title">笔记</text><text class="section-index">MARGINALIA</text></view>
       <view class="note-item" v-for="(n, i) in notes" :key="n.id">
         <text class="section-body">{{ n.content }}</text>
         <view class="item-actions">
           <text class="action danger" @click="doDeleteNote(n)">删除</text>
         </view>
       </view>
-      <text class="empty-tip" v-if="notes.length == 0">暂无笔记</text>
+      <text class="empty-tip" v-if="notes.length == 0">暂无笔记，记下你的理解与联想。</text>
 
       <view class="add-form" v-if="noteInputting">
         <textarea class="form-textarea" :value="noteInput" @input="onNoteInput" placeholder="记点什么…" />
@@ -100,39 +107,40 @@
           <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelNote"><text class="mini-btn-text">取消</text></view>
         </view>
       </view>
-      <text class="add" v-if="!noteInputting" @click="startNote">+ 添加笔记</text>
+      <view class="add pressable-soft" hover-class="press-soft" v-if="!noteInputting" @click="startNote"><text class="add-text">＋ 添加笔记</text></view>
     </view>
 
     <!-- 固定关联：近义词（系统 xref，可下钻） -->
-    <view class="neo-card section" v-if="synonyms.length > 0">
-      <text class="section-title">近义词</text>
+    <view class="glass-card section" v-if="synonyms.length > 0">
+      <view class="section-heading"><text class="section-title">近义词</text><text class="section-index">SIMILAR</text></view>
       <text class="link" v-for="(p, i) in synonyms" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
     </view>
 
     <!-- 固定关联：反义词（系统 ant，可下钻） -->
-    <view class="neo-card section" v-if="antonyms.length > 0">
-      <text class="section-title">反义词</text>
+    <view class="glass-card section" v-if="antonyms.length > 0">
+      <view class="section-heading"><text class="section-title">反义词</text><text class="section-index">OPPOSITE</text></view>
       <text class="link" v-for="(p, i) in antonyms" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
     </view>
 
     <!-- 固定关联：自他动词对（可下钻） -->
-    <view class="neo-card section" v-if="transPairs.length > 0">
-      <text class="section-title">自他动词对</text>
+    <view class="glass-card section" v-if="transPairs.length > 0">
+      <view class="section-heading"><text class="section-title">自他动词对</text><text class="section-index">VERB PAIR</text></view>
       <text class="link" v-for="(p, i) in transPairs" :key="p.id" @click="goWord(p.otherId)">{{ p.otherTerm }}（{{ p.otherReading }}）</text>
     </view>
 
     <!-- 固定关联：动词活用形（仅动词显示，派生计算） -->
-    <view class="neo-card section" v-if="word.verbType != ''">
-      <text class="section-title">活用形</text>
-      <view class="form-row" v-for="(f, i) in formRows" :key="i">
+    <view class="glass-card section" v-if="word.verbType != ''">
+      <view class="section-heading"><text class="section-title">活用形</text><text class="section-index">FORMS</text></view>
+      <view class="conjugation-row" v-for="(f, i) in formRows" :key="i">
         <text class="form-label">{{ f.label }}</text>
         <text class="form-value">{{ f.value }}</text>
       </view>
     </view>
 
     <!-- 自由关联（带理由，可下钻，可删） -->
-    <view class="neo-card section">
-      <text class="section-title">自由关联</text>
+    <view class="glass-card section connection-card">
+      <view class="section-heading"><text class="section-title">自由关联</text><text class="section-index">CONNECTIONS</text></view>
+      <text class="empty-tip" v-if="customs.length == 0">把这个词，连向另一个记忆。</text>
       <view class="custom-item" v-for="(c, i) in customs" :key="c.id">
         <text class="link" @click="goWord(c.otherId)">{{ c.otherTerm }}（{{ c.otherReading }}）</text>
         <text class="section-sub" v-if="c.note != ''">{{ c.note }}</text>
@@ -152,22 +160,24 @@
           <text class="rel-meaning">{{ w.meaning }}</text>
         </view>
         <input class="form-input" v-if="relSelected != null" :value="relNote" @input="onRelNote" placeholder="关联理由（可选）" />
-        <view class="form-actions" v-if="relSelected != null">
-          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" @click="doAddRelation"><text class="mini-btn-text-w">建立关联</text></view>
+        <view class="form-actions">
+          <view class="neo-card-sm mini-btn primary pressable" hover-class="press" v-if="relSelected != null" @click="doAddRelation"><text class="mini-btn-text-w">建立关联</text></view>
           <view class="neo-card-sm mini-btn pressable" hover-class="press" @click="cancelRelSearch"><text class="mini-btn-text">取消</text></view>
         </view>
       </view>
-      <text class="add" v-if="!relSearching" @click="startRelSearch">+ 搜索词库添加关联</text>
+      <view class="add pressable-soft" hover-class="press-soft" v-if="!relSearching" @click="startRelSearch"><text class="add-text">＋ 搜索词库添加关联</text></view>
     </view>
-    <view class="rate-space" v-if="rateMode"></view>
+    </view>
   </scroll-view>
 
   <!-- 背词会话进入时：三档评分悬浮底部（1/2 档词追加「已掌握」快捷入口） -->
-  <view class="rate-bar" v-if="rateMode">
-    <view class="neo-card-sm rate-btn rate-again pressable" hover-class="press" @click="onRate(0)"><text class="rate-text">忘记</text></view>
-    <view class="neo-card-sm rate-btn rate-hard pressable" hover-class="press" @click="onRate(1)"><text class="rate-text">模糊</text></view>
-    <view class="neo-card-sm rate-btn rate-good pressable" hover-class="press" @click="onRate(2)"><text class="rate-text">记得</text></view>
-    <view class="neo-card-sm rate-btn rate-master pressable" hover-class="press" v-if="showMasterBtn" @click="onMastered"><text class="rate-text rate-master-text">已掌握</text></view>
+  <view class="rate-dock" v-if="rateMode">
+    <view class="rate-bar">
+      <view class="rate-btn rate-again pressable-soft" hover-class="press-soft" @click="onRate(0)"><text class="rate-text">忘记</text></view>
+      <view class="rate-btn rate-hard pressable-soft" hover-class="press-soft" @click="onRate(1)"><text class="rate-text">模糊</text></view>
+      <view class="rate-btn rate-good pressable-soft" hover-class="press-soft" @click="onRate(2)"><text class="rate-text">记得</text></view>
+      <view class="rate-btn rate-master pressable-soft" hover-class="press-soft" v-if="showMasterBtn" @click="onMastered"><text class="rate-text">已掌握</text></view>
+    </view>
   </view>
   </view>
 </template>
@@ -180,6 +190,7 @@
   import { submitDetailRating, submitDetailMastered } from '../../services/studySession.uts'
   import { getStateRepo } from '../../repos/sqlite/stateRepoImpl.uts'
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
   import { manualPlay } from '../../services/audio.uts'
 
   // 背词会话评分模式（study 页带 rate=1 进入时显示底部评分条）
@@ -245,6 +256,11 @@
 
   const loadWord = async (id: number) => {
     try {
+      // 热重载或直接恢复详情时，等本地数据库就绪后再读取词卡。
+      const ready = await awaitDatabase()
+      if (!ready) {
+        return
+      }
       const d = await getWordDetail(id)
       if (d.word != null) {
         const w = d.word
@@ -653,293 +669,175 @@
 <style lang="scss">
   @import '../../uni.scss';
 
-  .page {
-    flex: 1;
-    background-color: $n-bg;
-    background-image: linear-gradient(180deg, #f3dfd6 0%, #f8f4ed 28%, #eef2f5 100%);
-  }
-  .body {
-    flex: 1;
-    padding: 28rpx 28rpx 48rpx;
-    background-color: transparent;
-  }
-  .rate-bar {
-    flex-direction: row;
-    background-color: rgba(247, 242, 234, 0.96);
-    border-top-width: 1rpx;
-    border-top-style: solid;
-    border-top-color: $a-line;
-    padding: 20rpx 24rpx 40rpx;
-  }
-  .rate-btn {
-    flex: 1;
-    padding: 24rpx 0;
-    margin: 0 8rpx;
-    align-items: center;
-  }
-  .neo-card-sm.rate-again {
-    background-color: $n-red;
-  }
-  .neo-card-sm.rate-hard {
-    background-color: $n-yellow;
-  }
-  .neo-card-sm.rate-good {
-    background-color: $n-green;
-  }
-  .neo-card-sm.rate-master {
-    background-color: $n-blue;
-  }
-  .rate-master-text {
-    color: $n-ink;
-    font-weight: bold;
-  }
-  .rate-text {
-    font-size: 28rpx;
-    color: $n-ink;
-    font-weight: bold;
-  }
-  .rate-space {
-    height: 140rpx;
+  /* 只让背景透色，正文保持不透明；不使用外扩阴影，避免原生触控范围重叠。 */
+  .page { flex: 1; background-color: $n-bg; }
+  .detail-wash { opacity: 0.58; }
+  .body { flex: 1; background-color: transparent; }
+  .page-content { padding: 24rpx 28rpx 36rpx; }
+  .glass-card {
+    background-color: rgba(255, 253, 249, 0.82);
+    border: 1rpx solid rgba(255, 255, 255, 0.88);
+    border-radius: 30rpx;
+    margin-bottom: 24rpx;
   }
   .header {
-    background-color: #f0c895;
-    background-image: linear-gradient(135deg, #f4dba0 0%, #efb28e 55%, #b8cbe0 100%);
-    border-width: 0rpx;
-    border-radius: 40rpx;
-    box-shadow: 0rpx 6rpx 18rpx rgba(71, 55, 72, 0.14);
-    padding: 36rpx;
-    margin-bottom: 24rpx;
+    background-color: rgba(255, 246, 232, 0.52);
+    border-radius: 38rpx;
+    padding: 24rpx 32rpx 32rpx;
   }
-  .header-row {
-    flex-direction: row;
+  .header-top { flex-direction: row; align-items: center; margin-bottom: 20rpx; }
+  .eyebrow { flex: 1; font-size: 20rpx; font-family: monospace; letter-spacing: 3rpx; color: #854438; }
+  .header-actions { flex-direction: row; }
+  .header-button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 16rpx 22rpx;
+    margin-left: 16rpx;
+    border: 1rpx solid rgba(255, 255, 255, 0.9);
+    border-radius: 999rpx;
+    background-color: rgba(255, 253, 249, 0.64);
     align-items: center;
-    margin-bottom: 12rpx;
+    justify-content: center;
   }
-  .term {
-    font-size: 56rpx;
-    font-family: serif;
-    font-weight: 500;
-    flex: 1;
-    color: $n-ink;
-  }
+  .header-button-text { font-size: 26rpx; color: $n-ink; }
+  .edit-caption { font-size: 26rpx; color: $n-text2; padding: 22rpx 0; }
+  .word-heading { margin-bottom: 24rpx; }
+  .term { font-size: 68rpx; line-height: 90rpx; font-family: serif; font-weight: 500; color: $n-ink; }
+  .reading-row { flex-direction: row; flex-wrap: wrap; align-items: center; margin-top: 8rpx; }
+  .reading { font-size: 32rpx; line-height: 48rpx; color: $n-ink; margin-right: 18rpx; }
+  .accent { font-size: 26rpx; line-height: 44rpx; color: #854438; }
+  .romaji { font-size: 24rpx; line-height: 36rpx; font-family: monospace; color: $n-text2; margin-top: 4rpx; }
+  .word-meta { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .pos { font-size: 24rpx; line-height: 36rpx; color: $n-text2; margin-right: 16rpx; }
   .badge {
     font-size: 22rpx;
-    color: $n-ink;
-    background-color: $n-green;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.12);
-    border-radius: 999rpx;
-    padding: 6rpx 14rpx;
-    margin-left: 16rpx;
-  }
-  .reading {
-    font-size: 30rpx;
-    font-family: serif;
-    color: $n-ink;
-  }
-  .romaji {
-    flex: 1;
-    font-size: 24rpx;
-    color: $n-text2;
-    margin-left: 16rpx;
-  }
-  .speaker {
-    width: 54rpx;
-    height: 54rpx;
-    border-radius: 999rpx;
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.12);
-    font-size: 22rpx;
-    font-weight: bold;
-    color: $n-ink;
-    text-align: center;
-    line-height: 54rpx;
-    margin-left: 16rpx;
-  }
-  .rel-line {
-    flex-direction: row;
-    align-items: center;
-  }
-  .accent {
-    font-size: 24rpx;
-    color: $n-ink;
-    margin-left: 16rpx;
-  }
-  .edit-link {
-    font-size: 26rpx;
-    color: $n-ink;
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.12);
+    line-height: 32rpx;
+    color: #3e6148;
+    background-color: rgba(217, 233, 215, 0.8);
     border-radius: 999rpx;
     padding: 6rpx 16rpx;
-    font-weight: bold;
-    margin-left: 16rpx;
   }
-  .pos {
-    flex: 1;
-    font-size: 26rpx;
-    color: $n-text2;
-  }
-  .word-meta {
-    flex-direction: row;
-    align-items: center;
-    margin-top: 4rpx;
-  }
-  .section {
-    padding: 32rpx;
-    margin-bottom: 24rpx;
-  }
-  .section-title {
-    font-size: 30rpx;
-    font-family: serif;
-    font-weight: 500;
+  .section { padding: 28rpx 32rpx; }
+  .meaning-card { background-color: rgba(255, 253, 249, 0.88); }
+  .note-card { background-color: rgba(250, 246, 234, 0.82); }
+  .connection-card { background-color: rgba(239, 244, 250, 0.82); }
+  .section-heading { flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
+  .section-title { font-size: 32rpx; line-height: 44rpx; font-family: serif; font-weight: 500; color: $n-ink; }
+  .section-index { font-size: 20rpx; font-family: monospace; letter-spacing: 2rpx; color: $n-text2; margin-left: 16rpx; }
+  .meaning-body { font-size: 32rpx; line-height: 50rpx; color: $n-ink; }
+  .section-body { font-size: 30rpx; line-height: 46rpx; color: $n-ink; }
+  .section-sub { font-size: 26rpx; line-height: 40rpx; color: $n-text2; margin-top: 10rpx; }
+  .empty-tip { font-size: 26rpx; line-height: 40rpx; color: $n-text2; margin-bottom: 8rpx; }
+  .sentence-item, .note-item, .custom-item {
+    border-bottom: 1rpx solid rgba(95, 89, 101, 0.12);
+    padding-bottom: 8rpx;
     margin-bottom: 16rpx;
-    color: $n-ink;
   }
-  .section-body {
-    font-size: 28rpx;
-    color: $n-ink;
+  .note-item { border-left: 3rpx solid rgba(198, 164, 90, 0.45); padding-left: 20rpx; }
+  .item-actions { flex-direction: row; margin-top: 4rpx; }
+  .action { min-width: 44px; min-height: 44px; font-size: 24rpx; line-height: 40rpx; text-align: center; color: $a-blue-ink; padding: 26rpx 12rpx; margin-right: 16rpx; }
+  .danger { color: $a-red-ink; }
+  .add {
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1rpx solid rgba(95, 89, 101, 0.14);
+    border-radius: 22rpx;
+    background-color: rgba(255, 253, 249, 0.58);
+    padding: 18rpx 20rpx;
+    margin-top: 16rpx;
   }
-  .section-sub {
-    font-size: 26rpx;
-    color: $n-text2;
-    margin-top: 8rpx;
-  }
+  .add-text { font-size: 26rpx; line-height: 40rpx; color: $n-ink; }
   .link {
     font-size: 28rpx;
+    line-height: 44rpx;
     color: $a-blue-ink;
-    font-weight: bold;
-  }
-  .empty-tip {
-    font-size: 26rpx;
-    color: $n-text3;
-  }
-  .sentence-item,
-  .note-item,
-  .custom-item {
-    margin-bottom: 16rpx;
-  }
-  .item-actions {
-    flex-direction: row;
-    margin-top: 8rpx;
-  }
-  .action {
-    font-size: 24rpx;
-    color: $a-blue-ink;
-    font-weight: bold;
-    margin-right: 24rpx;
-  }
-  .danger {
-    color: $a-red-ink;
-  }
-  .add {
-    font-size: 26rpx;
-    color: $n-ink;
-    background-color: $n-yellow;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: rgba(37, 34, 43, 0.12);
-    border-radius: 999rpx;
-    padding: 8rpx 18rpx;
-    font-weight: bold;
-    margin-top: 12rpx;
+    padding: 24rpx 18rpx;
+    margin-bottom: 12rpx;
+    border-radius: 20rpx;
+    background-color: rgba(230, 239, 249, 0.6);
   }
   .add-form {
-    background-color: #f3eee5;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: $a-line;
-    border-radius: $n-r-sm;
+    background-color: rgba(255, 253, 249, 0.52);
+    border: 1rpx solid rgba(255, 255, 255, 0.88);
+    border-radius: 24rpx;
     padding: 20rpx;
     margin-top: 16rpx;
   }
-  .form-row {
-    flex-direction: row;
-    align-items: center;
-    padding: 8rpx 0;
-  }
-  .form-label {
-    width: 140rpx;
-    font-size: 26rpx;
-    color: $n-text2;
-    font-family: monospace;
-    letter-spacing: 1rpx;
-  }
-  .form-value {
-    flex: 1;
-    font-size: 28rpx;
-  }
+  .form-row { margin-bottom: 20rpx; }
+  .form-label { width: 140rpx; font-size: 26rpx; line-height: 40rpx; color: $n-text2; }
+  .form-row .form-label { width: auto; margin-bottom: 10rpx; }
+  .form-value { flex: 1; font-size: 30rpx; line-height: 44rpx; color: $n-ink; }
+  .conjugation-row { flex-direction: row; align-items: center; padding: 20rpx 0; border-bottom: 1rpx solid rgba(95, 89, 101, 0.12); }
   .form-input {
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: $a-line;
-    border-radius: $n-r-sm;
-    padding: 12rpx 20rpx;
-    font-size: 26rpx;
+    min-height: 44px;
+    background-color: rgba(255, 253, 249, 0.94);
+    border: 1rpx solid rgba(95, 89, 101, 0.2);
+    border-radius: 20rpx;
+    padding: 20rpx;
+    font-size: 28rpx;
+    color: $n-ink;
     margin-bottom: 12rpx;
   }
-  .num {
-    width: 240rpx;
-  }
+  .form-row .form-input { margin-bottom: 0; }
   .form-textarea {
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: $a-line;
-    border-radius: $n-r-sm;
-    padding: 12rpx 20rpx;
-    font-size: 26rpx;
+    background-color: rgba(255, 253, 249, 0.94);
+    border: 1rpx solid rgba(95, 89, 101, 0.2);
+    border-radius: 20rpx;
+    padding: 20rpx;
+    font-size: 28rpx;
+    color: $n-ink;
     width: 100%;
-    height: 140rpx;
+    height: 220rpx;
   }
-  .form-actions {
-    flex-direction: row;
-    margin-top: 8rpx;
-  }
-  .mini-btn {
-    padding: 12rpx 40rpx;
-    background-color: $n-card;
-    margin-right: 16rpx;
+  .form-actions { flex-direction: row; margin-top: 20rpx; }
+  .neo-card-sm.mini-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 20rpx 12rpx;
+    margin: 0 8rpx;
+    background-color: rgba(255, 253, 249, 0.76);
+    border: 1rpx solid rgba(95, 89, 101, 0.14);
+    border-radius: 22rpx;
+    box-shadow: none;
     align-items: center;
+    justify-content: center;
   }
-  .mini-btn.primary {
-    background-color: $n-yellow;
-  }
-  .mini-btn-text {
-    font-size: 24rpx;
-    color: $n-ink;
-    font-weight: bold;
-  }
-  .mini-btn-text-w {
-    font-size: 24rpx;
-    color: $n-ink;
-    font-weight: bold;
-  }
+  .neo-card-sm.mini-btn.primary { background-color: rgba(246, 220, 168, 0.85); }
+  .mini-btn-text, .mini-btn-text-w { font-size: 26rpx; color: $n-ink; }
   .rel-result {
-    border-radius: $n-r-sm;
-    background-color: $n-card;
-    border-width: 1rpx;
-    border-style: solid;
-    border-color: $a-line;
-    padding: 14rpx 16rpx;
-    margin-bottom: 10rpx;
+    border-radius: 20rpx;
+    background-color: rgba(255, 253, 249, 0.86);
+    border: 1rpx solid rgba(95, 89, 101, 0.14);
+    padding: 22rpx 20rpx;
+    margin-bottom: 16rpx;
   }
-  .cand-on {
-    font-size: 24rpx;
-    color: $a-green-ink;
+  .rel-line { flex-direction: row; align-items: center; }
+  .cand-on { font-size: 26rpx; color: $a-green-ink; margin-right: 12rpx; }
+  .rel-term { flex: 1; font-size: 28rpx; line-height: 42rpx; color: $n-ink; }
+  .rel-meaning { font-size: 24rpx; line-height: 36rpx; color: $n-text2; margin-top: 8rpx; }
+  /* 评分栏是滚动区外的流式兄弟，无需再在正文末尾预留悬浮占位。 */
+  .rate-dock { padding: 12rpx 24rpx 28rpx; }
+  .rate-bar {
+    flex-direction: row;
+    padding: 12rpx 6rpx;
+    border: 1rpx solid rgba(255, 255, 255, 0.94);
+    border-radius: 32rpx;
+    background-color: rgba(255, 253, 249, 0.82);
   }
-  .rel-term {
-    font-size: 26rpx;
+  .rate-btn {
+    flex: 1;
+    min-height: 48px;
+    margin: 0 6rpx;
+    padding: 18rpx 0;
+    border: 1rpx solid rgba(255, 255, 255, 0.74);
+    border-radius: 23rpx;
+    align-items: center;
+    justify-content: center;
   }
-  .rel-meaning {
-    font-size: 22rpx;
-    color: $n-text2;
-    margin-top: 4rpx;
-  }
+  .rate-again { background-color: rgba(243, 184, 164, 0.72); }
+  .rate-hard { background-color: rgba(247, 223, 163, 0.78); }
+  .rate-good { background-color: rgba(190, 217, 192, 0.8); }
+  .rate-master { background-color: rgba(188, 208, 231, 0.82); }
+  .rate-text { font-size: 26rpx; color: $n-ink; }
 </style>

@@ -1,0 +1,242 @@
+{
+  "planName": "标日初级上 第1课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "中国人",
+      "reading": "ちゅうごくじん",
+      "meaning": "中国人",
+      "pos": "名词"
+    },
+    {
+      "term": "日本人",
+      "reading": "にほんじん",
+      "meaning": "日本人",
+      "pos": "名词"
+    },
+    {
+      "term": "韓国人",
+      "reading": "かんこくじん",
+      "meaning": "韩国人",
+      "pos": "名词"
+    },
+    {
+      "term": "アメリカじん",
+      "reading": "アメリカじん",
+      "meaning": "美国人",
+      "pos": "名词"
+    },
+    {
+      "term": "フランスじん",
+      "reading": "フランスじん",
+      "meaning": "法国人",
+      "pos": "名词"
+    },
+    {
+      "term": "学生",
+      "reading": "がくせい",
+      "meaning": "(大)学生",
+      "pos": "名词"
+    },
+    {
+      "term": "先生",
+      "reading": "せんせい",
+      "meaning": "老师",
+      "pos": "名词"
+    },
+    {
+      "term": "留学生",
+      "reading": "りゅうがくせい",
+      "meaning": "留学生",
+      "pos": "名词"
+    },
+    {
+      "term": "教授",
+      "reading": "きょうじゅ",
+      "meaning": "教授",
+      "pos": "名词"
+    },
+    {
+      "term": "社員",
+      "reading": "しゃいん",
+      "meaning": "职员",
+      "pos": "名词"
+    },
+    {
+      "term": "会社員",
+      "reading": "かいしゃいん",
+      "meaning": "公司职员",
+      "pos": "名词"
+    },
+    {
+      "term": "店員",
+      "reading": "てんいん",
+      "meaning": "店员",
+      "pos": "名词"
+    },
+    {
+      "term": "研修生",
+      "reading": "けんしゅうせい",
+      "meaning": "进修生",
+      "pos": "名词"
+    },
+    {
+      "term": "企業",
+      "reading": "きぎょう",
+      "meaning": "企业",
+      "pos": "名词"
+    },
+    {
+      "term": "大学",
+      "reading": "だいがく",
+      "meaning": "大学",
+      "pos": "名词"
+    },
+    {
+      "term": "父",
+      "reading": "ちち",
+      "meaning": "(我)父亲",
+      "pos": "名词"
+    },
+    {
+      "term": "課長",
+      "reading": "かちょう",
+      "meaning": "科长",
+      "pos": "名词"
+    },
+    {
+      "term": "社長",
+      "reading": "しゃちょう",
+      "meaning": "总经理，社长",
+      "pos": "名词"
+    },
+    {
+      "term": "出迎え",
+      "reading": "でむかえ",
+      "meaning": "迎接",
+      "pos": "名词"
+    },
+    {
+      "term": "あの人",
+      "reading": "あのひと",
+      "meaning": "那个人",
+      "pos": "名词"
+    },
+    {
+      "term": "わたし",
+      "reading": "わたし",
+      "meaning": "我",
+      "pos": "代词"
+    },
+    {
+      "term": "あなた",
+      "reading": "あなた",
+      "meaning": "你",
+      "pos": "代词"
+    },
+    {
+      "term": "どうも",
+      "reading": "どうも",
+      "meaning": "非常，很",
+      "pos": "副词"
+    },
+    {
+      "term": "はい",
+      "reading": "はい",
+      "meaning": "哎，是(应答)；是的",
+      "pos": "叹词"
+    },
+    {
+      "term": "いいえ",
+      "reading": "いいえ",
+      "meaning": "不，不是",
+      "pos": "叹词"
+    },
+    {
+      "term": "あっ",
+      "reading": "あっ",
+      "meaning": "哎，哎呀",
+      "pos": "叹词"
+    },
+    {
+      "term": "王",
+      "reading": "おう",
+      "meaning": "王",
+      "pos": "专有名词"
+    },
+    {
+      "term": "森",
+      "reading": "もり",
+      "meaning": "森",
+      "pos": "专有名词"
+    },
+    {
+      "term": "林",
+      "reading": "はやし",
+      "meaning": "林",
+      "pos": "专有名词"
+    },
+    {
+      "term": "金",
+      "reading": "キム",
+      "meaning": "金",
+      "pos": "专有名词"
+    },
+    {
+      "term": "中国",
+      "reading": "ちゅうごく",
+      "meaning": "中国",
+      "pos": "专有名词"
+    },
+    {
+      "term": "こんにちは",
+      "reading": "こんにちは",
+      "meaning": "你好"
+    },
+    {
+      "term": "すみません",
+      "reading": "すみません",
+      "meaning": "对不起；请问"
+    },
+    {
+      "term": "どうぞ",
+      "reading": "どうぞ",
+      "meaning": "请"
+    },
+    {
+      "term": "よろしくおねがいします",
+      "reading": "よろしくおねがいします",
+      "meaning": "请多关照"
+    },
+    {
+      "term": "はじめまして",
+      "reading": "はじめまして",
+      "meaning": "初次见面"
+    },
+    {
+      "term": "こちらこそ",
+      "reading": "こちらこそ",
+      "meaning": "我才要(请您～)"
+    },
+    {
+      "term": "そうです",
+      "reading": "そうです",
+      "meaning": "是(这样)"
+    },
+    {
+      "term": "ちがいます",
+      "reading": "ちがいます",
+      "meaning": "不是"
+    },
+    {
+      "term": "分かりません",
+      "reading": "わかりません",
+      "meaning": "不知道"
+    },
+    {
+      "term": "どうもすみません",
+      "reading": "どうもすみません",
+      "meaning": "实在对不起"
+    }
+  ]
+}

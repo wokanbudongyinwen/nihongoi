@@ -46,8 +46,12 @@ export interface PlanRepo {
   // 今日新词：激活计划中 status 仍为 new 的前 N 个（按 sort）
   // 实现上需联表 word_state，接口语义由 sqlite 实现保证
   pickTodayNewWords(planId: number, limit: number): Promise<Array<Word>>,
-  // 链式记忆：随机取一个「已学且无任何自由关联」的孤单词（全部串完返回 null）
-  pickLonelyWord(planId: number): Promise<Word | null>,
+  // 链式记忆：随机取一个「全局已学且无任何自由关联」的孤单词（全部串完返回 null）
+  // 全局口径：跨所有计划的 word_state 中 status != 'new'（含已掌握）
+  pickLonelyWord(): Promise<Word | null>,
+
+  // 从计划移除词（只删计划层：plan_item + 该计划内 word_state/review_log；词库词条与关联保留）
+  removePlanItems(planId: number, wordIds: Array<number>): Promise<boolean>,
 
   // 首页统计条下钻词列表（关键词 + 分页；口径与 buildTodaySummary 一致）
   // type: 'learning' 在学(learning+reviewing) / 'learned' 已学(有 state 行) / 'all' 计划全部 / 'todayReview' 今日已复习(去重，按最近复习倒序)

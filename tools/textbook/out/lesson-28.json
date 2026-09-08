@@ -1,0 +1,196 @@
+{
+  "planName": "标日初级下 第28课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "マフラー",
+      "reading": "マフラー",
+      "meaning": "围巾",
+      "pos": "名词"
+    },
+    {
+      "term": "ネックレス",
+      "reading": "ネックレス",
+      "meaning": "项链",
+      "pos": "名词"
+    },
+    {
+      "term": "家具",
+      "reading": "かぐ",
+      "meaning": "家具",
+      "pos": "名词"
+    },
+    {
+      "term": "文章",
+      "reading": "ぶんしょう",
+      "meaning": "文章",
+      "pos": "名词"
+    },
+    {
+      "term": "意味",
+      "reading": "いみ",
+      "meaning": "意思",
+      "pos": "名词"
+    },
+    {
+      "term": "雰囲気",
+      "reading": "ふんいき",
+      "meaning": "气氛",
+      "pos": "名词"
+    },
+    {
+      "term": "発音",
+      "reading": "はつおん",
+      "meaning": "发音",
+      "pos": "名词"
+    },
+    {
+      "term": "不動産屋",
+      "reading": "ふどうさんや",
+      "meaning": "房产公司",
+      "pos": "名词"
+    },
+    {
+      "term": "飲食店",
+      "reading": "いんしょくてん",
+      "meaning": "饮食店",
+      "pos": "名词"
+    },
+    {
+      "term": "大使館",
+      "reading": "たいしかん",
+      "meaning": "大使馆",
+      "pos": "名词"
+    },
+    {
+      "term": "新居",
+      "reading": "しんきょ",
+      "meaning": "新居",
+      "pos": "名词"
+    },
+    {
+      "term": "引っ越し",
+      "reading": "ひっこし",
+      "meaning": "搬家",
+      "pos": "名词"
+    },
+    {
+      "term": "近所",
+      "reading": "きんじょ",
+      "meaning": "附近",
+      "pos": "名词"
+    },
+    {
+      "term": "孫",
+      "reading": "まご",
+      "meaning": "孙子，孙女",
+      "pos": "名词"
+    },
+    {
+      "term": "係",
+      "reading": "かかり",
+      "meaning": "工作人员，主管人员",
+      "pos": "名词"
+    },
+    {
+      "term": "支社長",
+      "reading": "ししゃちょう",
+      "meaning": "分公司经理",
+      "pos": "名词"
+    },
+    {
+      "term": "就職",
+      "reading": "しゅうしょく",
+      "meaning": "就业",
+      "pos": "名词"
+    },
+    {
+      "term": "インターネット",
+      "reading": "インターネット",
+      "meaning": "互联网",
+      "pos": "名词"
+    },
+    {
+      "term": "拾う",
+      "reading": "ひろう",
+      "meaning": "捡、拾",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "訳す",
+      "reading": "やくす",
+      "meaning": "翻译",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "くれる",
+      "reading": "くれる",
+      "meaning": "给",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "届ける",
+      "reading": "とどける",
+      "meaning": "送到，送去",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "案内",
+      "reading": "あんない",
+      "meaning": "向导，导游",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "交換",
+      "reading": "こうかん",
+      "meaning": "换，交换",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "紹介",
+      "reading": "しょうかい",
+      "meaning": "介绍",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "すてき",
+      "reading": "すてき",
+      "meaning": "漂亮，极好",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "得意",
+      "reading": "とくい",
+      "meaning": "擅长",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "新鮮",
+      "reading": "しんせん",
+      "meaning": "新鲜",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "うまく",
+      "reading": "うまく",
+      "meaning": "高明地，很好地",
+      "pos": "副词"
+    },
+    {
+      "term": "それに",
+      "reading": "それに",
+      "meaning": "而且",
+      "pos": "接续词"
+    },
+    {
+      "term": "どういたしまして",
+      "reading": "どういたしまして",
+      "meaning": "没关系"
+    },
+    {
+      "term": "どの辺",
+      "reading": "どのへん",
+      "meaning": "哪儿"
+    }
+  ]
+}

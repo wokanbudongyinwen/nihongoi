@@ -1,0 +1,281 @@
+{
+  "planName": "标日初级下 第45课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "少子化",
+      "reading": "しょうしか",
+      "meaning": "孩子减少现象",
+      "pos": "名词"
+    },
+    {
+      "term": "人口",
+      "reading": "じんこう",
+      "meaning": "人口",
+      "pos": "名词"
+    },
+    {
+      "term": "平均年齢",
+      "reading": "へいきんねんれい",
+      "meaning": "平均年龄",
+      "pos": "名词"
+    },
+    {
+      "term": "交通",
+      "reading": "こうつう",
+      "meaning": "交通",
+      "pos": "名词"
+    },
+    {
+      "term": "便",
+      "reading": "べん",
+      "meaning": "方便，便利",
+      "pos": "名词"
+    },
+    {
+      "term": "アクセス",
+      "reading": "アクセス",
+      "meaning": "连接，衔接",
+      "pos": "名词"
+    },
+    {
+      "term": "リニアモーターカー",
+      "reading": "リニアモーターカー",
+      "meaning": "磁悬浮列车",
+      "pos": "名词"
+    },
+    {
+      "term": "便",
+      "reading": "びん",
+      "meaning": "航班",
+      "pos": "名词"
+    },
+    {
+      "term": "市内",
+      "reading": "しない",
+      "meaning": "市内",
+      "pos": "名词"
+    },
+    {
+      "term": "田舎",
+      "reading": "いなか",
+      "meaning": "乡下，农村",
+      "pos": "名词"
+    },
+    {
+      "term": "中心地",
+      "reading": "ちゅうしんち",
+      "meaning": "中心地区",
+      "pos": "名词"
+    },
+    {
+      "term": "近代化",
+      "reading": "きんだいか",
+      "meaning": "现代化",
+      "pos": "名词"
+    },
+    {
+      "term": "現代人",
+      "reading": "げんだいじん",
+      "meaning": "现代人",
+      "pos": "名词"
+    },
+    {
+      "term": "時間帯",
+      "reading": "じかんたい",
+      "meaning": "时间段",
+      "pos": "名词"
+    },
+    {
+      "term": "調子",
+      "reading": "ちょうし",
+      "meaning": "情况，状况；势头",
+      "pos": "名词"
+    },
+    {
+      "term": "よさ",
+      "reading": "よさ",
+      "meaning": "长处、好处",
+      "pos": "名词"
+    },
+    {
+      "term": "部屋代",
+      "reading": "へやだい",
+      "meaning": "房租",
+      "pos": "名词"
+    },
+    {
+      "term": "森林",
+      "reading": "しんりん",
+      "meaning": "森林",
+      "pos": "名词"
+    },
+    {
+      "term": "地球",
+      "reading": "ちきゅう",
+      "meaning": "地球",
+      "pos": "名词"
+    },
+    {
+      "term": "平均気温",
+      "reading": "へいきんきおん",
+      "meaning": "平均气温",
+      "pos": "名词"
+    },
+    {
+      "term": "地球温暖化",
+      "reading": "ちきゅうおんだんか",
+      "meaning": "地球变暖现象",
+      "pos": "名词"
+    },
+    {
+      "term": "冷凍食品",
+      "reading": "れいとうしょくひん",
+      "meaning": "冷冻食品",
+      "pos": "名词"
+    },
+    {
+      "term": "高齢者",
+      "reading": "こうれいしゃ",
+      "meaning": "高龄者",
+      "pos": "名词"
+    },
+    {
+      "term": "喫煙者",
+      "reading": "きつえんしゃ",
+      "meaning": "吸烟者",
+      "pos": "名词"
+    },
+    {
+      "term": "旅行者",
+      "reading": "りょこうしゃ",
+      "meaning": "旅行者",
+      "pos": "名词"
+    },
+    {
+      "term": "利用者",
+      "reading": "りようしゃ",
+      "meaning": "利用者",
+      "pos": "名词"
+    },
+    {
+      "term": "悩み",
+      "reading": "なやみ",
+      "meaning": "烦恼",
+      "pos": "名词"
+    },
+    {
+      "term": "町並み",
+      "reading": "まちなみ",
+      "meaning": "市容，街道，街景",
+      "pos": "名词"
+    },
+    {
+      "term": "売り上げ",
+      "reading": "うりあげ",
+      "meaning": "销售额，营业额",
+      "pos": "名词"
+    },
+    {
+      "term": "憧れ",
+      "reading": "あこがれ",
+      "meaning": "憧憬",
+      "pos": "名词"
+    },
+    {
+      "term": "進む",
+      "reading": "すすむ",
+      "meaning": "加重，前进",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "磨く",
+      "reading": "みがく",
+      "meaning": "刷，擦",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "曇る",
+      "reading": "くもる",
+      "meaning": "天阴",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "似る",
+      "reading": "にる",
+      "meaning": "像，相似",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "ライトアップする",
+      "reading": "ライトアップする",
+      "meaning": "景观照明",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "普及",
+      "reading": "ふきゅう",
+      "meaning": "普及",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "雨宿り",
+      "reading": "あまやどり",
+      "meaning": "避雨",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "ひどい",
+      "reading": "ひどい",
+      "meaning": "残酷，过分；激烈",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "手軽",
+      "reading": "てがる",
+      "meaning": "简便，简单，轻便",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "急速",
+      "reading": "きゅうそく",
+      "meaning": "迅速，快速",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "以前",
+      "reading": "いぜん",
+      "meaning": "以前",
+      "pos": "副词"
+    },
+    {
+      "term": "どんどん",
+      "reading": "どんどん",
+      "meaning": "接连不断地，接二连三地",
+      "pos": "副词"
+    },
+    {
+      "term": "ますます",
+      "reading": "ますます",
+      "meaning": "越来越，更加",
+      "pos": "副词"
+    },
+    {
+      "term": "なんか",
+      "reading": "なんか",
+      "meaning": "有点，总觉得，有些，好像",
+      "pos": "副词"
+    },
+    {
+      "term": "年々",
+      "reading": "ねんねん",
+      "meaning": "逐年，每年",
+      "pos": "副词"
+    },
+    {
+      "term": "軽い物",
+      "reading": "かるいもの",
+      "meaning": "清淡的或少量的食物"
+    }
+  ]
+}

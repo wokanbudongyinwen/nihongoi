@@ -1,0 +1,225 @@
+{
+  "planName": "标日初级下 第48课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "明日",
+      "reading": "みょうにち",
+      "meaning": "明天",
+      "pos": "名词"
+    },
+    {
+      "term": "明日",
+      "reading": "あす",
+      "meaning": "明天",
+      "pos": "名词"
+    },
+    {
+      "term": "昨日",
+      "reading": "さくじつ",
+      "meaning": "昨天",
+      "pos": "名词"
+    },
+    {
+      "term": "この度",
+      "reading": "このたび",
+      "meaning": "这次，这回",
+      "pos": "名词"
+    },
+    {
+      "term": "私",
+      "reading": "わたくし",
+      "meaning": "我",
+      "pos": "代词"
+    },
+    {
+      "term": "私ども",
+      "reading": "わたくしども",
+      "meaning": "我们",
+      "pos": "代词"
+    },
+    {
+      "term": "社",
+      "reading": "しゃ",
+      "meaning": "公司",
+      "pos": "名词"
+    },
+    {
+      "term": "者",
+      "reading": "もの",
+      "meaning": "人，～的人",
+      "pos": "名词"
+    },
+    {
+      "term": "弊社",
+      "reading": "へいしゃ",
+      "meaning": "敝公司",
+      "pos": "名词"
+    },
+    {
+      "term": "新車",
+      "reading": "しんしゃ",
+      "meaning": "新车",
+      "pos": "名词"
+    },
+    {
+      "term": "傷",
+      "reading": "きず",
+      "meaning": "瑕疵；创伤",
+      "pos": "名词"
+    },
+    {
+      "term": "指導",
+      "reading": "しどう",
+      "meaning": "指教，指导",
+      "pos": "名词"
+    },
+    {
+      "term": "おつり",
+      "reading": "おつり",
+      "meaning": "找的零钱",
+      "pos": "名词"
+    },
+    {
+      "term": "応接室",
+      "reading": "おうせつしつ",
+      "meaning": "会客室",
+      "pos": "名词"
+    },
+    {
+      "term": "案内状",
+      "reading": "あんないじょう",
+      "meaning": "通知；请帖",
+      "pos": "名词"
+    },
+    {
+      "term": "入学案内",
+      "reading": "にゅうがくあんない",
+      "meaning": "入学指南",
+      "pos": "名词"
+    },
+    {
+      "term": "伺う",
+      "reading": "うかがう",
+      "meaning": "(自谦)去；来；问；拜访；请教",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "いたす",
+      "reading": "いたす",
+      "meaning": "(自谦)做，干",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "参る",
+      "reading": "まいる",
+      "meaning": "(自谦)　来，去",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "いただく",
+      "reading": "いただく",
+      "meaning": "(自谦)吃，喝；得到",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "おる",
+      "reading": "おる",
+      "meaning": "在",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "ござう",
+      "reading": "ござう",
+      "meaning": "在，有，是",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "差し上げる",
+      "reading": "さしあげる",
+      "meaning": "(自谦)给",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "存じている",
+      "reading": "ぞんじている",
+      "meaning": "(自谦)知道",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "進める",
+      "reading": "すすめる",
+      "meaning": "推进，使前进",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "拝見",
+      "reading": "はいけん",
+      "meaning": "(自谦)看",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "承知",
+      "reading": "しょうち",
+      "meaning": "知道",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "期待",
+      "reading": "きたい",
+      "meaning": "希望，期待",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "世話",
+      "reading": "せわ",
+      "meaning": "帮助；照顾",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "貴重",
+      "reading": "きちょう",
+      "meaning": "贵重",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "少々",
+      "reading": "しょうしょう",
+      "meaning": "稍稍，一点儿",
+      "pos": "副词"
+    },
+    {
+      "term": "ただ今",
+      "reading": "ただいま",
+      "meaning": "这会儿，方才；马上，立刻",
+      "pos": "副词"
+    },
+    {
+      "term": "突然",
+      "reading": "とつぜん",
+      "meaning": "突然",
+      "pos": "副词"
+    },
+    {
+      "term": "実は",
+      "reading": "じつは",
+      "meaning": "其实，实际上",
+      "pos": "副词"
+    },
+    {
+      "term": "何のお構いもしませんで",
+      "reading": "なんのおかまいもしませんで",
+      "meaning": "招待不周"
+    },
+    {
+      "term": "いつもお世話になっております",
+      "reading": "いつもおせわになっております",
+      "meaning": "承蒙多方关照"
+    },
+    {
+      "term": "申し訳ございません",
+      "reading": "もうしわけございません",
+      "meaning": "非常抱歉"
+    }
+  ]
+}

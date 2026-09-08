@@ -307,15 +307,14 @@ class SqlitePlanRepo implements PlanRepo {
     return list
   }
 
-  async pickLonelyWord(planId: number): Promise<Word | null> {
-    // 已学（status != new）且不参与任何自由关联（双向 NOT EXISTS），随机取 1 个
+  async pickLonelyWord(): Promise<Word | null> {
+    // 全局已学（跨所有计划 status != new，含已掌握）且不参与任何自由关联（双向 NOT EXISTS），随机取 1 个
     const rows = await this.client().select(DB_NAME,
       'SELECT ' + JOIN_WORD_COLS +
-      ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
-      ' JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
-      " WHERE pi.plan_id = " + sqlNum(planId) + " AND ws.status != 'new'" +
+      ' FROM word w JOIN word_state ws ON ws.word_id = w.id' +
+      " WHERE ws.status != 'new'" +
       " AND NOT EXISTS (SELECT 1 FROM word_relation r WHERE r.relation_type = 'custom'" +
-      ' AND (r.from_word_id = pi.word_id OR r.to_word_id = pi.word_id))' +
+      ' AND (r.from_word_id = w.id OR r.to_word_id = w.id))' +
       ' ORDER BY RANDOM() LIMIT 1')
     if (rows.length == 0) {
       return null
@@ -324,6 +323,22 @@ class SqlitePlanRepo implements PlanRepo {
   }
 
   // ---------- 首页统计条下钻（learning / learned / all / todayReview） ----------
+
+  // 从计划移除词：三表同删（残留孤儿 word_state 会持续进入全局复习队列，须一并清理；
+  // review_log 同删与 deletePlan 的单词级对称；词库词条/例句/笔记/关联不动）
+  async removePlanItems(planId: number, wordIds: Array<number>): Promise<boolean> {
+    if (wordIds.length == 0) {
+      return true
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < wordIds.length; i++) {
+      const w = ' AND word_id = ' + sqlNum(wordIds[i])
+      sqls.push('DELETE FROM plan_item WHERE plan_id = ' + sqlNum(planId) + w)
+      sqls.push('DELETE FROM word_state WHERE plan_id = ' + sqlNum(planId) + w)
+      sqls.push('DELETE FROM review_log WHERE plan_id = ' + sqlNum(planId) + w)
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
 
   // 统一构造 FROM..WHERE 片段（list 与 count 共用；keyword 为空时无词匹配条件）
   private statsFrom(type: string, planId: number, dayStart: number, keyword: string): string {

@@ -1,0 +1,173 @@
+{
+  "planName": "标日初级上 第13课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "荷物",
+      "reading": "にもつ",
+      "meaning": "包裹",
+      "pos": "名词"
+    },
+    {
+      "term": "はがき",
+      "reading": "はがき",
+      "meaning": "明信片",
+      "pos": "名词"
+    },
+    {
+      "term": "切手",
+      "reading": "きって",
+      "meaning": "邮票",
+      "pos": "名词"
+    },
+    {
+      "term": "引き出し",
+      "reading": "ひきだし",
+      "meaning": "抽屉",
+      "pos": "名词"
+    },
+    {
+      "term": "アルバム",
+      "reading": "アルバム",
+      "meaning": "相册",
+      "pos": "名词"
+    },
+    {
+      "term": "タバコ",
+      "reading": "タバコ",
+      "meaning": "烟，烟草",
+      "pos": "名词"
+    },
+    {
+      "term": "漫画",
+      "reading": "まんが",
+      "meaning": "漫画",
+      "pos": "名词"
+    },
+    {
+      "term": "ガレージ",
+      "reading": "ガレージ",
+      "meaning": "车库，汽车房",
+      "pos": "名词"
+    },
+    {
+      "term": "修理",
+      "reading": "しゅうり",
+      "meaning": "修理",
+      "pos": "名词"
+    },
+    {
+      "term": "居酒屋",
+      "reading": "いざかや",
+      "meaning": "酒馆",
+      "pos": "名词"
+    },
+    {
+      "term": "生～",
+      "reading": "なまビール",
+      "meaning": "生啤",
+      "pos": "名词"
+    },
+    {
+      "term": "焼き鳥",
+      "reading": "やきとり",
+      "meaning": "烤鸡肉串",
+      "pos": "名词"
+    },
+    {
+      "term": "唐揚げ",
+      "reading": "からあげ",
+      "meaning": "炸鸡，油炸食品",
+      "pos": "名词"
+    },
+    {
+      "term": "肉じゃが",
+      "reading": "にくじゃが",
+      "meaning": "土豆炖肉",
+      "pos": "名词"
+    },
+    {
+      "term": "ボーリング",
+      "reading": "ボーリング",
+      "meaning": "保龄球",
+      "pos": "名词"
+    },
+    {
+      "term": "髪",
+      "reading": "かみ",
+      "meaning": "头发",
+      "pos": "名词"
+    },
+    {
+      "term": "象",
+      "reading": "ぞう",
+      "meaning": "象，大象",
+      "pos": "名词"
+    },
+    {
+      "term": "昼",
+      "reading": "ひる",
+      "meaning": "白天，中午",
+      "pos": "名词"
+    },
+    {
+      "term": "ほか",
+      "reading": "ほか",
+      "meaning": "另外，其他",
+      "pos": "名词"
+    },
+    {
+      "term": "かかる",
+      "reading": "かかる",
+      "meaning": "花费(时间，金钱)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "咲く",
+      "reading": "さく",
+      "meaning": "花开",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "泳ぐ",
+      "reading": "およぐ",
+      "meaning": "游泳",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "遊ぶ",
+      "reading": "あそぶ",
+      "meaning": "玩，玩耍",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "吸う",
+      "reading": "すう",
+      "meaning": "吸(烟)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "切る",
+      "reading": "きる",
+      "meaning": "剪，切，割",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "だいたい",
+      "reading": "だいたい",
+      "meaning": "大约，大概，大体",
+      "pos": "副词"
+    },
+    {
+      "term": "とりあえず",
+      "reading": "とりあえず",
+      "meaning": "暂且",
+      "pos": "副词"
+    },
+    {
+      "term": "どのぐらい／どれぐらい",
+      "reading": "どのぐらい／どれぐらい",
+      "meaning": "多久，多少钱"
+    }
+  ]
+}

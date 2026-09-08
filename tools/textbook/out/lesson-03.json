@@ -1,0 +1,263 @@
+{
+  "planName": "标日初级上 第3课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "デパート",
+      "reading": "デパート",
+      "meaning": "百货商店",
+      "pos": "名词"
+    },
+    {
+      "term": "食堂",
+      "reading": "しょくどう",
+      "meaning": "食堂",
+      "pos": "名词"
+    },
+    {
+      "term": "郵便局",
+      "reading": "ゆうびんきょく",
+      "meaning": "邮局",
+      "pos": "名词"
+    },
+    {
+      "term": "銀行",
+      "reading": "ぎんこう",
+      "meaning": "银行",
+      "pos": "名词"
+    },
+    {
+      "term": "図書館",
+      "reading": "としょかん",
+      "meaning": "图书馆",
+      "pos": "名词"
+    },
+    {
+      "term": "マンション",
+      "reading": "マンション",
+      "meaning": "高级)公寓",
+      "pos": "名词"
+    },
+    {
+      "term": "ホテル",
+      "reading": "ホテル",
+      "meaning": "宾馆",
+      "pos": "名词"
+    },
+    {
+      "term": "コンビニ",
+      "reading": "コンビニ",
+      "meaning": "便利店",
+      "pos": "名词"
+    },
+    {
+      "term": "喫茶店",
+      "reading": "きっさてん",
+      "meaning": "咖啡馆",
+      "pos": "名词"
+    },
+    {
+      "term": "病院",
+      "reading": "びょういん",
+      "meaning": "医院",
+      "pos": "名词"
+    },
+    {
+      "term": "本屋",
+      "reading": "ほんや",
+      "meaning": "书店",
+      "pos": "名词"
+    },
+    {
+      "term": "レストラン",
+      "reading": "レストラン",
+      "meaning": "餐馆，西餐馆",
+      "pos": "名词"
+    },
+    {
+      "term": "ビル",
+      "reading": "ビル",
+      "meaning": "大楼，大厦",
+      "pos": "名词"
+    },
+    {
+      "term": "建物",
+      "reading": "たてもの",
+      "meaning": "大楼，建筑物",
+      "pos": "名词"
+    },
+    {
+      "term": "売り場",
+      "reading": "うりば",
+      "meaning": "柜台，出售处",
+      "pos": "名词"
+    },
+    {
+      "term": "トイレ",
+      "reading": "トイレ",
+      "meaning": "厕所，盥洗室",
+      "pos": "名词"
+    },
+    {
+      "term": "入り口",
+      "reading": "いりぐち",
+      "meaning": "入口",
+      "pos": "名词"
+    },
+    {
+      "term": "事務所",
+      "reading": "じむしょ",
+      "meaning": "事务所，办事处",
+      "pos": "名词"
+    },
+    {
+      "term": "受付",
+      "reading": "うけつけ",
+      "meaning": "接待处",
+      "pos": "名词"
+    },
+    {
+      "term": "バーゲンかいじょう",
+      "reading": "バーゲンかいじょう",
+      "meaning": "降价处理大卖场",
+      "pos": "名词"
+    },
+    {
+      "term": "エスカレーター",
+      "reading": "エスカレーター",
+      "meaning": "自动扶梯",
+      "pos": "名词"
+    },
+    {
+      "term": "服",
+      "reading": "ふく",
+      "meaning": "衣服",
+      "pos": "名词"
+    },
+    {
+      "term": "コート",
+      "reading": "コート",
+      "meaning": "风衣，大衣",
+      "pos": "名词"
+    },
+    {
+      "term": "デジカメ",
+      "reading": "デジカメ",
+      "meaning": "数码相机",
+      "pos": "名词"
+    },
+    {
+      "term": "国",
+      "reading": "くに",
+      "meaning": "国，国家",
+      "pos": "名词"
+    },
+    {
+      "term": "地図",
+      "reading": "ちず",
+      "meaning": "地图",
+      "pos": "名词"
+    },
+    {
+      "term": "隣",
+      "reading": "となり",
+      "meaning": "旁边",
+      "pos": "名词"
+    },
+    {
+      "term": "周辺",
+      "reading": "しゅうへん",
+      "meaning": "附近，周边",
+      "pos": "名词"
+    },
+    {
+      "term": "今日",
+      "reading": "きょう",
+      "meaning": "今天",
+      "pos": "名词"
+    },
+    {
+      "term": "水曜日",
+      "reading": "すいようび",
+      "meaning": "星期三",
+      "pos": "名词"
+    },
+    {
+      "term": "木曜日",
+      "reading": "もくようび",
+      "meaning": "星期四",
+      "pos": "名词"
+    },
+    {
+      "term": "ここ",
+      "reading": "ここ",
+      "meaning": "这里，这儿",
+      "pos": "代词"
+    },
+    {
+      "term": "そこ",
+      "reading": "そこ",
+      "meaning": "那里，那儿",
+      "pos": "代词"
+    },
+    {
+      "term": "あそこ",
+      "reading": "あそこ",
+      "meaning": "那里，那儿",
+      "pos": "代词"
+    },
+    {
+      "term": "こちら",
+      "reading": "こちら",
+      "meaning": "这儿，这边",
+      "pos": "代词"
+    },
+    {
+      "term": "そちら",
+      "reading": "そちら",
+      "meaning": "那儿，那边",
+      "pos": "代词"
+    },
+    {
+      "term": "あちら",
+      "reading": "あちら",
+      "meaning": "那儿，那边",
+      "pos": "代词"
+    },
+    {
+      "term": "どこ",
+      "reading": "どこ",
+      "meaning": "哪里，哪儿",
+      "pos": "疑问词"
+    },
+    {
+      "term": "どちら",
+      "reading": "どちら",
+      "meaning": "哪儿，哪边",
+      "pos": "疑问词"
+    },
+    {
+      "term": "あのう",
+      "reading": "あのう",
+      "meaning": "请问，对不起",
+      "pos": "叹词"
+    },
+    {
+      "term": "シャンハイ",
+      "reading": "シャンハイ",
+      "meaning": "上海",
+      "pos": "专有名词"
+    },
+    {
+      "term": "とうきょう",
+      "reading": "とうきょう",
+      "meaning": "东京",
+      "pos": "专有名词"
+    },
+    {
+      "term": "いくら",
+      "reading": "いくら",
+      "meaning": "多少钱"
+    }
+  ]
+}

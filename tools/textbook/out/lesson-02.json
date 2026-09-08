@@ -1,0 +1,316 @@
+{
+  "planName": "标日初级上 第2课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "本",
+      "reading": "ほん",
+      "meaning": "书",
+      "pos": "名词"
+    },
+    {
+      "term": "かばん",
+      "reading": "かばん",
+      "meaning": "包，公文包",
+      "pos": "名词"
+    },
+    {
+      "term": "ノート",
+      "reading": "ノート",
+      "meaning": "笔记本，本子",
+      "pos": "名词"
+    },
+    {
+      "term": "鉛筆",
+      "reading": "えんぴつ",
+      "meaning": "铅笔",
+      "pos": "名词"
+    },
+    {
+      "term": "傘",
+      "reading": "かさ",
+      "meaning": "伞",
+      "pos": "名词"
+    },
+    {
+      "term": "靴",
+      "reading": "くつ",
+      "meaning": "鞋",
+      "pos": "名词"
+    },
+    {
+      "term": "新聞",
+      "reading": "しんぶん",
+      "meaning": "报纸",
+      "pos": "名词"
+    },
+    {
+      "term": "雑誌",
+      "reading": "ざっし",
+      "meaning": "杂志",
+      "pos": "名词"
+    },
+    {
+      "term": "辞書",
+      "reading": "じしょ",
+      "meaning": "词典",
+      "pos": "名词"
+    },
+    {
+      "term": "カメラ",
+      "reading": "カメラ",
+      "meaning": "照相机",
+      "pos": "名词"
+    },
+    {
+      "term": "テレビ",
+      "reading": "テレビ",
+      "meaning": "电视机",
+      "pos": "名词"
+    },
+    {
+      "term": "パソコン",
+      "reading": "パソコン",
+      "meaning": "个人电脑",
+      "pos": "名词"
+    },
+    {
+      "term": "ラジオ",
+      "reading": "ラジオ",
+      "meaning": "收音机",
+      "pos": "名词"
+    },
+    {
+      "term": "電話",
+      "reading": "でんわ",
+      "meaning": "电话",
+      "pos": "名词"
+    },
+    {
+      "term": "机",
+      "reading": "つくえ",
+      "meaning": "桌子，书桌",
+      "pos": "名词"
+    },
+    {
+      "term": "いす",
+      "reading": "いす",
+      "meaning": "椅子",
+      "pos": "名词"
+    },
+    {
+      "term": "かぎ",
+      "reading": "かぎ",
+      "meaning": "钥匙，锁",
+      "pos": "名词"
+    },
+    {
+      "term": "時計",
+      "reading": "とけい",
+      "meaning": "钟，表",
+      "pos": "名词"
+    },
+    {
+      "term": "手帳",
+      "reading": "てちょう",
+      "meaning": "记事本",
+      "pos": "名词"
+    },
+    {
+      "term": "写真",
+      "reading": "しゃしん",
+      "meaning": "照片",
+      "pos": "名词"
+    },
+    {
+      "term": "車",
+      "reading": "くるま",
+      "meaning": "车",
+      "pos": "名词"
+    },
+    {
+      "term": "自転車",
+      "reading": "じてんしゃ",
+      "meaning": "自行车",
+      "pos": "名词"
+    },
+    {
+      "term": "お土産",
+      "reading": "おみやげ",
+      "meaning": "礼物",
+      "pos": "名词"
+    },
+    {
+      "term": "名産品",
+      "reading": "めいさんひん",
+      "meaning": "特产，名产",
+      "pos": "名词"
+    },
+    {
+      "term": "シルク",
+      "reading": "シルク",
+      "meaning": "丝绸",
+      "pos": "名词"
+    },
+    {
+      "term": "ハンカチ",
+      "reading": "ハンカチ",
+      "meaning": "手绢",
+      "pos": "名词"
+    },
+    {
+      "term": "会社",
+      "reading": "かいしゃ",
+      "meaning": "公司",
+      "pos": "名词"
+    },
+    {
+      "term": "方",
+      "reading": "かた",
+      "meaning": "(敬称)位，人",
+      "pos": "名词"
+    },
+    {
+      "term": "人",
+      "reading": "ひと",
+      "meaning": "人",
+      "pos": "名词"
+    },
+    {
+      "term": "家族",
+      "reading": "かぞく",
+      "meaning": "家属，家人",
+      "pos": "名词"
+    },
+    {
+      "term": "母",
+      "reading": "はは",
+      "meaning": "(我)母亲",
+      "pos": "名词"
+    },
+    {
+      "term": "お母さん",
+      "reading": "おかあさん",
+      "meaning": "母亲",
+      "pos": "名词"
+    },
+    {
+      "term": "日本語",
+      "reading": "にほんご",
+      "meaning": "日语",
+      "pos": "名词"
+    },
+    {
+      "term": "中国語",
+      "reading": "ちゅうごくご",
+      "meaning": "汉语，中文",
+      "pos": "名词"
+    },
+    {
+      "term": "これ",
+      "reading": "これ",
+      "meaning": "这，这个",
+      "pos": "代词"
+    },
+    {
+      "term": "それ",
+      "reading": "それ",
+      "meaning": "那，那个",
+      "pos": "代词"
+    },
+    {
+      "term": "あれ",
+      "reading": "あれ",
+      "meaning": "那，那个",
+      "pos": "代词"
+    },
+    {
+      "term": "どれ",
+      "reading": "どれ",
+      "meaning": "哪个",
+      "pos": "疑问词"
+    },
+    {
+      "term": "何",
+      "reading": "なん",
+      "meaning": "什么",
+      "pos": "疑问词"
+    },
+    {
+      "term": "だれ",
+      "reading": "だれ",
+      "meaning": "谁",
+      "pos": "疑问词"
+    },
+    {
+      "term": "どなた",
+      "reading": "どなた",
+      "meaning": "哪位",
+      "pos": "疑问词"
+    },
+    {
+      "term": "この",
+      "reading": "この",
+      "meaning": "这，这个",
+      "pos": "连体词"
+    },
+    {
+      "term": "その",
+      "reading": "その",
+      "meaning": "那，那个",
+      "pos": "连体词"
+    },
+    {
+      "term": "あの",
+      "reading": "あの",
+      "meaning": "那，那个",
+      "pos": "连体词"
+    },
+    {
+      "term": "どの",
+      "reading": "どの",
+      "meaning": "哪个",
+      "pos": "连体词"
+    },
+    {
+      "term": "えっ",
+      "reading": "えっ",
+      "meaning": "啊",
+      "pos": "叹词"
+    },
+    {
+      "term": "わあ",
+      "reading": "わあ",
+      "meaning": "哇",
+      "pos": "叹词"
+    },
+    {
+      "term": "ええ",
+      "reading": "ええ",
+      "meaning": "(应答)嗯，是",
+      "pos": "叹词"
+    },
+    {
+      "term": "日本",
+      "reading": "にほん",
+      "meaning": "日本",
+      "pos": "专有名词"
+    },
+    {
+      "term": "ロンドン",
+      "reading": "ロンドン",
+      "meaning": "伦敦",
+      "pos": "专有名词"
+    },
+    {
+      "term": "ありがとうございます",
+      "reading": "ありがとうございます",
+      "meaning": "谢谢"
+    },
+    {
+      "term": "おいくつ",
+      "reading": "おいくつ",
+      "meaning": "多大"
+    }
+  ]
+}

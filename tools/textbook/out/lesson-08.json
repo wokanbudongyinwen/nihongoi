@@ -1,0 +1,320 @@
+{
+  "planName": "标日初级上 第8课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "プレゼント",
+      "reading": "プレゼント",
+      "meaning": "礼物",
+      "pos": "名词"
+    },
+    {
+      "term": "チケット",
+      "reading": "チケット",
+      "meaning": "票",
+      "pos": "名词"
+    },
+    {
+      "term": "パンフレット",
+      "reading": "パンフレット",
+      "meaning": "小册子",
+      "pos": "名词"
+    },
+    {
+      "term": "記念品",
+      "reading": "きねんひん",
+      "meaning": "纪念品",
+      "pos": "名词"
+    },
+    {
+      "term": "スケジュールひょう",
+      "reading": "スケジュールひょう",
+      "meaning": "日程表",
+      "pos": "名词"
+    },
+    {
+      "term": "写真集",
+      "reading": "しゃしんしゅう",
+      "meaning": "影集",
+      "pos": "名词"
+    },
+    {
+      "term": "花",
+      "reading": "はな",
+      "meaning": "花",
+      "pos": "名词"
+    },
+    {
+      "term": "お金",
+      "reading": "おかね",
+      "meaning": "钱，金钱",
+      "pos": "名词"
+    },
+    {
+      "term": "ボールペン",
+      "reading": "ボールペン",
+      "meaning": "圆珠笔",
+      "pos": "名词"
+    },
+    {
+      "term": "宿題",
+      "reading": "しゅくだい",
+      "meaning": "作业",
+      "pos": "名词"
+    },
+    {
+      "term": "航空便",
+      "reading": "こうくうびん",
+      "meaning": "航空邮件",
+      "pos": "名词"
+    },
+    {
+      "term": "速達",
+      "reading": "そくたつ",
+      "meaning": "速递，快件",
+      "pos": "名词"
+    },
+    {
+      "term": "ファックス",
+      "reading": "ファックス",
+      "meaning": "传真",
+      "pos": "名词"
+    },
+    {
+      "term": "メール",
+      "reading": "メール",
+      "meaning": "邮件",
+      "pos": "名词"
+    },
+    {
+      "term": "電話番号",
+      "reading": "でんわばんごう",
+      "meaning": "电话号码",
+      "pos": "名词"
+    },
+    {
+      "term": "住所",
+      "reading": "じゅうしょ",
+      "meaning": "住址",
+      "pos": "名词"
+    },
+    {
+      "term": "名前",
+      "reading": "なまえ",
+      "meaning": "姓名",
+      "pos": "名词"
+    },
+    {
+      "term": "件",
+      "reading": "けん",
+      "meaning": "事件，事情",
+      "pos": "名词"
+    },
+    {
+      "term": "新聞紙",
+      "reading": "しんぶんし",
+      "meaning": "报纸",
+      "pos": "名词"
+    },
+    {
+      "term": "紙飛行機",
+      "reading": "かみひこうき",
+      "meaning": "纸折的飞机",
+      "pos": "名词"
+    },
+    {
+      "term": "チョコレート",
+      "reading": "チョコレート",
+      "meaning": "巧克力",
+      "pos": "名词"
+    },
+    {
+      "term": "アイスクリーム",
+      "reading": "アイスクリーム",
+      "meaning": "冰激凌",
+      "pos": "名词"
+    },
+    {
+      "term": "小麦粉",
+      "reading": "こむぎこ",
+      "meaning": "面粉",
+      "pos": "名词"
+    },
+    {
+      "term": "はし",
+      "reading": "はし",
+      "meaning": "筷子",
+      "pos": "名词"
+    },
+    {
+      "term": "スプーン",
+      "reading": "スプーン",
+      "meaning": "勺子",
+      "pos": "名词"
+    },
+    {
+      "term": "お兄さん",
+      "reading": "おにいさん",
+      "meaning": "哥哥",
+      "pos": "名词"
+    },
+    {
+      "term": "韓国語",
+      "reading": "かんこくご",
+      "meaning": "韩语",
+      "pos": "名词"
+    },
+    {
+      "term": "夕方",
+      "reading": "ゆうがた",
+      "meaning": "傍晚",
+      "pos": "名词"
+    },
+    {
+      "term": "昼休み",
+      "reading": "ひるやすみ",
+      "meaning": "午休",
+      "pos": "名词"
+    },
+    {
+      "term": "もらう",
+      "reading": "もらう",
+      "meaning": "拿到，得到",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "会う",
+      "reading": "あう",
+      "meaning": "见",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "送る",
+      "reading": "おくる",
+      "meaning": "寄",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "作る",
+      "reading": "つくる",
+      "meaning": "做，制造",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "太る",
+      "reading": "ふとる",
+      "meaning": "胖",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "出す",
+      "reading": "だす",
+      "meaning": "寄(信)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "届く",
+      "reading": "とどく",
+      "meaning": "收到，送到，寄到",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "かく",
+      "reading": "かく",
+      "meaning": "画",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "貸す",
+      "reading": "かす",
+      "meaning": "借出，借给",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "習う",
+      "reading": "ならう",
+      "meaning": "学习",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "あげる",
+      "reading": "あげる",
+      "meaning": "给",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "かける",
+      "reading": "かける",
+      "meaning": "打(电话)",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "借りる",
+      "reading": "かりる",
+      "meaning": "(向别人)借",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "教える",
+      "reading": "おしえる",
+      "meaning": "教",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "もう",
+      "reading": "もう",
+      "meaning": "已经",
+      "pos": "副词"
+    },
+    {
+      "term": "さっき",
+      "reading": "さっき",
+      "meaning": "刚才",
+      "pos": "副词"
+    },
+    {
+      "term": "たった今",
+      "reading": "たったいま",
+      "meaning": "刚刚",
+      "pos": "副词"
+    },
+    {
+      "term": "もう一度",
+      "reading": "もういちど",
+      "meaning": "再一次",
+      "pos": "副词"
+    },
+    {
+      "term": "前に",
+      "reading": "まえに",
+      "meaning": "以前",
+      "pos": "副词"
+    },
+    {
+      "term": "陳",
+      "reading": "ちん",
+      "meaning": "陈",
+      "pos": "专有名词"
+    },
+    {
+      "term": "どうですか",
+      "reading": "どうですか",
+      "meaning": "怎样，如何"
+    },
+    {
+      "term": "お願いします",
+      "reading": "おねがいします",
+      "meaning": "拜托了"
+    },
+    {
+      "term": "分かりました",
+      "reading": "わかりました",
+      "meaning": "明白了"
+    },
+    {
+      "term": "よかったです",
+      "reading": "よかったです",
+      "meaning": "太好了"
+    }
+  ]
+}

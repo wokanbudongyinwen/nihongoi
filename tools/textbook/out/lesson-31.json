@@ -1,0 +1,244 @@
+{
+  "planName": "标日初级下 第31课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "ボタン",
+      "reading": "ボタン",
+      "meaning": "按钮；纽扣",
+      "pos": "名词"
+    },
+    {
+      "term": "ブローチ",
+      "reading": "ブローチ",
+      "meaning": "胸针",
+      "pos": "名词"
+    },
+    {
+      "term": "カーテン",
+      "reading": "カーテン",
+      "meaning": "窗帘，帘子",
+      "pos": "名词"
+    },
+    {
+      "term": "コンクリート",
+      "reading": "コンクリート",
+      "meaning": "混凝土，水泥",
+      "pos": "名词"
+    },
+    {
+      "term": "プラスチック",
+      "reading": "プラスチック",
+      "meaning": "塑胶，塑料",
+      "pos": "名词"
+    },
+    {
+      "term": "ひすい",
+      "reading": "ひすい",
+      "meaning": "翡翠",
+      "pos": "名词"
+    },
+    {
+      "term": "サービスセンター",
+      "reading": "サービスセンター",
+      "meaning": "维修服务中心",
+      "pos": "名词"
+    },
+    {
+      "term": "会員",
+      "reading": "かいいん",
+      "meaning": "会员",
+      "pos": "名词"
+    },
+    {
+      "term": "特典",
+      "reading": "とくてん",
+      "meaning": "优惠",
+      "pos": "名词"
+    },
+    {
+      "term": "お手洗い",
+      "reading": "おてあらい",
+      "meaning": "洗手间，厕所",
+      "pos": "名词"
+    },
+    {
+      "term": "階段",
+      "reading": "かいだん",
+      "meaning": "楼梯，台阶",
+      "pos": "名词"
+    },
+    {
+      "term": "以降",
+      "reading": "いこう",
+      "meaning": "以后",
+      "pos": "名词"
+    },
+    {
+      "term": "そば",
+      "reading": "そば",
+      "meaning": "旁边",
+      "pos": "名词"
+    },
+    {
+      "term": "卓球台",
+      "reading": "たっきゅうだい",
+      "meaning": "乒乓球台",
+      "pos": "名词"
+    },
+    {
+      "term": "サイズ",
+      "reading": "サイズ",
+      "meaning": "大小，尺寸",
+      "pos": "名词"
+    },
+    {
+      "term": "人間",
+      "reading": "にんげん",
+      "meaning": "人，人类",
+      "pos": "名词"
+    },
+    {
+      "term": "白鳥",
+      "reading": "はくちょう",
+      "meaning": "天鹅",
+      "pos": "名词"
+    },
+    {
+      "term": "電源",
+      "reading": "でんげん",
+      "meaning": "电源",
+      "pos": "名词"
+    },
+    {
+      "term": "スイカ",
+      "reading": "スイカ",
+      "meaning": "西瓜",
+      "pos": "名词"
+    },
+    {
+      "term": "押す",
+      "reading": "おす",
+      "meaning": "按，推，挤",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "つく",
+      "reading": "つく",
+      "meaning": "灯亮，灯开",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "下がる",
+      "reading": "さがる",
+      "meaning": "下降，降低",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "怒る",
+      "reading": "おこる",
+      "meaning": "生气",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "回す",
+      "reading": "まわす",
+      "meaning": "转，传送，传递",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "動く",
+      "reading": "うごく",
+      "meaning": "运转，转动",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "生きる",
+      "reading": "いきる",
+      "meaning": "活，生存",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "下りる",
+      "reading": "おりる",
+      "meaning": "下，下来",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "まとめる",
+      "reading": "まとめる",
+      "meaning": "总结，整理；汇集",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "フリーズ",
+      "reading": "フリーズ",
+      "meaning": "死机",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "故障",
+      "reading": "こしょう",
+      "meaning": "故障",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "美しい",
+      "reading": "うつくしい",
+      "meaning": "美丽",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "うまい",
+      "reading": "うまい",
+      "meaning": "高明，好吃，可口",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "詳しい",
+      "reading": "くわしい",
+      "meaning": "详细",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "自由",
+      "reading": "じゆう",
+      "meaning": "随便，自由",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "丁寧",
+      "reading": "ていねい",
+      "meaning": "精心，细心，恭敬",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "きちんと",
+      "reading": "きちんと",
+      "meaning": "好好地；正经地",
+      "pos": "副词"
+    },
+    {
+      "term": "ただし",
+      "reading": "ただし",
+      "meaning": "不过，只是",
+      "pos": "接续词"
+    },
+    {
+      "term": "しかし",
+      "reading": "しかし",
+      "meaning": "可是，但是",
+      "pos": "接续词"
+    },
+    {
+      "term": "気持ち悪い",
+      "reading": "きもちわるい",
+      "meaning": "不舒服"
+    },
+    {
+      "term": "～メートル",
+      "reading": "～メートル",
+      "meaning": "~米/第一个"
+    }
+  ]
+}

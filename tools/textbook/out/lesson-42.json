@@ -1,0 +1,215 @@
+{
+  "planName": "标日初级下 第42课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "責任者",
+      "reading": "せきにんしゃ",
+      "meaning": "负责人",
+      "pos": "名词"
+    },
+    {
+      "term": "同僚",
+      "reading": "どうりょう",
+      "meaning": "同事",
+      "pos": "名词"
+    },
+    {
+      "term": "観客",
+      "reading": "かんきゃく",
+      "meaning": "观众",
+      "pos": "名词"
+    },
+    {
+      "term": "空腹",
+      "reading": "くうふく",
+      "meaning": "空肚子，空腹，饿",
+      "pos": "名词"
+    },
+    {
+      "term": "換気",
+      "reading": "かんき",
+      "meaning": "换气",
+      "pos": "名词"
+    },
+    {
+      "term": "留守",
+      "reading": "るす",
+      "meaning": "不在家",
+      "pos": "名词"
+    },
+    {
+      "term": "講堂",
+      "reading": "こうどう",
+      "meaning": "讲堂",
+      "pos": "名词"
+    },
+    {
+      "term": "昼間",
+      "reading": "ひるま",
+      "meaning": "白天，白日",
+      "pos": "名词"
+    },
+    {
+      "term": "日程",
+      "reading": "にってい",
+      "meaning": "日程",
+      "pos": "名词"
+    },
+    {
+      "term": "次回",
+      "reading": "じかい",
+      "meaning": "下次，下回",
+      "pos": "名词"
+    },
+    {
+      "term": "目覚まし",
+      "reading": "めざまし",
+      "meaning": "闹钟；叫醒",
+      "pos": "名词"
+    },
+    {
+      "term": "アラーム",
+      "reading": "アラーム",
+      "meaning": "闹钟，闹铃",
+      "pos": "名词"
+    },
+    {
+      "term": "企画案",
+      "reading": "きかくあん",
+      "meaning": "策划方案",
+      "pos": "名词"
+    },
+    {
+      "term": "お返事",
+      "reading": "おへんじ",
+      "meaning": "回信",
+      "pos": "名词"
+    },
+    {
+      "term": "行き先",
+      "reading": "いきさき",
+      "meaning": "去的地方，目的地",
+      "pos": "名词"
+    },
+    {
+      "term": "預かる",
+      "reading": "あずかる",
+      "meaning": "保管，收存",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "気づく",
+      "reading": "きづく",
+      "meaning": "发觉，发现",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "冷やす",
+      "reading": "ひやす",
+      "meaning": "冰镇，冷却",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "思い出す",
+      "reading": "おもいだす",
+      "meaning": "想起，想出",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "告げる",
+      "reading": "つげる",
+      "meaning": "说，告诉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "冷える",
+      "reading": "ひえる",
+      "meaning": "变冷；感觉凉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "信じる",
+      "reading": "しんじる",
+      "meaning": "相信，信任",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "折れる",
+      "reading": "おれる",
+      "meaning": "折，断；拐弯",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "出勤",
+      "reading": "しゅっきん",
+      "meaning": "上班，出勤",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "セット",
+      "reading": "セット",
+      "meaning": "设定，设置",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "検討",
+      "reading": "けんとう",
+      "meaning": "讨论",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "正しい",
+      "reading": "ただしい",
+      "meaning": "正确的",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "当然",
+      "reading": "とうぜん",
+      "meaning": "当然，应当",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "確か",
+      "reading": "たしか",
+      "meaning": "确实，确切；大概",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "丈夫",
+      "reading": "じょうぶ",
+      "meaning": "牢固，结实",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "早速",
+      "reading": "さっそく",
+      "meaning": "马上，立即",
+      "pos": "副词"
+    },
+    {
+      "term": "直接",
+      "reading": "ちょくせつ",
+      "meaning": "直接",
+      "pos": "副词"
+    },
+    {
+      "term": "きっと",
+      "reading": "きっと",
+      "meaning": "一定",
+      "pos": "副词"
+    },
+    {
+      "term": "だって",
+      "reading": "だって",
+      "meaning": "可是，但是",
+      "pos": "接续词"
+    },
+    {
+      "term": "留守にします",
+      "reading": "るすにします",
+      "meaning": "不在家，无人在家"
+    }
+  ]
+}

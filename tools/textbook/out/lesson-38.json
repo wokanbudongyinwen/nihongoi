@@ -1,0 +1,220 @@
+{
+  "planName": "标日初级下 第38课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "商品",
+      "reading": "しょうひん",
+      "meaning": "商品",
+      "pos": "名词"
+    },
+    {
+      "term": "ごみ箱",
+      "reading": "ごみばこ",
+      "meaning": "垃圾箱",
+      "pos": "名词"
+    },
+    {
+      "term": "コップ",
+      "reading": "コップ",
+      "meaning": "杯子，杯",
+      "pos": "名词"
+    },
+    {
+      "term": "ペットボトル",
+      "reading": "ペットボトル",
+      "meaning": "塑料瓶",
+      "pos": "名词"
+    },
+    {
+      "term": "エンジン",
+      "reading": "エンジン",
+      "meaning": "发动机，引擎",
+      "pos": "名词"
+    },
+    {
+      "term": "タイヤ",
+      "reading": "タイヤ",
+      "meaning": "轮胎",
+      "pos": "名词"
+    },
+    {
+      "term": "胡同",
+      "reading": "フートン",
+      "meaning": "胡同",
+      "pos": "名词"
+    },
+    {
+      "term": "路地",
+      "reading": "ろじ",
+      "meaning": "小巷，弄堂",
+      "pos": "名词"
+    },
+    {
+      "term": "油条",
+      "reading": "ヨウティアオ",
+      "meaning": "油条",
+      "pos": "名词"
+    },
+    {
+      "term": "日本食",
+      "reading": "にほんしょく",
+      "meaning": "日本食品",
+      "pos": "名词"
+    },
+    {
+      "term": "刺し身",
+      "reading": "さしみ",
+      "meaning": "生鲜鱼、贝片",
+      "pos": "名词"
+    },
+    {
+      "term": "棚",
+      "reading": "たな",
+      "meaning": "橱柜，搁板",
+      "pos": "名词"
+    },
+    {
+      "term": "畳",
+      "reading": "たたみ",
+      "meaning": "草席，草垫",
+      "pos": "名词"
+    },
+    {
+      "term": "着物",
+      "reading": "きもの",
+      "meaning": "和服，衣服",
+      "pos": "名词"
+    },
+    {
+      "term": "具合",
+      "reading": "ぐあい",
+      "meaning": "情况",
+      "pos": "名词"
+    },
+    {
+      "term": "平仮名",
+      "reading": "ひらがな",
+      "meaning": "平假名",
+      "pos": "名词"
+    },
+    {
+      "term": "赤ちゃん",
+      "reading": "あかちゃん",
+      "meaning": "婴儿，幼儿",
+      "pos": "名词"
+    },
+    {
+      "term": "半分",
+      "reading": "はんぶん",
+      "meaning": "一半",
+      "pos": "名词"
+    },
+    {
+      "term": "最終",
+      "reading": "さいしゅう",
+      "meaning": "最终",
+      "pos": "名词"
+    },
+    {
+      "term": "試合",
+      "reading": "しあい",
+      "meaning": "比赛，竞赛",
+      "pos": "名词"
+    },
+    {
+      "term": "英字新聞",
+      "reading": "えいじしんぶん",
+      "meaning": "英文报纸",
+      "pos": "名词"
+    },
+    {
+      "term": "衛星放送",
+      "reading": "えいせいほうそう",
+      "meaning": "卫星广播",
+      "pos": "名词"
+    },
+    {
+      "term": "ストレス",
+      "reading": "ストレス",
+      "meaning": "精神紧张状态",
+      "pos": "名词"
+    },
+    {
+      "term": "伝統的",
+      "reading": "でんとうてき",
+      "meaning": "传统的",
+      "pos": "名词"
+    },
+    {
+      "term": "入り組む",
+      "reading": "いりくむ",
+      "meaning": "错综复杂",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "減る",
+      "reading": "へる",
+      "meaning": "减少",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "動かす",
+      "reading": "うごかす",
+      "meaning": "开动，移动，摇动",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "勝つ",
+      "reading": "かつ",
+      "meaning": "取胜，获胜",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "通り抜ける",
+      "reading": "とおりぬける",
+      "meaning": "走得出去，穿过，通过",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "感じる",
+      "reading": "かんじる",
+      "meaning": "感觉，觉得",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "取り替える",
+      "reading": "とりかえる",
+      "meaning": "更换，交换",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "徹夜",
+      "reading": "てつや",
+      "meaning": "熬通宵，彻夜",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "火傷",
+      "reading": "やけど",
+      "meaning": "烫伤，烧伤",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "なんだか",
+      "reading": "なんだか",
+      "meaning": "总觉得，总有点",
+      "pos": "副词"
+    },
+    {
+      "term": "この辺",
+      "reading": "このへん",
+      "meaning": "这一带，这附近，这儿"
+    },
+    {
+      "term": "急いで",
+      "reading": "いそいで",
+      "meaning": "急急忙忙地，匆忙地"
+    }
+  ]
+}

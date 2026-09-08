@@ -1,0 +1,302 @@
+{
+  "planName": "标日初级下 第27课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "経済",
+      "reading": "けいざい",
+      "meaning": "经济",
+      "pos": "名词"
+    },
+    {
+      "term": "国際関係学",
+      "reading": "こくさいかんけいがく",
+      "meaning": "国际关系学",
+      "pos": "名词"
+    },
+    {
+      "term": "大勢",
+      "reading": "おおぜい",
+      "meaning": "许多，众多",
+      "pos": "名词"
+    },
+    {
+      "term": "高校",
+      "reading": "こうこう",
+      "meaning": "高中",
+      "pos": "名词"
+    },
+    {
+      "term": "日記",
+      "reading": "にっき",
+      "meaning": "日记",
+      "pos": "名词"
+    },
+    {
+      "term": "教師",
+      "reading": "きょうし",
+      "meaning": "教师",
+      "pos": "名词"
+    },
+    {
+      "term": "お年寄り",
+      "reading": "おとしより",
+      "meaning": "老年人",
+      "pos": "名词"
+    },
+    {
+      "term": "ラジオたいそう",
+      "reading": "ラジオたいそう",
+      "meaning": "广播体操",
+      "pos": "名词"
+    },
+    {
+      "term": "社交～",
+      "reading": "しゃこうダンス",
+      "meaning": "交际舞",
+      "pos": "名词"
+    },
+    {
+      "term": "卓球",
+      "reading": "たっきゅう",
+      "meaning": "乒乓球",
+      "pos": "名词"
+    },
+    {
+      "term": "バスケットボール",
+      "reading": "バスケットボール",
+      "meaning": "篮球",
+      "pos": "名词"
+    },
+    {
+      "term": "スポーツセンター",
+      "reading": "スポーツセンター",
+      "meaning": "体育中心",
+      "pos": "名词"
+    },
+    {
+      "term": "入園料",
+      "reading": "にゅうえんりょう",
+      "meaning": "门票，入园费",
+      "pos": "名词"
+    },
+    {
+      "term": "有料",
+      "reading": "ゆうりょう",
+      "meaning": "收费",
+      "pos": "名词"
+    },
+    {
+      "term": "賞",
+      "reading": "しょう",
+      "meaning": "奖",
+      "pos": "名词"
+    },
+    {
+      "term": "曲",
+      "reading": "きょく",
+      "meaning": "乐曲，歌曲",
+      "pos": "名词"
+    },
+    {
+      "term": "詩",
+      "reading": "し",
+      "meaning": "诗歌",
+      "pos": "名词"
+    },
+    {
+      "term": "信号",
+      "reading": "しんごう",
+      "meaning": "信号，红绿灯",
+      "pos": "名词"
+    },
+    {
+      "term": "はさみ",
+      "reading": "はさみ",
+      "meaning": "剪刀",
+      "pos": "名词"
+    },
+    {
+      "term": "部品",
+      "reading": "ぶひん",
+      "meaning": "零部件",
+      "pos": "名词"
+    },
+    {
+      "term": "アルバイト",
+      "reading": "アルバイト",
+      "meaning": "打工，副业，工读",
+      "pos": "名词"
+    },
+    {
+      "term": "スピーチ",
+      "reading": "スピーチ",
+      "meaning": "演说，演讲",
+      "pos": "名词"
+    },
+    {
+      "term": "グラフ",
+      "reading": "グラフ",
+      "meaning": "图表",
+      "pos": "名词"
+    },
+    {
+      "term": "企画",
+      "reading": "きかく",
+      "meaning": "策划，计划",
+      "pos": "名词"
+    },
+    {
+      "term": "説明",
+      "reading": "せつめい",
+      "meaning": "说明",
+      "pos": "名词"
+    },
+    {
+      "term": "ご飯",
+      "reading": "ごはん",
+      "meaning": "饭",
+      "pos": "名词"
+    },
+    {
+      "term": "砂糖",
+      "reading": "さとう",
+      "meaning": "砂糖",
+      "pos": "名词"
+    },
+    {
+      "term": "海外旅行",
+      "reading": "かいがいりょこう",
+      "meaning": "海外旅行",
+      "pos": "名词"
+    },
+    {
+      "term": "こと",
+      "reading": "こと",
+      "meaning": "事情",
+      "pos": "名词"
+    },
+    {
+      "term": "おじいさん",
+      "reading": "おじいさん",
+      "meaning": "爷爷；老大爷",
+      "pos": "代词"
+    },
+    {
+      "term": "おばあさん",
+      "reading": "おばあさん",
+      "meaning": "奶奶；老奶奶",
+      "pos": "代词"
+    },
+    {
+      "term": "姉",
+      "reading": "あね",
+      "meaning": "姐姐",
+      "pos": "代词"
+    },
+    {
+      "term": "通う",
+      "reading": "かよう",
+      "meaning": "上学，来往",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "集まる",
+      "reading": "あつまる",
+      "meaning": "聚，集合",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "踊る",
+      "reading": "おどる",
+      "meaning": "跳舞",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "要る",
+      "reading": "いる",
+      "meaning": "要",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "困る",
+      "reading": "こまる",
+      "meaning": "为难，难办",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "たたく",
+      "reading": "たたく",
+      "meaning": "拍，敲，打",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "入れる",
+      "reading": "いれる",
+      "meaning": "放入，放进",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "看病",
+      "reading": "かんびょう",
+      "meaning": "护理",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "けんかする",
+      "reading": "けんかする",
+      "meaning": "吵架，打架",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "利用",
+      "reading": "りよう",
+      "meaning": "利用",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "相談",
+      "reading": "そうだん",
+      "meaning": "商谈",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "ほかに",
+      "reading": "ほかに",
+      "meaning": "另外",
+      "pos": "副词"
+    },
+    {
+      "term": "しばらく",
+      "reading": "しばらく",
+      "meaning": "许久，好久；片刻",
+      "pos": "副词"
+    },
+    {
+      "term": "へえ",
+      "reading": "へえ",
+      "meaning": "哎，哎呀，哎哟",
+      "pos": "叹词"
+    },
+    {
+      "term": "この前",
+      "reading": "このまえ",
+      "meaning": "前几天，之前，最近"
+    },
+    {
+      "term": "そう言えば",
+      "reading": "そういえば",
+      "meaning": "说起来，　这么说来"
+    },
+    {
+      "term": "気がつきます",
+      "reading": "きがつきます",
+      "meaning": "察觉"
+    },
+    {
+      "term": "しばらくです",
+      "reading": "しばらくです",
+      "meaning": "好久不见"
+    }
+  ]
+}

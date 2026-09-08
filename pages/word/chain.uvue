@@ -1,15 +1,18 @@
 <template>
   <view class="page">
     <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
-    <!-- 链路径（本次会话内存视图） -->
-    <scroll-view class="chain-bar" scroll-x="true" show-scrollbar="false" v-if="chainWords.length > 0">
-      <view class="chain-row">
-        <view class="chain-cell" v-for="(w, i) in chainWords" :key="w.id.toString() + '-' + i.toString()">
-          <text class="chain-word" :class="i == chainWords.length - 1 ? 'chain-word-on' : ''">{{ w.term }}</text>
-          <text class="chain-arrow" v-if="i < chainWords.length - 1">→</text>
+    <!-- 链路径（横向滚动；点击整条进入链条单词列表页查看/进词卡） -->
+    <view class="chain-bar pressable-soft" hover-class="press-soft" v-if="chainWords.length > 0" @click="goChainList">
+      <scroll-view class="chain-scroll" scroll-x="true" show-scrollbar="false">
+        <view class="chain-row">
+          <view class="chain-cell" v-for="(w, i) in chainWords" :key="w.id">
+            <text class="chain-word" :class="i == chainWords.length - 1 ? 'chain-word-on' : ''">{{ w.term }}</text>
+            <text class="chain-arrow" v-if="i < chainWords.length - 1">→</text>
+          </view>
         </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+      <text class="chain-hint">链条 {{ chainWords.length }} 词 · 点击查看列表 ▸</text>
+    </view>
 
     <!-- 主单词卡 -->
     <view class="neo-card main-card" v-if="hasMain">
@@ -89,8 +92,13 @@
   import { Word, RELATION_CUSTOM } from '../../domain/types.uts'
   import { accentsDisplay } from '../../domain/format.uts'
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { getWordRepo } from '../../repos/sqlite/wordRepoImpl.uts'
   import { searchWords, getWordDetail, addCustomRelation, addNote, RelationDisplay } from '../../services/wordEditor.uts'
   import { manualPlay } from '../../services/audio.uts'
+  import { setStoredString, getStoredString } from '../../repos/native/storage.uts'
+
+  // 链存档 key（逗号分隔的 wordId 序列）
+  const DRAFT_KEY = 'chain_draft'
 
   const emptyWord: Word = {
     id: 0,
@@ -118,8 +126,6 @@
   const reason = ref('')
   const noteInputting = ref(false)
   const noteInput = ref('')
-
-  let activePlanId = 0
 
   const accentText = (): string => {
     return accentsDisplay(mainWord.value.accent)
@@ -153,6 +159,57 @@
     customIds.value = ids
   }
 
+  // 点击链条 → 链条单词列表页（ids 逗号串传参，列表页逐 id 查库展示）
+  const goChainList = () => {
+    const ids: Array<string> = []
+    for (let i = 0; i < chainWords.value.length; i++) {
+      ids.push(chainWords.value[i].id.toString())
+    }
+    uni.navigateTo({ url: '/pages/word/chainList?ids=' + ids.join(',') })
+  }
+
+  // ---------- 链存档（自动续链：进入页面有档即恢复；仅「跳过/换一个」重开新局） ----------
+
+  const saveDraft = () => {
+    const ids: Array<string> = []
+    for (let i = 0; i < chainWords.value.length; i++) {
+      ids.push(chainWords.value[i].id.toString())
+    }
+    setStoredString(DRAFT_KEY, ids.join(','))
+  }
+
+  // 读档：逐 id 回查词条（词条可能已被编辑/删除，失效 id 跳过），全部失效视为无档
+  const loadDraft = async (): Promise<boolean> => {
+    const raw = getStoredString(DRAFT_KEY)
+    if (raw.length == 0) {
+      return false
+    }
+    const parts = raw.split(',')
+    const repo = getWordRepo()
+    const list: Array<Word> = []
+    for (let i = 0; i < parts.length; i++) {
+      const id = parseInt(parts[i])
+      if (isNaN(id) || id <= 0) {
+        continue
+      }
+      try {
+        const w = await repo.getById(id)
+        if (w != null) {
+          list.push(w)
+        }
+      } catch (e) {
+        console.error('链存档词条读取失败', id, e)
+      }
+    }
+    if (list.length == 0) {
+      return false
+    }
+    chainWords.value = list
+    await loadMainDetail(list[list.length - 1])
+    loaded.value = true
+    return true
+  }
+
   // 起始 / 跳过：随机取一个孤单词，重开一条链
   // （doSearch/cancelPick 须先声明——坑④：uts 要求先声明后引用）
   const doSearch = async () => {
@@ -179,19 +236,16 @@
   }
 
   const pickStart = async () => {
-    if (activePlanId <= 0) {
-      uni.showToast({ title: '无激活计划', icon: 'none' })
-      loaded.value = true
-      return
-    }
     try {
-      const w = await getPlanRepo().pickLonelyWord(activePlanId)
+      // 全局取词：任何计划学过的词都可成为链起点（无需激活计划）
+      const w = await getPlanRepo().pickLonelyWord()
       loaded.value = true
       if (w == null) {
         hasMain.value = false
         return
       }
       chainWords.value = [w] as Array<Word>
+      saveDraft()
       keyword.value = ''
       results.value = [] as Array<Word>
       cancelPick()
@@ -205,15 +259,11 @@
   }
 
   const start = async () => {
-    try {
-      const plan = await getPlanRepo().getActivePlan()
-      if (plan != null) {
-        activePlanId = plan.id
-      }
-    } catch (e) {
-      console.error('取激活计划失败', e)
+    // 自动续链：有存档先恢复；无档（首次/链词全部失效）才自动开新局
+    const restored = await loadDraft()
+    if (!restored) {
+      await pickStart()
     }
-    await pickStart()
   }
 
   const pickCand = (w: Word) => {
@@ -248,6 +298,7 @@
       }
       chain.push(p)
       chainWords.value = chain
+      saveDraft()
       keyword.value = ''
       results.value = [] as Array<Word>
       cancelPick()
@@ -318,10 +369,10 @@
     background-image: linear-gradient(180deg, #e9e3f1 0%, #f8f4ed 34%, #edf2f4 100%);
   }
 
-  /* ---------- 链路径 ---------- */
+  /* ---------- 链路径（横向滚动，点击进列表页） ---------- */
   .chain-bar {
     background-color: $n-cream;
-    padding: 16rpx 24rpx;
+    padding: 16rpx 24rpx 12rpx;
     border-bottom-width: 1rpx;
     border-bottom-style: solid;
     border-bottom-color: $a-line;
@@ -346,6 +397,13 @@
     font-size: $c-fs-xs;
     color: $n-text3;
     margin: 0 12rpx;
+  }
+  .chain-hint {
+    font-size: 20rpx;
+    color: $n-text3;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+    margin-top: 8rpx;
   }
 
   /* ---------- 主单词卡 ---------- */

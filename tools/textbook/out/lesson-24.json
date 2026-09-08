@@ -1,0 +1,178 @@
+{
+  "planName": "标日初级上 第24课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "ハイキング",
+      "reading": "ハイキング",
+      "meaning": "郊游，远足",
+      "pos": "名词"
+    },
+    {
+      "term": "お別れ",
+      "reading": "おわかれ",
+      "meaning": "分别，分手",
+      "pos": "名词"
+    },
+    {
+      "term": "話",
+      "reading": "はなし",
+      "meaning": "说话",
+      "pos": "名词"
+    },
+    {
+      "term": "見送り",
+      "reading": "みおくり",
+      "meaning": "送行，送别",
+      "pos": "名词"
+    },
+    {
+      "term": "間",
+      "reading": "あいだ",
+      "meaning": "时间，期间",
+      "pos": "名词"
+    },
+    {
+      "term": "法律",
+      "reading": "ほうりつ",
+      "meaning": "法律",
+      "pos": "名词"
+    },
+    {
+      "term": "思う",
+      "reading": "おもう",
+      "meaning": "想，思考",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "言う",
+      "reading": "いう",
+      "meaning": "说，讲",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "探す",
+      "reading": "さがす",
+      "meaning": "找，寻找，寻求",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "笑う",
+      "reading": "わらう",
+      "meaning": "笑",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "やめる",
+      "reading": "やめる",
+      "meaning": "戒，停止，放弃",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "決める",
+      "reading": "きめる",
+      "meaning": "决定",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "寝坊",
+      "reading": "ねぼう",
+      "meaning": "睡懒觉",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "外出",
+      "reading": "がいしゅつ",
+      "meaning": "外出，出去",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "研究",
+      "reading": "けんきゅう",
+      "meaning": "研究",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "おかしい",
+      "reading": "おかしい",
+      "meaning": "可笑，滑稽",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "いっぱい",
+      "reading": "いっぱい",
+      "meaning": "满",
+      "pos": "副词"
+    },
+    {
+      "term": "すごい",
+      "reading": "すごい",
+      "meaning": "惊人的，了不起",
+      "pos": "副词"
+    },
+    {
+      "term": "とうとう",
+      "reading": "とうとう",
+      "meaning": "终于，终究，到底",
+      "pos": "副词"
+    },
+    {
+      "term": "必ず",
+      "reading": "かならず",
+      "meaning": "一定，必定",
+      "pos": "副词"
+    },
+    {
+      "term": "絶対に",
+      "reading": "ぜったいに",
+      "meaning": "绝对",
+      "pos": "副词"
+    },
+    {
+      "term": "馬",
+      "reading": "ば",
+      "meaning": "马",
+      "pos": "专有名词"
+    },
+    {
+      "term": "お世話になりました",
+      "reading": "おせわになりました",
+      "meaning": "承蒙照顾"
+    },
+    {
+      "term": "よろしくおつたえください",
+      "reading": "よろしくおつたえください",
+      "meaning": "请代问好"
+    },
+    {
+      "term": "お元気で",
+      "reading": "おげんきで",
+      "meaning": "请多保重"
+    },
+    {
+      "term": "お気をつけて",
+      "reading": "おきをつけて",
+      "meaning": "小心点儿"
+    },
+    {
+      "term": "さようなら",
+      "reading": "さようなら",
+      "meaning": "再见"
+    },
+    {
+      "term": "どうやって",
+      "reading": "どうやって",
+      "meaning": "怎样，如何"
+    },
+    {
+      "term": "役に立ちます",
+      "reading": "やくにたちます",
+      "meaning": "有用"
+    },
+    {
+      "term": "おなかがいっぱいです",
+      "reading": "おなかがいっぱいです",
+      "meaning": "吃饱，饱"
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+{
+  "planName": "标日初级上 第7课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "コーヒー",
+      "reading": "コーヒー",
+      "meaning": "咖啡",
+      "pos": "名词"
+    },
+    {
+      "term": "コーラ",
+      "reading": "コーラ",
+      "meaning": "可乐",
+      "pos": "名词"
+    },
+    {
+      "term": "お茶",
+      "reading": "おちゃ",
+      "meaning": "茶",
+      "pos": "名词"
+    },
+    {
+      "term": "ワイン",
+      "reading": "ワイン",
+      "meaning": "葡萄酒",
+      "pos": "名词"
+    },
+    {
+      "term": "パン",
+      "reading": "パン",
+      "meaning": "面包",
+      "pos": "名词"
+    },
+    {
+      "term": "ケーキ",
+      "reading": "ケーキ",
+      "meaning": "蛋糕",
+      "pos": "名词"
+    },
+    {
+      "term": "お粥",
+      "reading": "おかゆ",
+      "meaning": "粥",
+      "pos": "名词"
+    },
+    {
+      "term": "昼ご飯",
+      "reading": "ひるごはん",
+      "meaning": "午饭",
+      "pos": "名词"
+    },
+    {
+      "term": "お弁当",
+      "reading": "おべんとう",
+      "meaning": "盒饭",
+      "pos": "名词"
+    },
+    {
+      "term": "そば",
+      "reading": "そば",
+      "meaning": "荞麦面",
+      "pos": "名词"
+    },
+    {
+      "term": "うどん",
+      "reading": "うどん",
+      "meaning": "面条",
+      "pos": "名词"
+    },
+    {
+      "term": "親子丼",
+      "reading": "おやこどん",
+      "meaning": "鸡肉鸡蛋盖饭",
+      "pos": "名词"
+    },
+    {
+      "term": "カレー",
+      "reading": "カレー",
+      "meaning": "咖喱(饭)",
+      "pos": "名词"
+    },
+    {
+      "term": "卵",
+      "reading": "たまご",
+      "meaning": "鸡蛋",
+      "pos": "名词"
+    },
+    {
+      "term": "チーズ",
+      "reading": "チーズ",
+      "meaning": "干酪",
+      "pos": "名词"
+    },
+    {
+      "term": "リンゴ",
+      "reading": "リンゴ",
+      "meaning": "苹果",
+      "pos": "名词"
+    },
+    {
+      "term": "イチゴ",
+      "reading": "イチゴ",
+      "meaning": "草莓",
+      "pos": "名词"
+    },
+    {
+      "term": "そば屋",
+      "reading": "そばや",
+      "meaning": "荞麦面馆",
+      "pos": "名词"
+    },
+    {
+      "term": "テニス",
+      "reading": "テニス",
+      "meaning": "网球",
+      "pos": "名词"
+    },
+    {
+      "term": "ジョギング",
+      "reading": "ジョギング",
+      "meaning": "慢跑，跑步",
+      "pos": "名词"
+    },
+    {
+      "term": "サッカー",
+      "reading": "サッカー",
+      "meaning": "足球",
+      "pos": "名词"
+    },
+    {
+      "term": "野球",
+      "reading": "やきゅう",
+      "meaning": "棒球",
+      "pos": "名词"
+    },
+    {
+      "term": "申込書",
+      "reading": "もうしこみしょ",
+      "meaning": "申请书",
+      "pos": "名词"
+    },
+    {
+      "term": "手紙",
+      "reading": "てがみ",
+      "meaning": "信",
+      "pos": "名词"
+    },
+    {
+      "term": "ＣＤ",
+      "reading": "シーディー",
+      "meaning": "ＣＤ",
+      "pos": "名词"
+    },
+    {
+      "term": "音楽",
+      "reading": "おんがく",
+      "meaning": "音乐",
+      "pos": "名词"
+    },
+    {
+      "term": "映画",
+      "reading": "えいが",
+      "meaning": "电影",
+      "pos": "名词"
+    },
+    {
+      "term": "動物園",
+      "reading": "どうぶつえん",
+      "meaning": "动物园",
+      "pos": "名词"
+    },
+    {
+      "term": "パンダ",
+      "reading": "パンダ",
+      "meaning": "熊猫",
+      "pos": "名词"
+    },
+    {
+      "term": "飲む",
+      "reading": "のむ",
+      "meaning": "喝",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "買う",
+      "reading": "かう",
+      "meaning": "买",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "撮る",
+      "reading": "とる",
+      "meaning": "拍照，拍摄",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "書く",
+      "reading": "かく",
+      "meaning": "写",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "読む",
+      "reading": "よむ",
+      "meaning": "读",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "聞く",
+      "reading": "きく",
+      "meaning": "听",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "食べる",
+      "reading": "たべる",
+      "meaning": "吃",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "見る",
+      "reading": "みる",
+      "meaning": "看",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "する",
+      "reading": "する",
+      "meaning": "干，做",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "掃除",
+      "reading": "そうじ",
+      "meaning": "打扫，扫除",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "これから",
+      "reading": "これから",
+      "meaning": "从现在起，今后",
+      "pos": "副词"
+    },
+    {
+      "term": "じゃあ／では",
+      "reading": "じゃあ／では",
+      "meaning": "那么",
+      "pos": "接续词"
+    },
+    {
+      "term": "いらっしゃいませ",
+      "reading": "いらっしゃいませ",
+      "meaning": "欢迎光临"
+    },
+    {
+      "term": "失礼します",
+      "reading": "しつれいします",
+      "meaning": "告辞了，我走了"
+    },
+    {
+      "term": "失礼しました",
+      "reading": "しつれいしました",
+      "meaning": "打搅了，失礼了"
+    },
+    {
+      "term": "いってまいります",
+      "reading": "いってまいります",
+      "meaning": "我走了"
+    },
+    {
+      "term": "いってきます",
+      "reading": "いってきます",
+      "meaning": "我走了"
+    },
+    {
+      "term": "いってらっしゃい",
+      "reading": "いってらっしゃい",
+      "meaning": "你走好"
+    },
+    {
+      "term": "ただいま",
+      "reading": "ただいま",
+      "meaning": "我回来了"
+    },
+    {
+      "term": "お帰りなさい",
+      "reading": "おかえりなさい",
+      "meaning": "你回来了"
+    },
+    {
+      "term": "かしこまりました",
+      "reading": "かしこまりました",
+      "meaning": "我知道了"
+    },
+    {
+      "term": "お邪魔します",
+      "reading": "おじゃまします",
+      "meaning": "打扰了"
+    },
+    {
+      "term": "ください",
+      "reading": "ください",
+      "meaning": "给我"
+    },
+    {
+      "term": "午前中",
+      "reading": "ごぜんちゅう",
+      "meaning": "上午"
+    }
+  ]
+}

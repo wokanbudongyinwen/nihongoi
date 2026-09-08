@@ -1,0 +1,330 @@
+{
+  "planName": "标日初级下 第36课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "最初",
+      "reading": "さいしょ",
+      "meaning": "开始的时候，最初",
+      "pos": "名词"
+    },
+    {
+      "term": "出身",
+      "reading": "しゅっしん",
+      "meaning": "出生地",
+      "pos": "名词"
+    },
+    {
+      "term": "工場",
+      "reading": "こうじょう",
+      "meaning": "工厂",
+      "pos": "名词"
+    },
+    {
+      "term": "煙突",
+      "reading": "えんとつ",
+      "meaning": "烟筒",
+      "pos": "名词"
+    },
+    {
+      "term": "フライパン",
+      "reading": "フライパン",
+      "meaning": "平底锅",
+      "pos": "名词"
+    },
+    {
+      "term": "卵焼き",
+      "reading": "たまごやき",
+      "meaning": "煎鸡蛋",
+      "pos": "名词"
+    },
+    {
+      "term": "グラウンド",
+      "reading": "グラウンド",
+      "meaning": "操场，运动场",
+      "pos": "名词"
+    },
+    {
+      "term": "屋上",
+      "reading": "おくじょう",
+      "meaning": "屋顶上，屋顶",
+      "pos": "名词"
+    },
+    {
+      "term": "凧",
+      "reading": "たこ",
+      "meaning": "风筝",
+      "pos": "名词"
+    },
+    {
+      "term": "テープ",
+      "reading": "テープ",
+      "meaning": "磁带，音像带",
+      "pos": "名词"
+    },
+    {
+      "term": "読書",
+      "reading": "どくしょ",
+      "meaning": "读书",
+      "pos": "名词"
+    },
+    {
+      "term": "申請",
+      "reading": "しんせい",
+      "meaning": "申请",
+      "pos": "名词"
+    },
+    {
+      "term": "関西弁",
+      "reading": "かんさいべん",
+      "meaning": "关西话，关西方言",
+      "pos": "名词"
+    },
+    {
+      "term": "日常会話",
+      "reading": "にちじょうかいわ",
+      "meaning": "日常会话",
+      "pos": "名词"
+    },
+    {
+      "term": "日本文化",
+      "reading": "にほんぶんか",
+      "meaning": "日本文化",
+      "pos": "名词"
+    },
+    {
+      "term": "生産～",
+      "reading": "せいさんコスト",
+      "meaning": "生产成本",
+      "pos": "名词"
+    },
+    {
+      "term": "交通事故",
+      "reading": "こうつうじこ",
+      "meaning": "交通事故",
+      "pos": "名词"
+    },
+    {
+      "term": "ご主人",
+      "reading": "ごしゅじん",
+      "meaning": "您丈夫，您先生",
+      "pos": "名词"
+    },
+    {
+      "term": "量り売り",
+      "reading": "はかりうり",
+      "meaning": "称斤卖，论重量卖",
+      "pos": "名词"
+    },
+    {
+      "term": "笑い声",
+      "reading": "わらいごえ",
+      "meaning": "笑声",
+      "pos": "名词"
+    },
+    {
+      "term": "持ち歩く",
+      "reading": "もちあるく",
+      "meaning": "携带，拿着走",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "繰り返す",
+      "reading": "くりかえす",
+      "meaning": "反复",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "騒ぐ",
+      "reading": "さわぐ",
+      "meaning": "吵嚷，吵闹",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "間に合う",
+      "reading": "まにあう",
+      "meaning": "来得及，赶得上",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "鳴く",
+      "reading": "なく",
+      "meaning": "叫，鸣，啼",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "眠る",
+      "reading": "ねむる",
+      "meaning": "睡觉",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "鳴る",
+      "reading": "なる",
+      "meaning": "鸣响，响起",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "喜ぶ",
+      "reading": "よろこぶ",
+      "meaning": "喜悦，高兴",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "役立つ",
+      "reading": "やくだつ",
+      "meaning": "有用，有益",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "雇う",
+      "reading": "やとう",
+      "meaning": "雇佣",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "泣く",
+      "reading": "なく",
+      "meaning": "哭，哭泣",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "振る",
+      "reading": "ふる",
+      "meaning": "挥动，摆动",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "見える",
+      "reading": "みえる",
+      "meaning": "看到，看得见",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "聞こえる",
+      "reading": "きこえる",
+      "meaning": "听到，听得见",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "通じる",
+      "reading": "つうじる",
+      "meaning": "通过，相通",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "揚げる",
+      "reading": "あげる",
+      "meaning": "放(风筝)；扬起",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "慣れる",
+      "reading": "なれる",
+      "meaning": "习惯",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "ぬれる",
+      "reading": "ぬれる",
+      "meaning": "淋湿，打湿",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "焼ける",
+      "reading": "やける",
+      "meaning": "着火，燃烧",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "下げる",
+      "reading": "さげる",
+      "meaning": "降低，下降",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "失敗",
+      "reading": "しっぱい",
+      "meaning": "出岔子，失败",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "苦労",
+      "reading": "くろう",
+      "meaning": "辛苦，辛劳",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "びっくり",
+      "reading": "びっくり",
+      "meaning": "吃惊，吓一跳",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "出席",
+      "reading": "しゅっせき",
+      "meaning": "出席",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "悲しい",
+      "reading": "かなしい",
+      "meaning": "悲伤，悲哀",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "ほんと",
+      "reading": "ほんと",
+      "meaning": "真的",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "とにかく",
+      "reading": "とにかく",
+      "meaning": "特别是，总之",
+      "pos": "副词"
+    },
+    {
+      "term": "まだまだ",
+      "reading": "まだまだ",
+      "meaning": "还，尚，仍",
+      "pos": "副词"
+    },
+    {
+      "term": "ぺらぺら",
+      "reading": "ぺらぺら",
+      "meaning": "流利地",
+      "pos": "副词"
+    },
+    {
+      "term": "ワンワン",
+      "reading": "ワンワン",
+      "meaning": "(狗)汪汪(叫)",
+      "pos": "副词"
+    },
+    {
+      "term": "ザーザー",
+      "reading": "ザーザー",
+      "meaning": "(雨)哗啦哗啦",
+      "pos": "副词"
+    },
+    {
+      "term": "すやすや",
+      "reading": "すやすや",
+      "meaning": "香甜地，安静地",
+      "pos": "副词"
+    },
+    {
+      "term": "くねくね",
+      "reading": "くねくね",
+      "meaning": "弯曲，弯弯曲曲",
+      "pos": "副词"
+    },
+    {
+      "term": "メキシコ",
+      "reading": "メキシコ",
+      "meaning": "墨西哥",
+      "pos": "专有名词"
+    }
+  ]
+}

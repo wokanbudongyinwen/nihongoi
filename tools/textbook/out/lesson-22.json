@@ -1,0 +1,150 @@
+{
+  "planName": "标日初级上 第22课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "スキーじょう",
+      "reading": "スキーじょう",
+      "meaning": "滑雪场",
+      "pos": "名词"
+    },
+    {
+      "term": "送別会",
+      "reading": "そうべつかい",
+      "meaning": "欢送会",
+      "pos": "名词"
+    },
+    {
+      "term": "都合",
+      "reading": "つごう",
+      "meaning": "方便；情况",
+      "pos": "名词"
+    },
+    {
+      "term": "予定",
+      "reading": "よてい",
+      "meaning": "预计，预定",
+      "pos": "名词"
+    },
+    {
+      "term": "おもちゃ",
+      "reading": "おもちゃ",
+      "meaning": "玩具",
+      "pos": "名词"
+    },
+    {
+      "term": "火事",
+      "reading": "かじ",
+      "meaning": "火灾",
+      "pos": "名词"
+    },
+    {
+      "term": "期間",
+      "reading": "きかん",
+      "meaning": "时间，期间",
+      "pos": "名词"
+    },
+    {
+      "term": "転勤",
+      "reading": "てんきん",
+      "meaning": "调动工作",
+      "pos": "名词"
+    },
+    {
+      "term": "携帯",
+      "reading": "けいたい",
+      "meaning": "手机",
+      "pos": "名词"
+    },
+    {
+      "term": "バドミントン",
+      "reading": "バドミントン",
+      "meaning": "羽毛球",
+      "pos": "名词"
+    },
+    {
+      "term": "ラケット",
+      "reading": "ラケット",
+      "meaning": "球拍",
+      "pos": "名词"
+    },
+    {
+      "term": "奥さん",
+      "reading": "おくさん",
+      "meaning": "夫人，(别人的)爱人",
+      "pos": "名词"
+    },
+    {
+      "term": "歌手",
+      "reading": "かしゅ",
+      "meaning": "歌手",
+      "pos": "名词"
+    },
+    {
+      "term": "大統領",
+      "reading": "だいとうりょう",
+      "meaning": "总统",
+      "pos": "名词"
+    },
+    {
+      "term": "やる",
+      "reading": "やる",
+      "meaning": "做",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "うれしい",
+      "reading": "うれしい",
+      "meaning": "高兴",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "眠い",
+      "reading": "ねむい",
+      "meaning": "困倦",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "重い",
+      "reading": "おもい",
+      "meaning": "重，沉重",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "急",
+      "reading": "きゅう",
+      "meaning": "突然；紧急",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "まあまあ",
+      "reading": "まあまあ",
+      "meaning": "大致，还算",
+      "pos": "副词"
+    },
+    {
+      "term": "あんまり",
+      "reading": "あんまり",
+      "meaning": "太，非常，过于",
+      "pos": "副词"
+    },
+    {
+      "term": "ごめん",
+      "reading": "ごめん",
+      "meaning": "抱歉，请原谅",
+      "pos": "叹词"
+    },
+    {
+      "term": "ううん",
+      "reading": "ううん",
+      "meaning": "不",
+      "pos": "叹词"
+    },
+    {
+      "term": "うん",
+      "reading": "うん",
+      "meaning": "嗯",
+      "pos": "叹词"
+    }
+  ]
+}

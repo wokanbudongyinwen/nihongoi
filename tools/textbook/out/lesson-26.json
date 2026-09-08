@@ -1,0 +1,244 @@
+{
+  "planName": "标日初级下 第26课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "大雨",
+      "reading": "おおあめ",
+      "meaning": "大雨",
+      "pos": "名词"
+    },
+    {
+      "term": "桜",
+      "reading": "さくら",
+      "meaning": "樱花",
+      "pos": "名词"
+    },
+    {
+      "term": "風",
+      "reading": "かぜ",
+      "meaning": "风",
+      "pos": "名词"
+    },
+    {
+      "term": "月",
+      "reading": "つき",
+      "meaning": "月亮",
+      "pos": "名词"
+    },
+    {
+      "term": "表",
+      "reading": "ひょう",
+      "meaning": "表",
+      "pos": "名词"
+    },
+    {
+      "term": "握手",
+      "reading": "あくしゅ",
+      "meaning": "握手",
+      "pos": "名词"
+    },
+    {
+      "term": "習慣",
+      "reading": "しゅうかん",
+      "meaning": "习惯",
+      "pos": "名词"
+    },
+    {
+      "term": "お辞儀",
+      "reading": "おじぎ",
+      "meaning": "鞠躬",
+      "pos": "名词"
+    },
+    {
+      "term": "あいさつ",
+      "reading": "あいさつ",
+      "meaning": "寒暄",
+      "pos": "名词"
+    },
+    {
+      "term": "手",
+      "reading": "て",
+      "meaning": "手",
+      "pos": "名词"
+    },
+    {
+      "term": "お客さん",
+      "reading": "おきゃくさん",
+      "meaning": "顾客，客人",
+      "pos": "名词"
+    },
+    {
+      "term": "普通",
+      "reading": "ふつう",
+      "meaning": "一般，普通",
+      "pos": "名词"
+    },
+    {
+      "term": "次",
+      "reading": "つぎ",
+      "meaning": "这回，下面，下回",
+      "pos": "名词"
+    },
+    {
+      "term": "スーパー",
+      "reading": "スーパー",
+      "meaning": "超市",
+      "pos": "名词"
+    },
+    {
+      "term": "料金",
+      "reading": "りょうきん",
+      "meaning": "费用",
+      "pos": "名词"
+    },
+    {
+      "term": "会費",
+      "reading": "かいひ",
+      "meaning": "会费",
+      "pos": "名词"
+    },
+    {
+      "term": "バーゲン",
+      "reading": "バーゲン",
+      "meaning": "降价出售",
+      "pos": "名词"
+    },
+    {
+      "term": "クレジットカード",
+      "reading": "クレジットカード",
+      "meaning": "信用卡",
+      "pos": "名词"
+    },
+    {
+      "term": "色鉛筆",
+      "reading": "いろえんぴつ",
+      "meaning": "彩色铅笔",
+      "pos": "名词"
+    },
+    {
+      "term": "豊作",
+      "reading": "ほうさく",
+      "meaning": "丰收",
+      "pos": "名词"
+    },
+    {
+      "term": "仲",
+      "reading": "なか",
+      "meaning": "关系，友情，友谊",
+      "pos": "名词"
+    },
+    {
+      "term": "忘れ物",
+      "reading": "わすれもの",
+      "meaning": "忘记的东西，遗忘的物品",
+      "pos": "名词"
+    },
+    {
+      "term": "防ぐ",
+      "reading": "ふせぐ",
+      "meaning": "防御，防备，防守",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "回る",
+      "reading": "まわる",
+      "meaning": "走访；转；绕弯",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "走る",
+      "reading": "はしる",
+      "meaning": "跑，奔跑",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "吹く",
+      "reading": "ふく",
+      "meaning": "吹",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "挙げる",
+      "reading": "あげる",
+      "meaning": "举，举起",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "足りる",
+      "reading": "たりる",
+      "meaning": "足，够",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "スケッチ",
+      "reading": "スケッチ",
+      "meaning": "素描，写生",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "発言",
+      "reading": "はつげん",
+      "meaning": "发言",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "優勝",
+      "reading": "ゆうしょう",
+      "meaning": "得冠军",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "合格",
+      "reading": "ごうかく",
+      "meaning": "及格，合格",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "約束",
+      "reading": "やくそく",
+      "meaning": "约定",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "もしかしたら",
+      "reading": "もしかしたら",
+      "meaning": "也许",
+      "pos": "副词"
+    },
+    {
+      "term": "つい",
+      "reading": "つい",
+      "meaning": "不知不觉地，无意中",
+      "pos": "副词"
+    },
+    {
+      "term": "すぐに",
+      "reading": "すぐに",
+      "meaning": "就要，立刻，马上",
+      "pos": "副词"
+    },
+    {
+      "term": "ほとんど",
+      "reading": "ほとんど",
+      "meaning": "大部分，几乎",
+      "pos": "副词"
+    },
+    {
+      "term": "それで",
+      "reading": "それで",
+      "meaning": "因此",
+      "pos": "接续词"
+    },
+    {
+      "term": "あいさつ回り",
+      "reading": "あいさつまわり",
+      "meaning": "寒暄拜访"
+    },
+    {
+      "term": "いけない",
+      "reading": "いけない",
+      "meaning": "不行，不好，不可以"
+    }
+  ]
+}

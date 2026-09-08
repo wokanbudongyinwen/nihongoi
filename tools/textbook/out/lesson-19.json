@@ -1,0 +1,240 @@
+{
+  "planName": "标日初级上 第19课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "品物",
+      "reading": "しなもの",
+      "meaning": "物品，　商品",
+      "pos": "名词"
+    },
+    {
+      "term": "お皿",
+      "reading": "おさら",
+      "meaning": "盘子",
+      "pos": "名词"
+    },
+    {
+      "term": "ごみ",
+      "reading": "ごみ",
+      "meaning": "垃圾",
+      "pos": "名词"
+    },
+    {
+      "term": "初心者",
+      "reading": "しょしんしゃ",
+      "meaning": "初学者",
+      "pos": "名词"
+    },
+    {
+      "term": "上級者",
+      "reading": "じょうきゅうしゃ",
+      "meaning": "熟练者",
+      "pos": "名词"
+    },
+    {
+      "term": "高級",
+      "reading": "こうきゅう",
+      "meaning": "高级",
+      "pos": "名词"
+    },
+    {
+      "term": "上級～",
+      "reading": "じょうきゅうクラス",
+      "meaning": "高级班",
+      "pos": "名词"
+    },
+    {
+      "term": "英会話",
+      "reading": "えいかいわ",
+      "meaning": "英语会话",
+      "pos": "名词"
+    },
+    {
+      "term": "コース",
+      "reading": "コース",
+      "meaning": "路线，滑道",
+      "pos": "名词"
+    },
+    {
+      "term": "スキー",
+      "reading": "スキー",
+      "meaning": "滑雪",
+      "pos": "名词"
+    },
+    {
+      "term": "レポート",
+      "reading": "レポート",
+      "meaning": "报告",
+      "pos": "名词"
+    },
+    {
+      "term": "パスポート",
+      "reading": "パスポート",
+      "meaning": "护照",
+      "pos": "名词"
+    },
+    {
+      "term": "のど",
+      "reading": "のど",
+      "meaning": "喉咙",
+      "pos": "名词"
+    },
+    {
+      "term": "触る",
+      "reading": "さわる",
+      "meaning": "触，碰",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "脱ぐ",
+      "reading": "ぬぐ",
+      "meaning": "脱",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "転ぶ",
+      "reading": "ころぶ",
+      "meaning": "摔，摔倒，跌倒",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "渇く",
+      "reading": "かわく",
+      "meaning": "渴",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "治る",
+      "reading": "なおる",
+      "meaning": "痊愈，医好",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "滑る",
+      "reading": "すべる",
+      "meaning": "滑，滑行",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "呼ぶ",
+      "reading": "よぶ",
+      "meaning": "呼喊",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "返す",
+      "reading": "かえす",
+      "meaning": "归还",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "手伝う",
+      "reading": "てつだう",
+      "meaning": "帮忙",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "運ぶ",
+      "reading": "はこぶ",
+      "meaning": "搬运",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "なくす",
+      "reading": "なくす",
+      "meaning": "丢，丢失",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "落とす",
+      "reading": "おとす",
+      "meaning": "掉，使落下",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "置く",
+      "reading": "おく",
+      "meaning": "放置",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "払う",
+      "reading": "はらう",
+      "meaning": "支付",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "立つ",
+      "reading": "たつ",
+      "meaning": "站，立",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "忘れる",
+      "reading": "わすれる",
+      "meaning": "忘记",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "慌てる",
+      "reading": "あわてる",
+      "meaning": "惊慌，慌张，着急",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "捨てる",
+      "reading": "すてる",
+      "meaning": "扔，扔掉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "残業",
+      "reading": "ざんぎょう",
+      "meaning": "加班",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "心配",
+      "reading": "しんぱい",
+      "meaning": "担心",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "本当",
+      "reading": "ほんとう",
+      "meaning": "真的，真正",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "早く",
+      "reading": "はやく",
+      "meaning": "早点儿",
+      "pos": "副词"
+    },
+    {
+      "term": "やっと",
+      "reading": "やっと",
+      "meaning": "好不容易，终于",
+      "pos": "副词"
+    },
+    {
+      "term": "だいぶ",
+      "reading": "だいぶ",
+      "meaning": "很，相当地",
+      "pos": "副词"
+    },
+    {
+      "term": "初めて",
+      "reading": "はじめて",
+      "meaning": "第一次",
+      "pos": "副词"
+    },
+    {
+      "term": "先に",
+      "reading": "さきに",
+      "meaning": "先",
+      "pos": "副词"
+    }
+  ]
+}

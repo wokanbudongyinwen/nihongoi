@@ -24,6 +24,9 @@
           <text class="label">进度</text>
           <text class="value">{{ learned }} / {{ entries.length }} 已学</text>
         </view>
+        <view class="neo-card-sm activate-btn pressable" hover-class="press" @click="doActivate" v-if="!isActive">
+          <text class="activate-text">设为激活计划</text>
+        </view>
         <view class="neo-card-sm save-btn pressable" hover-class="press" @click="doSave">
           <text class="save-text">保存参数</text>
         </view>
@@ -32,6 +35,9 @@
         </view>
         <view class="neo-card-sm audio-btn" v-if="audioDownloading">
           <text class="audio-text">音频下载中 {{ audioDone }} / {{ audioTotal }}…</text>
+        </view>
+        <view class="neo-card-sm delete-btn pressable" hover-class="press" @click="doDeletePlan">
+          <text class="delete-text">删除计划</text>
         </view>
       </view>
 
@@ -42,11 +48,15 @@
           <text class="manage-toggle pressable-soft" hover-class="press-soft" @click="toggleManage">{{ manageMode ? '完成' : '管理状态' }}</text>
         </view>
         <input class="search" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onSearch" />
-        <view class="chips">
-          <text class="chip" :class="filterMode == -1 ? 'chip-on' : ''" @click="setFilter(-1)">全部</text>
-          <text class="chip" :class="filterMode == 0 ? 'chip-on' : ''" @click="setFilter(0)">未学习</text>
-          <text class="chip" :class="filterMode == 1 ? 'chip-on' : ''" @click="setFilter(1)">学习中</text>
-          <text class="chip" :class="filterMode == 2 ? 'chip-on' : ''" @click="setFilter(2)">已掌握</text>
+        <view class="filter-row">
+          <view class="filter-item">
+            <text class="filter-label">状态</text>
+            <text class="filter-value pressable-soft" hover-class="press-soft" @click="onStatusTap">{{ statusOptions[statusIdx] }} ▾</text>
+          </view>
+          <view class="filter-item">
+            <text class="filter-label">档位</text>
+            <text class="filter-value pressable-soft" hover-class="press-soft" @click="onPrTap">{{ prOptions[prIdx] }} ▾</text>
+          </view>
         </view>
         <text class="pr-hint">档位：①一次即会（一次记得即掌握）②两次即会 ③常规 · 点行内档位标签切换</text>
         <view class="select-tools" v-if="manageMode">
@@ -60,13 +70,14 @@
           <text class="pr-chip pr-2" @click="doSetPriority(2)">② 两次即会</text>
           <text class="pr-chip pr-3" @click="doSetPriority(3)">③ 常规</text>
         </view>
-        <view class="word-row pressable-soft" hover-class="press-soft" v-for="(e, i) in visibleList" :key="e.word.id">
-          <view class="check" :class="isSelected(e.word.id) ? 'check-on' : ''" v-if="manageMode" @click="toggleSelect(e)">
+        <!-- 整行点击：管理模式=勾选/取消（圆点只是状态展示），非管理模式=进词卡；档位标签 stop 防误触 -->
+        <view class="word-row pressable-soft" hover-class="press-soft" v-for="(e, i) in visibleList" :key="e.word.id" @click="onRowClick(e)">
+          <view class="check" :class="isSelected(e.word.id) ? 'check-on' : ''" v-if="manageMode">
             <text class="check-icon" v-if="isSelected(e.word.id)">✓</text>
           </view>
           <text class="word-no">{{ i + 1 }}</text>
-          <text class="pr-chip" :class="prClass(e.priority)" @click="cyclePriority(e)">{{ prText(e.priority) }}</text>
-          <view class="word-main" @click="onRowClick(e)">
+          <text class="pr-chip" :class="prClass(e.priority)" @click.stop="cyclePriority(e)">{{ prText(e.priority) }}</text>
+          <view class="word-main">
             <view class="word-line">
               <text class="word-term">{{ e.word.term }}</text>
               <text class="word-reading">{{ e.word.reading }}</text>
@@ -92,6 +103,9 @@
       <view class="neo-card-sm manage-btn manage-reset pressable" hover-class="press" @click="doResetNew">
         <text class="manage-btn-text">恢复未学习</text>
       </view>
+      <view class="neo-card-sm manage-btn manage-del pressable" hover-class="press" @click="doRemoveWords">
+        <text class="manage-btn-text">从计划移除</text>
+      </view>
     </view>
   </view>
 </template>
@@ -110,7 +124,11 @@
   const cycleText = ref('1 · 2 · 4 天')
   const learned = ref(0)
   const keyword = ref('')
-  const filterMode = ref(-1) // -1 全部 / 0 未学习 / 1 学习中 / 2 已掌握
+  // 复合筛选：状态下拉（0 全部/1 未学习/2 学习中/3 已掌握）+ 档位下拉（0 全部/1①/2②/3③）
+  const statusIdx = ref(0)
+  const prIdx = ref(0)
+  const statusOptions: Array<string> = ['全部状态', '未学习', '学习中', '已掌握']
+  const prOptions: Array<string> = ['全部档位', '① 一次即会', '② 两次即会', '③ 常规']
   const entries = ref<Array<PlanWordEntry>>([])
   const filtered = ref<Array<PlanWordEntry>>([])
 
@@ -196,14 +214,18 @@
     return 'status-learning'
   }
 
-  // 关键词 + 状态筛选（内存过滤，词单量级小），渲染层只取前 renderCount 条
+  // 关键词 + 状态 + 档位复合筛选（内存过滤，词单量级小），渲染层只取前 renderCount 条
   const applyFilter = () => {
     const kw = keyword.value
-    const mode = filterMode.value
+    const statusGroupFilter = statusIdx.value - 1 // -1=不过滤
+    const prFilter = prIdx.value                  // 0=不过滤
     const list: Array<PlanWordEntry> = []
     for (let i = 0; i < entries.value.length; i++) {
       const e = entries.value[i]
-      if (mode >= 0 && statusGroup(e.status) != mode) {
+      if (statusGroupFilter >= 0 && statusGroup(e.status) != statusGroupFilter) {
+        continue
+      }
+      if (prFilter > 0 && e.priority != prFilter) {
         continue
       }
       if (kw.length > 0 && e.word.term.indexOf(kw) < 0 && e.word.reading.indexOf(kw) < 0 && e.word.romaji.indexOf(kw) < 0 && e.word.meaning.indexOf(kw) < 0) {
@@ -221,9 +243,25 @@
     applyFilter()
   }
 
-  const setFilter = (mode: number) => {
-    filterMode.value = mode
-    applyFilter()
+  // 下拉筛选：点击胶囊弹 ActionSheet 选择（picker 组件事件类型在 uts 不可用，见踩坑记录）
+  const onStatusTap = () => {
+    uni.showActionSheet({
+      itemList: statusOptions,
+      success: (res) => {
+        statusIdx.value = res.tapIndex
+        applyFilter()
+      }
+    })
+  }
+
+  const onPrTap = () => {
+    uni.showActionSheet({
+      itemList: prOptions,
+      success: (res) => {
+        prIdx.value = res.tapIndex
+        applyFilter()
+      }
+    })
   }
 
   const load = async (id: number) => {
@@ -283,6 +321,25 @@
     } catch (e) {
       console.error('计划参数保存失败', e)
       uni.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }
+
+  // 激活切换：同一时间仅一个计划激活，激活本计划即暂停旧计划（今日新词/首页统计随之切换）
+  const doActivate = async () => {
+    if (planId <= 0) {
+      return
+    }
+    try {
+      const ok = await getPlanRepo().activatePlan(planId)
+      if (ok) {
+        isActive.value = true
+        uni.showToast({ title: '已激活', icon: 'success' })
+      } else {
+        uni.showToast({ title: '激活失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('计划激活失败', e)
+      uni.showToast({ title: '激活失败', icon: 'none' })
     }
   }
 
@@ -488,6 +545,76 @@
     })
   }
 
+  // 从计划移除所选词（词库词条保留，只解除计划引用；学习状态/复习记录一并清理防止孤儿到期）
+  const doRemoveWordsRun = async () => {
+    const ids = selectedIds.value
+    if (ids.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    try {
+      const ok = await getPlanRepo().removePlanItems(planId, ids)
+      if (ok) {
+        uni.showToast({ title: '已从计划移除 ' + ids.length + ' 词', icon: 'none' })
+        manageMode.value = false
+        load(planId)
+      } else {
+        uni.showToast({ title: '操作失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('从计划移除失败', e)
+      uni.showToast({ title: '操作失败', icon: 'none' })
+    }
+  }
+
+  const doRemoveWords = () => {
+    if (selectedIds.value.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    uni.showModal({
+      title: '从计划移除',
+      content: '将 ' + selectedIds.value.length + ' 个词移出本计划（学习状态与复习记录一并移除；词库词条、例句、笔记、关联保留），确定？',
+      success: (res) => {
+        if (res.confirm) {
+          doRemoveWordsRun()
+        }
+      }
+    })
+  }
+
+  // 删除整个计划（词库词条保留）
+  const doDeletePlanRun = async () => {
+    try {
+      const ok = await getPlanRepo().deletePlan(planId)
+      if (ok) {
+        uni.showToast({ title: '计划已删除', icon: 'success' })
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 600)
+      } else {
+        uni.showToast({ title: '删除失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('计划删除失败', e)
+      uni.showToast({ title: '删除失败', icon: 'none' })
+    }
+  }
+
+  const doDeletePlan = () => {
+    uni.showModal({
+      title: '删除计划',
+      content: '将删除「' + name.value + '」及其全部词单、学习状态与复习记录（词库词条保留，可重新建计划引用），确定？',
+      confirmText: '删除',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          doDeletePlanRun()
+        }
+      }
+    })
+  }
+
   // ---------- 音频预下载 ----------
 
   const audioDownloading = ref(false)
@@ -594,6 +721,18 @@
     padding: 10rpx 20rpx;
     font-size: 28rpx;
   }
+  .activate-btn {
+    margin-top: 20rpx;
+    background-color: $n-green;
+    border-width: 0rpx;
+    padding: 18rpx 0;
+    align-items: center;
+  }
+  .activate-text {
+    color: $n-ink;
+    font-size: 28rpx;
+    font-weight: bold;
+  }
   .save-btn {
     margin-top: 20rpx;
     background-color: $n-yellow;
@@ -614,6 +753,18 @@
   .audio-text {
     color: $n-ink;
     font-size: 26rpx;
+    font-weight: 500;
+  }
+  .delete-btn {
+    margin-top: 16rpx;
+    background-color: $n-red;
+    border-width: 0rpx;
+    padding: 18rpx 0;
+    align-items: center;
+  }
+  .delete-text {
+    color: $n-ink;
+    font-size: 28rpx;
     font-weight: bold;
   }
   .word-row {
@@ -678,11 +829,24 @@
     font-size: 26rpx;
     margin-bottom: 16rpx;
   }
-  .chips {
+  .filter-row {
     flex-direction: row;
-    margin-bottom: 20rpx;
+    align-items: center;
+    margin: 16rpx 0 4rpx;
   }
-  .chip {
+  .filter-item {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 32rpx;
+  }
+  .filter-label {
+    font-size: 24rpx;
+    color: $n-text2;
+    font-family: monospace;
+    letter-spacing: 1rpx;
+    margin-right: 12rpx;
+  }
+  .filter-value {
     font-size: 24rpx;
     color: $n-ink;
     background-color: $n-cream;
@@ -691,12 +855,6 @@
     border-color: $a-line;
     border-radius: 999rpx;
     padding: 8rpx 24rpx;
-    margin-right: 16rpx;
-  }
-  .chip-on {
-    color: $n-ink;
-    background-color: $n-yellow;
-    font-weight: bold;
   }
   .status {
     font-size: 20rpx;
@@ -810,6 +968,9 @@
   }
   .manage-reset {
     background-color: $n-yellow;
+  }
+  .manage-del {
+    background-color: $n-red;
   }
   .manage-btn-text {
     color: $n-ink;

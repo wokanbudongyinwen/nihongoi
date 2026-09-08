@@ -1,0 +1,191 @@
+{
+  "planName": "标日初级下 第30课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "宅配便",
+      "reading": "たくはいびん",
+      "meaning": "送货上门服务",
+      "pos": "名词"
+    },
+    {
+      "term": "報告書",
+      "reading": "ほうこくしょ",
+      "meaning": "报告书",
+      "pos": "名词"
+    },
+    {
+      "term": "梅雨",
+      "reading": "つゆ",
+      "meaning": "梅雨",
+      "pos": "名词"
+    },
+    {
+      "term": "秋",
+      "reading": "あき",
+      "meaning": "秋天，秋季",
+      "pos": "名词"
+    },
+    {
+      "term": "ピクニック",
+      "reading": "ピクニック",
+      "meaning": "郊游",
+      "pos": "名词"
+    },
+    {
+      "term": "行楽地",
+      "reading": "こうらくち",
+      "meaning": "景点，游览地",
+      "pos": "名词"
+    },
+    {
+      "term": "ピザ",
+      "reading": "ピザ",
+      "meaning": "比萨饼",
+      "pos": "名词"
+    },
+    {
+      "term": "終電",
+      "reading": "しゅうでん",
+      "meaning": "未班电车",
+      "pos": "名词"
+    },
+    {
+      "term": "待合室",
+      "reading": "まちあいしつ",
+      "meaning": "候诊室，等候室",
+      "pos": "名词"
+    },
+    {
+      "term": "患者",
+      "reading": "かんじゃ",
+      "meaning": "病人，患者",
+      "pos": "名词"
+    },
+    {
+      "term": "灰皿",
+      "reading": "はいざら",
+      "meaning": "烟灰缸",
+      "pos": "名词"
+    },
+    {
+      "term": "吸殻",
+      "reading": "すいがら",
+      "meaning": "烟头，烟灰，烟蒂",
+      "pos": "名词"
+    },
+    {
+      "term": "歯",
+      "reading": "は",
+      "meaning": "牙齿",
+      "pos": "名词"
+    },
+    {
+      "term": "彼",
+      "reading": "かれ",
+      "meaning": "他",
+      "pos": "代词"
+    },
+    {
+      "term": "そろう",
+      "reading": "そろう",
+      "meaning": "到齐，齐全",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "寄る",
+      "reading": "よる",
+      "meaning": "顺便去；靠近",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "開く",
+      "reading": "ひらく",
+      "meaning": "开，开张",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "引っ越す",
+      "reading": "ひっこす",
+      "meaning": "搬迁，搬家",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "迎える",
+      "reading": "むかえる",
+      "meaning": "迎接",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "壊れる",
+      "reading": "こわれる",
+      "meaning": "出故障，坏",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "間違える",
+      "reading": "まちがえる",
+      "meaning": "搞错",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "出発",
+      "reading": "しゅっぱつ",
+      "meaning": "出发",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "転職",
+      "reading": "てんしょく",
+      "meaning": "换工作",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "パンク",
+      "reading": "パンク",
+      "meaning": "轮胎爆裂，撑破",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "寂しい",
+      "reading": "さびしい",
+      "meaning": "寂寞",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "楽しみ",
+      "reading": "たのしみ",
+      "meaning": "愉快，期待",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "特別",
+      "reading": "とくべつ",
+      "meaning": "特别",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "それでは",
+      "reading": "それでは",
+      "meaning": "那么",
+      "pos": "接续词"
+    },
+    {
+      "term": "そうか",
+      "reading": "そうか",
+      "meaning": "是吗",
+      "pos": "叹词"
+    },
+    {
+      "term": "まあ",
+      "reading": "まあ",
+      "meaning": "嗯，嘿，哎哟",
+      "pos": "叹词"
+    },
+    {
+      "term": "仕方ない",
+      "reading": "しかたない",
+      "meaning": "没有办法"
+    }
+  ]
+}

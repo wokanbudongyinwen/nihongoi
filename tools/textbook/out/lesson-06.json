@@ -1,0 +1,254 @@
+{
+  "planName": "标日初级上 第6课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "来月",
+      "reading": "らいげつ",
+      "meaning": "下个月",
+      "pos": "名词"
+    },
+    {
+      "term": "先月",
+      "reading": "せんげつ",
+      "meaning": "上个月",
+      "pos": "名词"
+    },
+    {
+      "term": "夜中",
+      "reading": "よなか",
+      "meaning": "午夜，半夜",
+      "pos": "名词"
+    },
+    {
+      "term": "ゆうべ",
+      "reading": "ゆうべ",
+      "meaning": "昨天晚上",
+      "pos": "名词"
+    },
+    {
+      "term": "コンサート",
+      "reading": "コンサート",
+      "meaning": "音乐会",
+      "pos": "名词"
+    },
+    {
+      "term": "クリスマス",
+      "reading": "クリスマス",
+      "meaning": "圣诞节",
+      "pos": "名词"
+    },
+    {
+      "term": "誕生日",
+      "reading": "たんじょうび",
+      "meaning": "生日",
+      "pos": "名词"
+    },
+    {
+      "term": "こどもの日",
+      "reading": "こどものひ",
+      "meaning": "儿童节",
+      "pos": "名词"
+    },
+    {
+      "term": "夏休み",
+      "reading": "なつやすみ",
+      "meaning": "暑假",
+      "pos": "名词"
+    },
+    {
+      "term": "交通機関",
+      "reading": "こうつうきかん",
+      "meaning": "交通工具",
+      "pos": "名词"
+    },
+    {
+      "term": "新幹線",
+      "reading": "しんかんせん",
+      "meaning": "新干线",
+      "pos": "名词"
+    },
+    {
+      "term": "飛行機",
+      "reading": "ひこうき",
+      "meaning": "飞机",
+      "pos": "名词"
+    },
+    {
+      "term": "フェリー",
+      "reading": "フェリー",
+      "meaning": "渡轮",
+      "pos": "名词"
+    },
+    {
+      "term": "電車",
+      "reading": "でんしゃ",
+      "meaning": "电车",
+      "pos": "名词"
+    },
+    {
+      "term": "バス",
+      "reading": "バス",
+      "meaning": "公共汽车",
+      "pos": "名词"
+    },
+    {
+      "term": "タクシー",
+      "reading": "タクシー",
+      "meaning": "出租车",
+      "pos": "名词"
+    },
+    {
+      "term": "美術館",
+      "reading": "びじゅつかん",
+      "meaning": "美术馆",
+      "pos": "名词"
+    },
+    {
+      "term": "アパート",
+      "reading": "アパート",
+      "meaning": "公寓",
+      "pos": "名词"
+    },
+    {
+      "term": "うち",
+      "reading": "うち",
+      "meaning": "家",
+      "pos": "名词"
+    },
+    {
+      "term": "プール",
+      "reading": "プール",
+      "meaning": "游泳池",
+      "pos": "名词"
+    },
+    {
+      "term": "友達",
+      "reading": "ともだち",
+      "meaning": "朋友",
+      "pos": "名词"
+    },
+    {
+      "term": "弟",
+      "reading": "おとうと",
+      "meaning": "弟弟",
+      "pos": "名词"
+    },
+    {
+      "term": "行く",
+      "reading": "いく",
+      "meaning": "去",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "帰る",
+      "reading": "かえる",
+      "meaning": "回来，回去",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "来る",
+      "reading": "くる",
+      "meaning": "来",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "たしか",
+      "reading": "たしか",
+      "meaning": "好像是，大概；的确",
+      "pos": "副词"
+    },
+    {
+      "term": "まっすぐ",
+      "reading": "まっすぐ",
+      "meaning": "径直，笔直",
+      "pos": "副词"
+    },
+    {
+      "term": "いっしょに",
+      "reading": "いっしょに",
+      "meaning": "一起",
+      "pos": "副词"
+    },
+    {
+      "term": "佐藤",
+      "reading": "さとう",
+      "meaning": "佐藤",
+      "pos": "专有名词"
+    },
+    {
+      "term": "北京",
+      "reading": "ペキン",
+      "meaning": "北京",
+      "pos": "专有名词"
+    },
+    {
+      "term": "アメリカ",
+      "reading": "アメリカ",
+      "meaning": "美国",
+      "pos": "专有名词"
+    },
+    {
+      "term": "韓国",
+      "reading": "かんこく",
+      "meaning": "韩国",
+      "pos": "专有名词"
+    },
+    {
+      "term": "フランス",
+      "reading": "フランス",
+      "meaning": "法国",
+      "pos": "专有名词"
+    },
+    {
+      "term": "広島",
+      "reading": "ひろしま",
+      "meaning": "广岛",
+      "pos": "专有名词"
+    },
+    {
+      "term": "京都",
+      "reading": "きょうと",
+      "meaning": "京都",
+      "pos": "专有名词"
+    },
+    {
+      "term": "北海道",
+      "reading": "ほっかいどう",
+      "meaning": "北海道",
+      "pos": "专有名词"
+    },
+    {
+      "term": "銀座",
+      "reading": "ぎんざ",
+      "meaning": "银座",
+      "pos": "专有名词"
+    },
+    {
+      "term": "渋谷",
+      "reading": "しぶや",
+      "meaning": "涩谷",
+      "pos": "专有名词"
+    },
+    {
+      "term": "お疲れ様でした",
+      "reading": "おつかれさまでした",
+      "meaning": "够累的"
+    },
+    {
+      "term": "お先に失礼します",
+      "reading": "おさきにしつれいします",
+      "meaning": "我先走了，我先告辞了"
+    },
+    {
+      "term": "歩いて",
+      "reading": "あるいて",
+      "meaning": "步行"
+    },
+    {
+      "term": "大変ですね",
+      "reading": "たいへんですね",
+      "meaning": "真不容易，够受的，不得了"
+    }
+  ]
+}

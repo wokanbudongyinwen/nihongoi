@@ -1,0 +1,413 @@
+{
+  "planName": "标日初级上 第9课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "料理",
+      "reading": "りょうり",
+      "meaning": "菜肴，饭菜",
+      "pos": "名词"
+    },
+    {
+      "term": "四川料理",
+      "reading": "しせんりょうり",
+      "meaning": "四川菜",
+      "pos": "名词"
+    },
+    {
+      "term": "スープ",
+      "reading": "スープ",
+      "meaning": "汤",
+      "pos": "名词"
+    },
+    {
+      "term": "北京～",
+      "reading": "ペキンダック",
+      "meaning": "北京烤鸭",
+      "pos": "名词"
+    },
+    {
+      "term": "食べ物",
+      "reading": "たべもの",
+      "meaning": "食物，食品",
+      "pos": "名词"
+    },
+    {
+      "term": "すき焼き",
+      "reading": "すきやき",
+      "meaning": "日式牛肉火锅",
+      "pos": "名词"
+    },
+    {
+      "term": "温泉",
+      "reading": "おんせん",
+      "meaning": "温泉",
+      "pos": "名词"
+    },
+    {
+      "term": "お湯",
+      "reading": "おゆ",
+      "meaning": "热水，开水",
+      "pos": "名词"
+    },
+    {
+      "term": "水",
+      "reading": "みず",
+      "meaning": "水，凉水",
+      "pos": "名词"
+    },
+    {
+      "term": "浴衣",
+      "reading": "ゆかた",
+      "meaning": "浴衣，夏季和服",
+      "pos": "名词"
+    },
+    {
+      "term": "眺め",
+      "reading": "ながめ",
+      "meaning": "景色，风景",
+      "pos": "名词"
+    },
+    {
+      "term": "薬",
+      "reading": "くすり",
+      "meaning": "药",
+      "pos": "名词"
+    },
+    {
+      "term": "天気",
+      "reading": "てんき",
+      "meaning": "天气",
+      "pos": "名词"
+    },
+    {
+      "term": "海",
+      "reading": "うみ",
+      "meaning": "大海",
+      "pos": "名词"
+    },
+    {
+      "term": "山",
+      "reading": "やま",
+      "meaning": "山",
+      "pos": "名词"
+    },
+    {
+      "term": "紙",
+      "reading": "かみ",
+      "meaning": "纸",
+      "pos": "名词"
+    },
+    {
+      "term": "ニュース",
+      "reading": "ニュース",
+      "meaning": "新闻",
+      "pos": "名词"
+    },
+    {
+      "term": "女性",
+      "reading": "じょせい",
+      "meaning": "女性",
+      "pos": "名词"
+    },
+    {
+      "term": "お客様",
+      "reading": "おきゃくさま",
+      "meaning": "来宾",
+      "pos": "名词"
+    },
+    {
+      "term": "グラス",
+      "reading": "グラス",
+      "meaning": "玻璃杯",
+      "pos": "名词"
+    },
+    {
+      "term": "歌舞伎",
+      "reading": "かぶき",
+      "meaning": "歌舞伎",
+      "pos": "名词"
+    },
+    {
+      "term": "気持ち",
+      "reading": "きもち",
+      "meaning": "心情",
+      "pos": "名词"
+    },
+    {
+      "term": "たくさん",
+      "reading": "たくさん",
+      "meaning": "很多",
+      "pos": "名词"
+    },
+    {
+      "term": "辛い",
+      "reading": "からい",
+      "meaning": "辣",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "甘い",
+      "reading": "あまい",
+      "meaning": "甜",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "しおからい(塩辛い)／しょっぱい",
+      "reading": "しおからい(塩辛い)／しょっぱい",
+      "meaning": "咸",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "酸っぱい",
+      "reading": "すっぱい",
+      "meaning": "酸",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "苦い",
+      "reading": "にがい",
+      "meaning": "苦",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "おいしい",
+      "reading": "おいしい",
+      "meaning": "好吃，可口",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "まずい",
+      "reading": "まずい",
+      "meaning": "不好吃，难吃",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "熱い",
+      "reading": "あつい",
+      "meaning": "热，烫",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "冷たい",
+      "reading": "つめたい",
+      "meaning": "凉",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "楽しい",
+      "reading": "たのしい",
+      "meaning": "愉快，快乐",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "おもしろい",
+      "reading": "おもしろい",
+      "meaning": "有趣，有意思",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "つまらない",
+      "reading": "つまらない",
+      "meaning": "无聊",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "広い",
+      "reading": "ひろい",
+      "meaning": "广阔，宽敞",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "狭い",
+      "reading": "せまい",
+      "meaning": "狭窄",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "大きい",
+      "reading": "おおきい",
+      "meaning": "大",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "小さい",
+      "reading": "ちいさい",
+      "meaning": "小",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "忙しい",
+      "reading": "いそがしい",
+      "meaning": "忙，忙碌",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "いい",
+      "reading": "いい",
+      "meaning": "好",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "悪い",
+      "reading": "わるい",
+      "meaning": "不好，坏",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "すばらしい",
+      "reading": "すばらしい",
+      "meaning": "极好，绝佳",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "遠い",
+      "reading": "とおい",
+      "meaning": "远",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "近い",
+      "reading": "ちかい",
+      "meaning": "近",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "高い",
+      "reading": "たかい",
+      "meaning": "高，贵",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "低い",
+      "reading": "ひくい",
+      "meaning": "低",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "安い",
+      "reading": "やすい",
+      "meaning": "便宜",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "寒い",
+      "reading": "さむい",
+      "meaning": "寒冷",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "暑い",
+      "reading": "あつい",
+      "meaning": "(天气)热",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "青い",
+      "reading": "あおい",
+      "meaning": "蓝色的",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "白い",
+      "reading": "しろい",
+      "meaning": "白色的",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "新しい",
+      "reading": "あたらしい",
+      "meaning": "新",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "古い",
+      "reading": "ふるい",
+      "meaning": "旧",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "難しい",
+      "reading": "むずかしい",
+      "meaning": "难",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "易しい",
+      "reading": "やさしい",
+      "meaning": "容易",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "多い",
+      "reading": "おおい",
+      "meaning": "多",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "少ない",
+      "reading": "すくない",
+      "meaning": "少",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "かわいい",
+      "reading": "かわいい",
+      "meaning": "可爱",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "本当に",
+      "reading": "ほんとうに",
+      "meaning": "真的，实在是",
+      "pos": "副词"
+    },
+    {
+      "term": "あまり",
+      "reading": "あまり",
+      "meaning": "不(太)～，不很～",
+      "pos": "副词"
+    },
+    {
+      "term": "とても／たいへん",
+      "reading": "とても／たいへん",
+      "meaning": "很，非常",
+      "pos": "副词"
+    },
+    {
+      "term": "すこし(少し)／ちょっと",
+      "reading": "すこし(少し)／ちょっと",
+      "meaning": "一点儿",
+      "pos": "副词"
+    },
+    {
+      "term": "全然",
+      "reading": "ぜんぜん",
+      "meaning": "根本(不)，全然(不)",
+      "pos": "副词"
+    },
+    {
+      "term": "ちょうど",
+      "reading": "ちょうど",
+      "meaning": "正好，恰好",
+      "pos": "副词"
+    },
+    {
+      "term": "あら／あれ",
+      "reading": "あら／あれ",
+      "meaning": "哎呀，咦",
+      "pos": "叹词"
+    },
+    {
+      "term": "ああ",
+      "reading": "ああ",
+      "meaning": "啊",
+      "pos": "叹词"
+    },
+    {
+      "term": "気持ちがいい",
+      "reading": "きもちがいい",
+      "meaning": "感觉舒服，心情愉快"
+    }
+  ]
+}

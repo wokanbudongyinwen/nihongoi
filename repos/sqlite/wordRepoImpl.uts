@@ -23,6 +23,21 @@ function likeEscape(kw: string): string {
   return kw.split('\\').join('\\\\').split('%').join('\\%').split('_').join('\\_')
 }
 
+// 学习状态筛选 → AND 子查询片段（跨计划：EXISTS 任一计划满足状态即命中）
+function stateFilterCond(filter: string): string {
+  if (filter == 'new') {
+    // 未学习 = 不存在「已学过」的 state 行（未建行也是未学）
+    return " AND NOT EXISTS (SELECT 1 FROM word_state s WHERE s.word_id = word.id AND s.status != 'new')"
+  }
+  if (filter == 'learning') {
+    return " AND EXISTS (SELECT 1 FROM word_state s WHERE s.word_id = word.id AND s.status IN ('learning','reviewing'))"
+  }
+  if (filter == 'mastered') {
+    return " AND EXISTS (SELECT 1 FROM word_state s WHERE s.word_id = word.id AND s.status = 'mastered')"
+  }
+  return ''
+}
+
 function rowToWord(r: Array<string>): Word {
   const w: Word = {
     id: toNum(r[0]),
@@ -124,8 +139,8 @@ class SqliteWordRepo implements WordRepo {
     return list
   }
 
-  // 分页浏览：WHERE 条件同 search（空关键词 = 全库），LIMIT offset, limit
-  async listPage(keyword: string, limit: number, offset: number): Promise<Array<Word>> {
+  // 分页浏览：WHERE 条件同 search（空关键词 = 全库）+ 学习状态筛选，LIMIT offset, limit
+  async listPage(keyword: string, filter: string, limit: number, offset: number): Promise<Array<Word>> {
     let where = ''
     if (keyword.length > 0) {
       const pat = sqlStr('%' + likeEscape(keyword) + '%')
@@ -134,6 +149,13 @@ class SqliteWordRepo implements WordRepo {
         ' OR reading LIKE ' + pat + esc +
         ' OR romaji LIKE ' + pat + esc +
         ' OR meaning LIKE ' + pat + esc
+    }
+    // 关键词 OR 组合需整体括号后再 AND 状态条件
+    const stateCond = stateFilterCond(filter)
+    if (stateCond.length > 0) {
+      where = where.length > 0
+        ? ' WHERE (' + where.slice(7) + ')' + stateCond
+        : ' WHERE 1=1' + stateCond
     }
     const rows = await this.client().select(DB_NAME,
       'SELECT ' + WORD_COLS + ' FROM word' + where + ' ORDER BY id LIMIT ' + sqlNum(limit) + ' OFFSET ' + sqlNum(offset))
@@ -144,7 +166,7 @@ class SqliteWordRepo implements WordRepo {
     return list
   }
 
-  async countWords(keyword: string): Promise<number> {
+  async countWords(keyword: string, filter: string): Promise<number> {
     let where = ''
     if (keyword.length > 0) {
       const pat = sqlStr('%' + likeEscape(keyword) + '%')
@@ -153,6 +175,12 @@ class SqliteWordRepo implements WordRepo {
         ' OR reading LIKE ' + pat + esc +
         ' OR romaji LIKE ' + pat + esc +
         ' OR meaning LIKE ' + pat + esc
+    }
+    const stateCond = stateFilterCond(filter)
+    if (stateCond.length > 0) {
+      where = where.length > 0
+        ? ' WHERE (' + where.slice(7) + ')' + stateCond
+        : ' WHERE 1=1' + stateCond
     }
     const rows = await this.client().select(DB_NAME,
       'SELECT COUNT(*) FROM word' + where)

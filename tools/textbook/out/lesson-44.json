@@ -1,0 +1,382 @@
+{
+  "planName": "标日初级下 第44课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "社員旅行",
+      "reading": "しゃいんりょこう",
+      "meaning": "员工旅行",
+      "pos": "名词"
+    },
+    {
+      "term": "新入社員",
+      "reading": "しんにゅうしゃいん",
+      "meaning": "新来的职员",
+      "pos": "名词"
+    },
+    {
+      "term": "会議場",
+      "reading": "かいぎじょう",
+      "meaning": "会场",
+      "pos": "名词"
+    },
+    {
+      "term": "国際会議",
+      "reading": "こくさいかいぎ",
+      "meaning": "国际会议",
+      "pos": "名词"
+    },
+    {
+      "term": "ビアガーデン",
+      "reading": "ビアガーデン",
+      "meaning": "庭院式的啤酒店",
+      "pos": "名词"
+    },
+    {
+      "term": "大型～",
+      "reading": "おおがたスーパー",
+      "meaning": "大型超市",
+      "pos": "名词"
+    },
+    {
+      "term": "湖",
+      "reading": "みずうみ",
+      "meaning": "湖",
+      "pos": "名词"
+    },
+    {
+      "term": "パトカー",
+      "reading": "パトカー",
+      "meaning": "警车，巡逻车",
+      "pos": "名词"
+    },
+    {
+      "term": "サイレン",
+      "reading": "サイレン",
+      "meaning": "警笛，警报器",
+      "pos": "名词"
+    },
+    {
+      "term": "アニメ",
+      "reading": "アニメ",
+      "meaning": "动画片",
+      "pos": "名词"
+    },
+    {
+      "term": "パワー",
+      "reading": "パワー",
+      "meaning": "能力，力量",
+      "pos": "名词"
+    },
+    {
+      "term": "心",
+      "reading": "こころ",
+      "meaning": "心",
+      "pos": "名词"
+    },
+    {
+      "term": "態度",
+      "reading": "たいど",
+      "meaning": "态度",
+      "pos": "名词"
+    },
+    {
+      "term": "性格",
+      "reading": "せいかく",
+      "meaning": "性格",
+      "pos": "名词"
+    },
+    {
+      "term": "評判",
+      "reading": "ひょうばん",
+      "meaning": "评价，评论",
+      "pos": "名词"
+    },
+    {
+      "term": "行列",
+      "reading": "ぎょうれつ",
+      "meaning": "行列，队伍",
+      "pos": "名词"
+    },
+    {
+      "term": "容器",
+      "reading": "ようき",
+      "meaning": "容器",
+      "pos": "名词"
+    },
+    {
+      "term": "内容",
+      "reading": "ないよう",
+      "meaning": "内容",
+      "pos": "名词"
+    },
+    {
+      "term": "売れ行き",
+      "reading": "うれゆき",
+      "meaning": "销路，销售(情况)",
+      "pos": "名词"
+    },
+    {
+      "term": "乗り物",
+      "reading": "のりもの",
+      "meaning": "交通工具",
+      "pos": "名词"
+    },
+    {
+      "term": "汗",
+      "reading": "あせ",
+      "meaning": "汗",
+      "pos": "名词"
+    },
+    {
+      "term": "倍",
+      "reading": "ばい",
+      "meaning": "倍，加倍",
+      "pos": "名词"
+    },
+    {
+      "term": "縦",
+      "reading": "たて",
+      "meaning": "纵，竖",
+      "pos": "名词"
+    },
+    {
+      "term": "中国全土",
+      "reading": "ちゅうごくぜんど",
+      "meaning": "全中国",
+      "pos": "名词"
+    },
+    {
+      "term": "長期予報",
+      "reading": "ちょうきよほう",
+      "meaning": "长期预报",
+      "pos": "名词"
+    },
+    {
+      "term": "笑い",
+      "reading": "わらい",
+      "meaning": "笑",
+      "pos": "名词"
+    },
+    {
+      "term": "暑さ",
+      "reading": "あつさ",
+      "meaning": "暑热，暑气",
+      "pos": "名词"
+    },
+    {
+      "term": "美しさ",
+      "reading": "うつくしさ",
+      "meaning": "美好，美丽程度",
+      "pos": "名词"
+    },
+    {
+      "term": "おもしろさ",
+      "reading": "おもしろさ",
+      "meaning": "趣味，有趣程度",
+      "pos": "名词"
+    },
+    {
+      "term": "大きさ",
+      "reading": "おおきさ",
+      "meaning": "大小",
+      "pos": "名词"
+    },
+    {
+      "term": "高さ",
+      "reading": "たかさ",
+      "meaning": "高度",
+      "pos": "名词"
+    },
+    {
+      "term": "深さ",
+      "reading": "ふかさ",
+      "meaning": "深度",
+      "pos": "名词"
+    },
+    {
+      "term": "長さ",
+      "reading": "ながさ",
+      "meaning": "长度",
+      "pos": "名词"
+    },
+    {
+      "term": "広さ",
+      "reading": "ひろさ",
+      "meaning": "面积",
+      "pos": "名词"
+    },
+    {
+      "term": "太さ",
+      "reading": "ふとさ",
+      "meaning": "粗(度)",
+      "pos": "名词"
+    },
+    {
+      "term": "重さ",
+      "reading": "おもさ",
+      "meaning": "重量",
+      "pos": "名词"
+    },
+    {
+      "term": "厚さ",
+      "reading": "あつさ",
+      "meaning": "厚度",
+      "pos": "名词"
+    },
+    {
+      "term": "速さ",
+      "reading": "はやさ",
+      "meaning": "速度",
+      "pos": "名词"
+    },
+    {
+      "term": "便利さ",
+      "reading": "べんりさ",
+      "meaning": "方便程度",
+      "pos": "名词"
+    },
+    {
+      "term": "複雑さ",
+      "reading": "ふくざつさ",
+      "meaning": "复杂程度",
+      "pos": "名词"
+    },
+    {
+      "term": "おいしさ",
+      "reading": "おいしさ",
+      "meaning": "美味，好吃程度",
+      "pos": "名词"
+    },
+    {
+      "term": "重要さ",
+      "reading": "じゅうようさ",
+      "meaning": "重要性，重要程度",
+      "pos": "名词"
+    },
+    {
+      "term": "甘さ",
+      "reading": "あまさ",
+      "meaning": "甜度",
+      "pos": "名词"
+    },
+    {
+      "term": "広がる",
+      "reading": "ひろがる",
+      "meaning": "蔓延，拓宽",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "戻る",
+      "reading": "もどる",
+      "meaning": "返回，回到",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "驚く",
+      "reading": "おどろく",
+      "meaning": "惊讶，吃惊",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "しゃれる",
+      "reading": "しゃれる",
+      "meaning": "别致，风趣；打扮得漂亮",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "実感",
+      "reading": "じっかん",
+      "meaning": "切实感受，真切感受",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "深い",
+      "reading": "ふかい",
+      "meaning": "深",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "おとなしい",
+      "reading": "おとなしい",
+      "meaning": "温顺，老实",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "恥ずかしい",
+      "reading": "はずかしい",
+      "meaning": "害羞，难为情",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "珍しい",
+      "reading": "めずらしい",
+      "meaning": "珍奇，新奇",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "豪華",
+      "reading": "ごうか",
+      "meaning": "豪华，奢华",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "好調",
+      "reading": "こうちょう",
+      "meaning": "顺利，情况良好",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "控えめ",
+      "reading": "ひかえめ",
+      "meaning": "分量少，节制，控制；拘谨",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "好評",
+      "reading": "こうひょう",
+      "meaning": "好评，称赞",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "大事",
+      "reading": "だいじ",
+      "meaning": "重要，宝贵",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "かなり",
+      "reading": "かなり",
+      "meaning": "颇，相当",
+      "pos": "副词"
+    },
+    {
+      "term": "けっこう",
+      "reading": "けっこう",
+      "meaning": "很，相当",
+      "pos": "副词"
+    },
+    {
+      "term": "琵琶湖",
+      "reading": "びわこ",
+      "meaning": "琵琶湖",
+      "pos": "专有名词"
+    },
+    {
+      "term": "のぞみ",
+      "reading": "のぞみ",
+      "meaning": "“希望号”",
+      "pos": "专有名词"
+    },
+    {
+      "term": "おかげさまで",
+      "reading": "おかげさまで",
+      "meaning": "托您的福"
+    },
+    {
+      "term": "何と言っても",
+      "reading": "なんといっても",
+      "meaning": "首先是，无论如何"
+    }
+  ]
+}

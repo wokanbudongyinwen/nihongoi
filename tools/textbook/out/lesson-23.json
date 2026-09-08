@@ -1,0 +1,120 @@
+{
+  "planName": "标日初级上 第23课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "週末",
+      "reading": "しゅうまつ",
+      "meaning": "周末",
+      "pos": "名词"
+    },
+    {
+      "term": "スケート",
+      "reading": "スケート",
+      "meaning": "滑冰，溜冰",
+      "pos": "名词"
+    },
+    {
+      "term": "味",
+      "reading": "あじ",
+      "meaning": "口味，(食物的)味道",
+      "pos": "名词"
+    },
+    {
+      "term": "毎回",
+      "reading": "まいかい",
+      "meaning": "每次，每回",
+      "pos": "名词"
+    },
+    {
+      "term": "通勤",
+      "reading": "つうきん",
+      "meaning": "上下班，通勤",
+      "pos": "名词"
+    },
+    {
+      "term": "船",
+      "reading": "ふね",
+      "meaning": "船",
+      "pos": "名词"
+    },
+    {
+      "term": "生地",
+      "reading": "きじ",
+      "meaning": "布料，衣料",
+      "pos": "名词"
+    },
+    {
+      "term": "閉店時刻",
+      "reading": "へいてんじこく",
+      "meaning": "关门时间",
+      "pos": "名词"
+    },
+    {
+      "term": "卒業式",
+      "reading": "そつぎょうしき",
+      "meaning": "毕业典礼",
+      "pos": "名词"
+    },
+    {
+      "term": "違う",
+      "reading": "ちがう",
+      "meaning": "不同，不一样",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "込む",
+      "reading": "こむ",
+      "meaning": "拥挤，混杂",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "決まる",
+      "reading": "きまる",
+      "meaning": "定，决定",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "知らせる",
+      "reading": "しらせる",
+      "meaning": "告诉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "確かめる",
+      "reading": "たしかめる",
+      "meaning": "查(看)，弄清",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "濃い",
+      "reading": "こい",
+      "meaning": "(口味)重；浓",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "薄い",
+      "reading": "うすい",
+      "meaning": "(口味)轻；薄",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "はやい早い",
+      "reading": "はやい早い",
+      "meaning": "早",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "遅い",
+      "reading": "おそい",
+      "meaning": "晚；慢",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "たぶん",
+      "reading": "たぶん",
+      "meaning": "可能，大概",
+      "pos": "副词"
+    }
+  ]
+}

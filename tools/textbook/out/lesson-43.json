@@ -1,0 +1,383 @@
+{
+  "planName": "标日初级下 第43课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "お手伝い",
+      "reading": "おてつだい",
+      "meaning": "帮忙，帮助",
+      "pos": "名词"
+    },
+    {
+      "term": "乗り換え",
+      "reading": "のりかえ",
+      "meaning": "换车，换乘",
+      "pos": "名词"
+    },
+    {
+      "term": "考え",
+      "reading": "かんがえ",
+      "meaning": "想法，思想",
+      "pos": "名词"
+    },
+    {
+      "term": "女性向け",
+      "reading": "じょせいむけ",
+      "meaning": "女性专用，专为女性",
+      "pos": "名词"
+    },
+    {
+      "term": "申し出",
+      "reading": "もうしで",
+      "meaning": "申请，提议",
+      "pos": "名词"
+    },
+    {
+      "term": "感じ",
+      "reading": "かんじ",
+      "meaning": "感觉",
+      "pos": "名词"
+    },
+    {
+      "term": "多く",
+      "reading": "おおく",
+      "meaning": "多，多数",
+      "pos": "名词"
+    },
+    {
+      "term": "部下",
+      "reading": "ぶか",
+      "meaning": "部下",
+      "pos": "名词"
+    },
+    {
+      "term": "監督",
+      "reading": "かんとく",
+      "meaning": "教练，领队",
+      "pos": "名词"
+    },
+    {
+      "term": "選手",
+      "reading": "せんしゅ",
+      "meaning": "运动员，选手",
+      "pos": "名词"
+    },
+    {
+      "term": "消費者",
+      "reading": "しょうひしゃ",
+      "meaning": "消费者",
+      "pos": "名词"
+    },
+    {
+      "term": "案内役",
+      "reading": "あんないやく",
+      "meaning": "向导，导游",
+      "pos": "名词"
+    },
+    {
+      "term": "親",
+      "reading": "おや",
+      "meaning": "双亲，父母",
+      "pos": "名词"
+    },
+    {
+      "term": "プレゼンテーション",
+      "reading": "プレゼンテーション",
+      "meaning": "策划方案说明(会)",
+      "pos": "名词"
+    },
+    {
+      "term": "アルファベット",
+      "reading": "アルファベット",
+      "meaning": "英语字母，拉丁字母",
+      "pos": "名词"
+    },
+    {
+      "term": "イメージ",
+      "reading": "イメージ",
+      "meaning": "形象，印象",
+      "pos": "名词"
+    },
+    {
+      "term": "インパクト",
+      "reading": "インパクト",
+      "meaning": "冲击力，力量感",
+      "pos": "名词"
+    },
+    {
+      "term": "ガラス",
+      "reading": "ガラス",
+      "meaning": "玻璃，玻璃杯",
+      "pos": "名词"
+    },
+    {
+      "term": "気分",
+      "reading": "きぶん",
+      "meaning": "(身体)舒适(与否)；情绪",
+      "pos": "名词"
+    },
+    {
+      "term": "親近感",
+      "reading": "しんきんかん",
+      "meaning": "亲切感",
+      "pos": "名词"
+    },
+    {
+      "term": "品質",
+      "reading": "ひんしつ",
+      "meaning": "质量，品质",
+      "pos": "名词"
+    },
+    {
+      "term": "物価",
+      "reading": "ぶっか",
+      "meaning": "物价",
+      "pos": "名词"
+    },
+    {
+      "term": "免税店",
+      "reading": "めんぜいてん",
+      "meaning": "免税店",
+      "pos": "名词"
+    },
+    {
+      "term": "説明書",
+      "reading": "せつめいしょ",
+      "meaning": "说明书",
+      "pos": "名词"
+    },
+    {
+      "term": "塾",
+      "reading": "じゅく",
+      "meaning": "私塾，补习学校",
+      "pos": "名词"
+    },
+    {
+      "term": "例文",
+      "reading": "れいぶん",
+      "meaning": "例句",
+      "pos": "名词"
+    },
+    {
+      "term": "会場",
+      "reading": "かいじょう",
+      "meaning": "会场",
+      "pos": "名词"
+    },
+    {
+      "term": "設備",
+      "reading": "せつび",
+      "meaning": "设备",
+      "pos": "名词"
+    },
+    {
+      "term": "洗濯物",
+      "reading": "せんたくもの",
+      "meaning": "洗的衣服",
+      "pos": "名词"
+    },
+    {
+      "term": "もの",
+      "reading": "もの",
+      "meaning": "东西，事物",
+      "pos": "名词"
+    },
+    {
+      "term": "字",
+      "reading": "じ",
+      "meaning": "字",
+      "pos": "名词"
+    },
+    {
+      "term": "妻",
+      "reading": "つま",
+      "meaning": "妻子",
+      "pos": "名词"
+    },
+    {
+      "term": "我々",
+      "reading": "われわれ",
+      "meaning": "我们",
+      "pos": "代词"
+    },
+    {
+      "term": "引っ張る",
+      "reading": "ひっぱる",
+      "meaning": "拉，拽",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "浮かぶ",
+      "reading": "うかぶ",
+      "meaning": "想起，浮，浮现",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "整う",
+      "reading": "ととのう",
+      "meaning": "齐备，完备",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "乾く",
+      "reading": "かわく",
+      "meaning": "干，干燥",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "暮らす",
+      "reading": "くらす",
+      "meaning": "生活",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "避ける",
+      "reading": "さける",
+      "meaning": "回避，避免",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "売れる",
+      "reading": "うれる",
+      "meaning": "好卖，畅销",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "受ける",
+      "reading": "うける",
+      "meaning": "感受，受到",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "温める",
+      "reading": "あたためる",
+      "meaning": "热，温",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "理解",
+      "reading": "りかい",
+      "meaning": "理解",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "提案",
+      "reading": "ていあん",
+      "meaning": "建议，提案",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "試作",
+      "reading": "しさく",
+      "meaning": "试作，试制",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "経験",
+      "reading": "けいけん",
+      "meaning": "经验，经历",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "暗記",
+      "reading": "あんき",
+      "meaning": "熟记，背诵",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "早退",
+      "reading": "そうたい",
+      "meaning": "早退",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "休職",
+      "reading": "きゅうしょく",
+      "meaning": "(暂时)停职",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "力強い",
+      "reading": "ちからづよい",
+      "meaning": "强有力；心里踏实",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "柔らかい",
+      "reading": "やわらかい",
+      "meaning": "柔软",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "硬い",
+      "reading": "かたい",
+      "meaning": "硬",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "厚い",
+      "reading": "あつい",
+      "meaning": "厚",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "重要",
+      "reading": "じゅうよう",
+      "meaning": "重要",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "単純",
+      "reading": "たんじゅん",
+      "meaning": "单纯",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "理想的",
+      "reading": "りそうてき",
+      "meaning": "理想",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "具体的",
+      "reading": "ぐたいてき",
+      "meaning": "具体",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "斬新",
+      "reading": "ざんしん",
+      "meaning": "新颖，崭新",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "ぐっと",
+      "reading": "ぐっと",
+      "meaning": "更加；用力",
+      "pos": "副词"
+    },
+    {
+      "term": "例えば",
+      "reading": "たとえば",
+      "meaning": "比如，例如",
+      "pos": "副词"
+    },
+    {
+      "term": "しかも",
+      "reading": "しかも",
+      "meaning": "而且",
+      "pos": "接续词"
+    },
+    {
+      "term": "そこで",
+      "reading": "そこで",
+      "meaning": "因此，于是，所以；那么",
+      "pos": "接续词"
+    },
+    {
+      "term": "言うまでもなく",
+      "reading": "いうまでもなく",
+      "meaning": "不言而喻"
+    }
+  ]
+}

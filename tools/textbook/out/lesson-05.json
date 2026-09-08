@@ -1,0 +1,305 @@
+{
+  "planName": "标日初级上 第5课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "今",
+      "reading": "いま",
+      "meaning": "现在",
+      "pos": "名词"
+    },
+    {
+      "term": "先週",
+      "reading": "せんしゅう",
+      "meaning": "上个星期",
+      "pos": "名词"
+    },
+    {
+      "term": "来週",
+      "reading": "らいしゅう",
+      "meaning": "下个星期",
+      "pos": "名词"
+    },
+    {
+      "term": "さ来週",
+      "reading": "さらいしゅう",
+      "meaning": "下下个星期",
+      "pos": "名词"
+    },
+    {
+      "term": "今週",
+      "reading": "こんしゅう",
+      "meaning": "这个星期",
+      "pos": "名词"
+    },
+    {
+      "term": "昨日",
+      "reading": "きのう",
+      "meaning": "昨天",
+      "pos": "名词"
+    },
+    {
+      "term": "明日",
+      "reading": "あした",
+      "meaning": "明天",
+      "pos": "名词"
+    },
+    {
+      "term": "あさって",
+      "reading": "あさって",
+      "meaning": "后天",
+      "pos": "名词"
+    },
+    {
+      "term": "おととい",
+      "reading": "おととい",
+      "meaning": "前天",
+      "pos": "名词"
+    },
+    {
+      "term": "毎日",
+      "reading": "まいにち",
+      "meaning": "每天，每日",
+      "pos": "名词"
+    },
+    {
+      "term": "毎朝",
+      "reading": "まいあさ",
+      "meaning": "每天早晨",
+      "pos": "名词"
+    },
+    {
+      "term": "毎晩",
+      "reading": "まいばん",
+      "meaning": "每天晚上",
+      "pos": "名词"
+    },
+    {
+      "term": "毎週",
+      "reading": "まいしゅう",
+      "meaning": "每个星期",
+      "pos": "名词"
+    },
+    {
+      "term": "午前",
+      "reading": "ごぜん",
+      "meaning": "上午",
+      "pos": "名词"
+    },
+    {
+      "term": "午後",
+      "reading": "ごご",
+      "meaning": "下午",
+      "pos": "名词"
+    },
+    {
+      "term": "日曜日",
+      "reading": "にちようび",
+      "meaning": "星期日",
+      "pos": "名词"
+    },
+    {
+      "term": "月曜日",
+      "reading": "げつようび",
+      "meaning": "星期一",
+      "pos": "名词"
+    },
+    {
+      "term": "火曜日",
+      "reading": "かようび",
+      "meaning": "星期二",
+      "pos": "名词"
+    },
+    {
+      "term": "金曜日",
+      "reading": "きんようび",
+      "meaning": "星期五",
+      "pos": "名词"
+    },
+    {
+      "term": "土曜日",
+      "reading": "どようび",
+      "meaning": "星期六",
+      "pos": "名词"
+    },
+    {
+      "term": "今朝",
+      "reading": "けさ",
+      "meaning": "今天早晨",
+      "pos": "名词"
+    },
+    {
+      "term": "今晩",
+      "reading": "こんばん",
+      "meaning": "今天晚上",
+      "pos": "名词"
+    },
+    {
+      "term": "来年",
+      "reading": "らいねん",
+      "meaning": "明年",
+      "pos": "名词"
+    },
+    {
+      "term": "去年",
+      "reading": "きょねん",
+      "meaning": "去年",
+      "pos": "名词"
+    },
+    {
+      "term": "夜",
+      "reading": "よる",
+      "meaning": "晚上，夜里，夜晚",
+      "pos": "名词"
+    },
+    {
+      "term": "晩",
+      "reading": "ばん",
+      "meaning": "晚上",
+      "pos": "名词"
+    },
+    {
+      "term": "朝",
+      "reading": "あさ",
+      "meaning": "早晨",
+      "pos": "名词"
+    },
+    {
+      "term": "学校",
+      "reading": "がっこう",
+      "meaning": "学校",
+      "pos": "名词"
+    },
+    {
+      "term": "試験",
+      "reading": "しけん",
+      "meaning": "考试",
+      "pos": "名词"
+    },
+    {
+      "term": "仕事",
+      "reading": "しごと",
+      "meaning": "工作",
+      "pos": "名词"
+    },
+    {
+      "term": "遅刻",
+      "reading": "ちこく",
+      "meaning": "迟到",
+      "pos": "名词"
+    },
+    {
+      "term": "休み",
+      "reading": "やすみ",
+      "meaning": "休息",
+      "pos": "名词"
+    },
+    {
+      "term": "出張",
+      "reading": "しゅっちょう",
+      "meaning": "出差",
+      "pos": "名词"
+    },
+    {
+      "term": "研修",
+      "reading": "けんしゅう",
+      "meaning": "进修",
+      "pos": "名词"
+    },
+    {
+      "term": "旅行",
+      "reading": "りょこう",
+      "meaning": "旅行",
+      "pos": "名词"
+    },
+    {
+      "term": "展覧会",
+      "reading": "てんらんかい",
+      "meaning": "展览会",
+      "pos": "名词"
+    },
+    {
+      "term": "歓迎会",
+      "reading": "かんげいかい",
+      "meaning": "欢迎会",
+      "pos": "名词"
+    },
+    {
+      "term": "パーティー",
+      "reading": "パーティー",
+      "meaning": "联欢会",
+      "pos": "名词"
+    },
+    {
+      "term": "お宅",
+      "reading": "おたく",
+      "meaning": "府上，(您)家",
+      "pos": "名词"
+    },
+    {
+      "term": "いつ",
+      "reading": "いつ",
+      "meaning": "什么时候",
+      "pos": "疑问词"
+    },
+    {
+      "term": "休む",
+      "reading": "やすむ",
+      "meaning": "休息",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "働く",
+      "reading": "はたらく",
+      "meaning": "工作",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "始まる",
+      "reading": "はじまる",
+      "meaning": "开始",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "終わる",
+      "reading": "おわる",
+      "meaning": "结束",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "起きる",
+      "reading": "おきる",
+      "meaning": "起床",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "寝る",
+      "reading": "ねる",
+      "meaning": "睡觉",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "勉強",
+      "reading": "べんきょう",
+      "meaning": "学习",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "いつも",
+      "reading": "いつも",
+      "meaning": "经常，总是",
+      "pos": "副词"
+    },
+    {
+      "term": "神戸",
+      "reading": "こうべ",
+      "meaning": "神户",
+      "pos": "专有名词"
+    },
+    {
+      "term": "おはよう",
+      "reading": "おはよう",
+      "meaning": "你早"
+    }
+  ]
+}

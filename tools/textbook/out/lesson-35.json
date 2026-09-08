@@ -1,0 +1,264 @@
+{
+  "planName": "标日初级下 第35课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "マラソンたいかい",
+      "reading": "マラソンたいかい",
+      "meaning": "马拉松大赛",
+      "pos": "名词"
+    },
+    {
+      "term": "ホームパーティー",
+      "reading": "ホームパーティー",
+      "meaning": "家庭聚会",
+      "pos": "名词"
+    },
+    {
+      "term": "ゴーカート",
+      "reading": "ゴーカート",
+      "meaning": "游戏汽车，玩具汽车",
+      "pos": "名词"
+    },
+    {
+      "term": "テレビゲーム",
+      "reading": "テレビゲーム",
+      "meaning": "电子游戏",
+      "pos": "名词"
+    },
+    {
+      "term": "中止",
+      "reading": "ちゅうし",
+      "meaning": "中止，中顿",
+      "pos": "名词"
+    },
+    {
+      "term": "表現",
+      "reading": "ひょうげん",
+      "meaning": "表达，表现",
+      "pos": "名词"
+    },
+    {
+      "term": "反対",
+      "reading": "はんたい",
+      "meaning": "反对",
+      "pos": "名词"
+    },
+    {
+      "term": "営業",
+      "reading": "えいぎょう",
+      "meaning": "营业",
+      "pos": "名词"
+    },
+    {
+      "term": "在庫",
+      "reading": "ざいこ",
+      "meaning": "库存，存货",
+      "pos": "名词"
+    },
+    {
+      "term": "大人",
+      "reading": "おとな",
+      "meaning": "大人，成人",
+      "pos": "名词"
+    },
+    {
+      "term": "おじ",
+      "reading": "おじ",
+      "meaning": "叔叔，伯伯，舅舅",
+      "pos": "名词"
+    },
+    {
+      "term": "小学生",
+      "reading": "しょうがくせい",
+      "meaning": "小学生",
+      "pos": "名词"
+    },
+    {
+      "term": "宇宙飛行士",
+      "reading": "うちゅうひこうし",
+      "meaning": "宇航员",
+      "pos": "名词"
+    },
+    {
+      "term": "カタログ",
+      "reading": "カタログ",
+      "meaning": "目录，商品目录",
+      "pos": "名词"
+    },
+    {
+      "term": "宝くじ",
+      "reading": "たからくじ",
+      "meaning": "彩票",
+      "pos": "名词"
+    },
+    {
+      "term": "成績",
+      "reading": "せいせき",
+      "meaning": "成绩",
+      "pos": "名词"
+    },
+    {
+      "term": "計算",
+      "reading": "けいさん",
+      "meaning": "计算",
+      "pos": "名词"
+    },
+    {
+      "term": "消し～",
+      "reading": "けしゴム",
+      "meaning": "橡皮",
+      "pos": "名词"
+    },
+    {
+      "term": "葉",
+      "reading": "は",
+      "meaning": "叶子",
+      "pos": "名词"
+    },
+    {
+      "term": "ビタミンざい",
+      "reading": "ビタミンざい",
+      "meaning": "维生素片剂",
+      "pos": "名词"
+    },
+    {
+      "term": "中古",
+      "reading": "ちゅうこ",
+      "meaning": "二手货，旧货",
+      "pos": "名词"
+    },
+    {
+      "term": "機会",
+      "reading": "きかい",
+      "meaning": "机会",
+      "pos": "名词"
+    },
+    {
+      "term": "休日",
+      "reading": "きゅうじつ",
+      "meaning": "休息日，假日",
+      "pos": "名词"
+    },
+    {
+      "term": "今回",
+      "reading": "こんかい",
+      "meaning": "这次，这回",
+      "pos": "名词"
+    },
+    {
+      "term": "今月",
+      "reading": "こんげつ",
+      "meaning": "这个月",
+      "pos": "名词"
+    },
+    {
+      "term": "最終点検",
+      "reading": "さいしゅうてんけん",
+      "meaning": "最终检查",
+      "pos": "名词"
+    },
+    {
+      "term": "効く",
+      "reading": "きく",
+      "meaning": "有效，起作用",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "祝う",
+      "reading": "いわう",
+      "meaning": "祝贺",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "当たる",
+      "reading": "あたる",
+      "meaning": "中(彩)，抽中",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "空く",
+      "reading": "あく",
+      "meaning": "空，有空",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "腐る",
+      "reading": "くさる",
+      "meaning": "腐烂，腐败",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "見つける",
+      "reading": "みつける",
+      "meaning": "寻找，看见",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "晴れる",
+      "reading": "はれる",
+      "meaning": "晴朗，天晴",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "訪ねる",
+      "reading": "たずねる",
+      "meaning": "访问，拜访",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "滞在",
+      "reading": "たいざい",
+      "meaning": "停留，滞留",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "休憩",
+      "reading": "きゅうけい",
+      "meaning": "休息",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "参加",
+      "reading": "さんか",
+      "meaning": "参加",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "乾杯",
+      "reading": "かんぱい",
+      "meaning": "干杯",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "変",
+      "reading": "へん",
+      "meaning": "不恰当，奇怪，反常",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "完全",
+      "reading": "かんぜん",
+      "meaning": "充分，完全",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "必要",
+      "reading": "ひつよう",
+      "meaning": "必要，必须",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "だんだん",
+      "reading": "だんだん",
+      "meaning": "渐渐地，逐渐地",
+      "pos": "副词"
+    },
+    {
+      "term": "もし",
+      "reading": "もし",
+      "meaning": "如果，假如",
+      "pos": "副词"
+    }
+  ]
+}

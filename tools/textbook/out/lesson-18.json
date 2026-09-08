@@ -1,0 +1,237 @@
+{
+  "planName": "标日初级上 第18课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "音",
+      "reading": "おと",
+      "meaning": "声音，响声",
+      "pos": "名词"
+    },
+    {
+      "term": "声",
+      "reading": "こえ",
+      "meaning": "声音",
+      "pos": "名词"
+    },
+    {
+      "term": "空気",
+      "reading": "くうき",
+      "meaning": "空气",
+      "pos": "名词"
+    },
+    {
+      "term": "息子",
+      "reading": "むすこ",
+      "meaning": "儿子",
+      "pos": "名词"
+    },
+    {
+      "term": "医者",
+      "reading": "いしゃ",
+      "meaning": "医生",
+      "pos": "名词"
+    },
+    {
+      "term": "お嬢さん",
+      "reading": "おじょうさん",
+      "meaning": "令爱",
+      "pos": "名词"
+    },
+    {
+      "term": "社会人",
+      "reading": "しゃかいじん",
+      "meaning": "社会的一员，成人",
+      "pos": "名词"
+    },
+    {
+      "term": "旅行～",
+      "reading": "りょこうガイド",
+      "meaning": "旅行导游",
+      "pos": "名词"
+    },
+    {
+      "term": "学者",
+      "reading": "がくしゃ",
+      "meaning": "学者",
+      "pos": "名词"
+    },
+    {
+      "term": "パイロット",
+      "reading": "パイロット",
+      "meaning": "飞行员",
+      "pos": "名词"
+    },
+    {
+      "term": "デザイナー",
+      "reading": "デザイナー",
+      "meaning": "设计者，设计家",
+      "pos": "名词"
+    },
+    {
+      "term": "タイムサービス",
+      "reading": "タイムサービス",
+      "meaning": "时段廉价销售",
+      "pos": "名词"
+    },
+    {
+      "term": "新春～",
+      "reading": "しんしゅんセール",
+      "meaning": "新年大甩卖",
+      "pos": "名词"
+    },
+    {
+      "term": "３割引",
+      "reading": "さんわりびき",
+      "meaning": "七折",
+      "pos": "名词"
+    },
+    {
+      "term": "定価",
+      "reading": "ていか",
+      "meaning": "定价",
+      "pos": "名词"
+    },
+    {
+      "term": "半額",
+      "reading": "はんがく",
+      "meaning": "半价",
+      "pos": "名词"
+    },
+    {
+      "term": "値段",
+      "reading": "ねだん",
+      "meaning": "价格",
+      "pos": "名词"
+    },
+    {
+      "term": "シャツ",
+      "reading": "シャツ",
+      "meaning": "衬衫",
+      "pos": "名词"
+    },
+    {
+      "term": "スカート",
+      "reading": "スカート",
+      "meaning": "裙子",
+      "pos": "名词"
+    },
+    {
+      "term": "色",
+      "reading": "いろ",
+      "meaning": "颜色",
+      "pos": "名词"
+    },
+    {
+      "term": "赤",
+      "reading": "あか",
+      "meaning": "红色",
+      "pos": "名词"
+    },
+    {
+      "term": "青",
+      "reading": "あお",
+      "meaning": "蓝色",
+      "pos": "名词"
+    },
+    {
+      "term": "お正月",
+      "reading": "おしょうがつ",
+      "meaning": "过年，新年",
+      "pos": "名词"
+    },
+    {
+      "term": "時間",
+      "reading": "じかん",
+      "meaning": "时间",
+      "pos": "名词"
+    },
+    {
+      "term": "将来",
+      "reading": "しょうらい",
+      "meaning": "将来",
+      "pos": "名词"
+    },
+    {
+      "term": "準備",
+      "reading": "じゅんび",
+      "meaning": "准备",
+      "pos": "名词"
+    },
+    {
+      "term": "病気",
+      "reading": "びょうき",
+      "meaning": "疾病",
+      "pos": "名词"
+    },
+    {
+      "term": "なる",
+      "reading": "なる",
+      "meaning": "变，当，变成，成为",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "開く",
+      "reading": "あく",
+      "meaning": "开",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "似合う",
+      "reading": "にあう",
+      "meaning": "适合，相称",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "うるさい",
+      "reading": "うるさい",
+      "meaning": "闹，使人心烦",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "シンプル",
+      "reading": "シンプル",
+      "meaning": "单纯　，简洁",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "間もなく",
+      "reading": "まもなく",
+      "meaning": "马上，一会儿，不久",
+      "pos": "副词"
+    },
+    {
+      "term": "もうすぐ",
+      "reading": "もうすぐ",
+      "meaning": "马上",
+      "pos": "副词"
+    },
+    {
+      "term": "さらに",
+      "reading": "さらに",
+      "meaning": "更加，更",
+      "pos": "副词"
+    },
+    {
+      "term": "さあ",
+      "reading": "さあ",
+      "meaning": "啊，喂",
+      "pos": "叹词"
+    },
+    {
+      "term": "できるだけ",
+      "reading": "できるだけ",
+      "meaning": "尽量，尽可能"
+    },
+    {
+      "term": "まとめて",
+      "reading": "まとめて",
+      "meaning": "一下子，一起，汇总，汇集"
+    },
+    {
+      "term": "今から",
+      "reading": "いまから",
+      "meaning": "从现在起"
+    }
+  ]
+}

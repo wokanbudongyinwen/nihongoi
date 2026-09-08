@@ -1,0 +1,419 @@
+{
+  "planName": "标日初级上 第16课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "操作",
+      "reading": "そうさ",
+      "meaning": "操作，操纵",
+      "pos": "名词"
+    },
+    {
+      "term": "機械",
+      "reading": "きかい",
+      "meaning": "机械，机器",
+      "pos": "名词"
+    },
+    {
+      "term": "旅行会社",
+      "reading": "りょこうがいしゃ",
+      "meaning": "旅行社",
+      "pos": "名词"
+    },
+    {
+      "term": "航空会社",
+      "reading": "こうくうがいしゃ",
+      "meaning": "航空公司",
+      "pos": "名词"
+    },
+    {
+      "term": "営業部",
+      "reading": "えいぎょうぶ",
+      "meaning": "营业部",
+      "pos": "名词"
+    },
+    {
+      "term": "IT産業",
+      "reading": "アイティーさんぎょう",
+      "meaning": "IT产业，信息技术产业",
+      "pos": "名词"
+    },
+    {
+      "term": "製品",
+      "reading": "せいひん",
+      "meaning": "产品",
+      "pos": "名词"
+    },
+    {
+      "term": "建築家",
+      "reading": "けんちくか",
+      "meaning": "建筑师",
+      "pos": "名词"
+    },
+    {
+      "term": "設計",
+      "reading": "せっけい",
+      "meaning": "设计",
+      "pos": "名词"
+    },
+    {
+      "term": "デザイン",
+      "reading": "デザイン",
+      "meaning": "设计(图)，(制作)图案",
+      "pos": "名词"
+    },
+    {
+      "term": "形",
+      "reading": "かたち",
+      "meaning": "造型，形状，形式",
+      "pos": "名词"
+    },
+    {
+      "term": "最新",
+      "reading": "さいしん",
+      "meaning": "最新",
+      "pos": "名词"
+    },
+    {
+      "term": "ネクタイ",
+      "reading": "ネクタイ",
+      "meaning": "领带",
+      "pos": "名词"
+    },
+    {
+      "term": "財布",
+      "reading": "さいふ",
+      "meaning": "钱包",
+      "pos": "名词"
+    },
+    {
+      "term": "革",
+      "reading": "かわ",
+      "meaning": "革，皮革",
+      "pos": "名词"
+    },
+    {
+      "term": "布",
+      "reading": "ぬの",
+      "meaning": "布，布匹",
+      "pos": "名词"
+    },
+    {
+      "term": "水筒",
+      "reading": "すいとう",
+      "meaning": "水壶，水筒",
+      "pos": "名词"
+    },
+    {
+      "term": "緑",
+      "reading": "みどり",
+      "meaning": "绿，绿色",
+      "pos": "名词"
+    },
+    {
+      "term": "足",
+      "reading": "あし",
+      "meaning": "脚",
+      "pos": "名词"
+    },
+    {
+      "term": "指",
+      "reading": "ゆび",
+      "meaning": "手指，指头",
+      "pos": "名词"
+    },
+    {
+      "term": "目",
+      "reading": "め",
+      "meaning": "眼，眼睛",
+      "pos": "名词"
+    },
+    {
+      "term": "鼻",
+      "reading": "はな",
+      "meaning": "鼻，鼻子",
+      "pos": "名词"
+    },
+    {
+      "term": "顔",
+      "reading": "かお",
+      "meaning": "脸，颜面",
+      "pos": "名词"
+    },
+    {
+      "term": "頭",
+      "reading": "あたま",
+      "meaning": "头，头脑",
+      "pos": "名词"
+    },
+    {
+      "term": "ID～",
+      "reading": "アイディーカード",
+      "meaning": "身份证件",
+      "pos": "名词"
+    },
+    {
+      "term": "間違い",
+      "reading": "まちがい",
+      "meaning": "错误，失误",
+      "pos": "名词"
+    },
+    {
+      "term": "問題",
+      "reading": "もんだい",
+      "meaning": "问题",
+      "pos": "名词"
+    },
+    {
+      "term": "広告",
+      "reading": "こうこく",
+      "meaning": "广告",
+      "pos": "名词"
+    },
+    {
+      "term": "看板",
+      "reading": "かんばん",
+      "meaning": "牌子",
+      "pos": "名词"
+    },
+    {
+      "term": "展示場",
+      "reading": "てんじじょう",
+      "meaning": "展览会场",
+      "pos": "名词"
+    },
+    {
+      "term": "入場料",
+      "reading": "にゅうじょうりょう",
+      "meaning": "门票，进场费",
+      "pos": "名词"
+    },
+    {
+      "term": "サービス",
+      "reading": "サービス",
+      "meaning": "服务",
+      "pos": "名词"
+    },
+    {
+      "term": "天井",
+      "reading": "てんじょう",
+      "meaning": "天棚",
+      "pos": "名词"
+    },
+    {
+      "term": "警備",
+      "reading": "けいび",
+      "meaning": "戒备，警备",
+      "pos": "名词"
+    },
+    {
+      "term": "クリスマスツリー",
+      "reading": "クリスマスツリー",
+      "meaning": "圣诞树",
+      "pos": "名词"
+    },
+    {
+      "term": "オーストラリアじん",
+      "reading": "オーストラリアじん",
+      "meaning": "澳大利亚人",
+      "pos": "名词"
+    },
+    {
+      "term": "皆さん",
+      "reading": "みなさん",
+      "meaning": "大家，诸位",
+      "pos": "名词"
+    },
+    {
+      "term": "子",
+      "reading": "こ",
+      "meaning": "孩子",
+      "pos": "名词"
+    },
+    {
+      "term": "横",
+      "reading": "よこ",
+      "meaning": "旁边，侧面",
+      "pos": "名词"
+    },
+    {
+      "term": "持つ",
+      "reading": "もつ",
+      "meaning": "有，拥有，持有",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "住む",
+      "reading": "すむ",
+      "meaning": "住，居住",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "知る",
+      "reading": "しる",
+      "meaning": "认识，知道，了解",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "直す",
+      "reading": "なおす",
+      "meaning": "改，修改，改正",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "片づける",
+      "reading": "かたづける",
+      "meaning": "收拾，整理",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "練習",
+      "reading": "れんしゅう",
+      "meaning": "练习",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "結婚",
+      "reading": "けっこん",
+      "meaning": "结婚",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "安心",
+      "reading": "あんしん",
+      "meaning": "安心，放心",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "明るい",
+      "reading": "あかるい",
+      "meaning": "明亮，开朗",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "長い",
+      "reading": "ながい",
+      "meaning": "长，长久，长远",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "短い",
+      "reading": "みじかい",
+      "meaning": "短，短暂",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "軽い",
+      "reading": "かるい",
+      "meaning": "轻巧，轻，轻松，轻微",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "優しい",
+      "reading": "やさしい",
+      "meaning": "和蔼，温和，体贴",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "細い",
+      "reading": "ほそい",
+      "meaning": "小，细长，纤细",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "太い",
+      "reading": "ふとい",
+      "meaning": "粗，胖",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "黒い",
+      "reading": "くろい",
+      "meaning": "黑，黑色",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "ユニーク",
+      "reading": "ユニーク",
+      "meaning": "独特",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "安全",
+      "reading": "あんぜん",
+      "meaning": "安全",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "派手",
+      "reading": "はで",
+      "meaning": "耀眼，花哨",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "地味",
+      "reading": "じみ",
+      "meaning": "朴素，质朴",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "厳重",
+      "reading": "げんじゅう",
+      "meaning": "森严；严格",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "まじめ",
+      "reading": "まじめ",
+      "meaning": "认真；严肃",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "大切",
+      "reading": "たいせつ",
+      "meaning": "重要，珍贵",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "複雑",
+      "reading": "ふくざつ",
+      "meaning": "复杂，繁杂",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "ちゃんと",
+      "reading": "ちゃんと",
+      "meaning": "好好地，的确，完全",
+      "pos": "副词"
+    },
+    {
+      "term": "まだ",
+      "reading": "まだ",
+      "meaning": "还，尚",
+      "pos": "副词"
+    },
+    {
+      "term": "すぐ",
+      "reading": "すぐ",
+      "meaning": "马上，立即",
+      "pos": "副词"
+    },
+    {
+      "term": "ずいぶん",
+      "reading": "ずいぶん",
+      "meaning": "相当，非常，很",
+      "pos": "副词"
+    },
+    {
+      "term": "ほら",
+      "reading": "ほら",
+      "meaning": "你看，瞧，喂",
+      "pos": "叹词"
+    },
+    {
+      "term": "頭がいい",
+      "reading": "あたまがいい",
+      "meaning": "脑子好，聪明"
+    }
+  ]
+}

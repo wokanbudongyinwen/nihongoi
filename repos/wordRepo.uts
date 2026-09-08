@@ -8,10 +8,11 @@ export interface WordRepo {
   getById(id: number): Promise<Word | null>,
   // 词库搜索：term 或 reading 前缀/包含匹配，词卡编辑与导入预览共用
   search(keyword: string, limit: number): Promise<Array<Word>>,
-  // 分页浏览：空关键词=全库按 id 序；返回一页词条
-  listPage(keyword: string, limit: number, offset: number): Promise<Array<Word>>,
-  // 总词数（可带关键词过滤）
-  countWords(keyword: string): Promise<number>,
+  // 分页浏览：空关键词=全库按 id 序；filter 为学习状态筛选（''=全部 / 'new' 未学习 /
+  // 'learning' 学习中 / 'mastered' 已掌握，跨计划判断）；返回一页词条
+  listPage(keyword: string, filter: string, limit: number, offset: number): Promise<Array<Word>>,
+  // 总词数（可带关键词与学习状态过滤）
+  countWords(keyword: string, filter: string): Promise<number>,
   // 精确匹配（导入分层匹配用：term+reading 精确 → 仅 term → 仅 reading）
   findByTerm(term: string): Promise<Array<Word>>,
   findByReading(reading: string): Promise<Array<Word>>,

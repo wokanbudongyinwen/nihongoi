@@ -1,0 +1,323 @@
+{
+  "planName": "标日初级上 第14课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "船便",
+      "reading": "ふなびん",
+      "meaning": "海运",
+      "pos": "名词"
+    },
+    {
+      "term": "書類",
+      "reading": "しょるい",
+      "meaning": "文件，文稿",
+      "pos": "名词"
+    },
+    {
+      "term": "原稿",
+      "reading": "げんこう",
+      "meaning": "稿子，原稿",
+      "pos": "名词"
+    },
+    {
+      "term": "記事",
+      "reading": "きじ",
+      "meaning": "报道",
+      "pos": "名词"
+    },
+    {
+      "term": "メモ",
+      "reading": "メモ",
+      "meaning": "记录",
+      "pos": "名词"
+    },
+    {
+      "term": "駅前",
+      "reading": "えきまえ",
+      "meaning": "车站一带",
+      "pos": "名词"
+    },
+    {
+      "term": "橋",
+      "reading": "はし",
+      "meaning": "桥，桥梁",
+      "pos": "名词"
+    },
+    {
+      "term": "角",
+      "reading": "かど",
+      "meaning": "拐角",
+      "pos": "名词"
+    },
+    {
+      "term": "横断歩道",
+      "reading": "おうだんほどう",
+      "meaning": "人行横道",
+      "pos": "名词"
+    },
+    {
+      "term": "右",
+      "reading": "みぎ",
+      "meaning": "右，右边",
+      "pos": "名词"
+    },
+    {
+      "term": "左",
+      "reading": "ひだり",
+      "meaning": "左，左边",
+      "pos": "名词"
+    },
+    {
+      "term": "交差点",
+      "reading": "こうさてん",
+      "meaning": "十字路口",
+      "pos": "名词"
+    },
+    {
+      "term": "道",
+      "reading": "みち",
+      "meaning": "路，道路",
+      "pos": "名词"
+    },
+    {
+      "term": "ドア",
+      "reading": "ドア",
+      "meaning": "门",
+      "pos": "名词"
+    },
+    {
+      "term": "電気",
+      "reading": "でんき",
+      "meaning": "电，电力",
+      "pos": "名词"
+    },
+    {
+      "term": "太極拳",
+      "reading": "たいきょくけん",
+      "meaning": "太极拳",
+      "pos": "名词"
+    },
+    {
+      "term": "朝ご飯",
+      "reading": "あさごはん",
+      "meaning": "早饭",
+      "pos": "名词"
+    },
+    {
+      "term": "晩ご飯",
+      "reading": "ばんごはん",
+      "meaning": "晚饭",
+      "pos": "名词"
+    },
+    {
+      "term": "バーベキュー",
+      "reading": "バーベキュー",
+      "meaning": "户外烧烤",
+      "pos": "名词"
+    },
+    {
+      "term": "通る",
+      "reading": "とおる",
+      "meaning": "通过，经过",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "急ぐ",
+      "reading": "いそぐ",
+      "meaning": "急，匆忙",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "飛ぶ",
+      "reading": "とぶ",
+      "meaning": "飞，飞行",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "死ぬ",
+      "reading": "しぬ",
+      "meaning": "死，死亡",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "待つ",
+      "reading": "まつ",
+      "meaning": "等待，等候",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "売る",
+      "reading": "うる",
+      "meaning": "卖，销售",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "話す",
+      "reading": "はなす",
+      "meaning": "说话，说",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "渡る",
+      "reading": "わたる",
+      "meaning": "过(桥，河)，穿过(马路)",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "下ろす",
+      "reading": "おろす",
+      "meaning": "取，卸货",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "選ぶ",
+      "reading": "えらぶ",
+      "meaning": "挑选，选择",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "消す",
+      "reading": "けす",
+      "meaning": "关(灯)，消除，去除",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "歩く",
+      "reading": "あるく",
+      "meaning": "步行，行走",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "曲がる",
+      "reading": "まがる",
+      "meaning": "拐弯，曲折",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "洗う",
+      "reading": "あらう",
+      "meaning": "洗，洗涤",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "出る",
+      "reading": "でる",
+      "meaning": "离开",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "出かける",
+      "reading": "でかける",
+      "meaning": "外出，出门",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "開ける",
+      "reading": "あける",
+      "meaning": "开，打开，开启",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "過ぎる",
+      "reading": "すぎる",
+      "meaning": "过",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "見せる",
+      "reading": "みせる",
+      "meaning": "给……看；出示",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "つける",
+      "reading": "つける",
+      "meaning": "开(灯)",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "降りる",
+      "reading": "おりる",
+      "meaning": "下(车，山)",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "買い物",
+      "reading": "かいもの",
+      "meaning": "买东西",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "卒業",
+      "reading": "そつぎょう",
+      "meaning": "毕业",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "食事",
+      "reading": "しょくじ",
+      "meaning": "吃饭，用餐",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "整理",
+      "reading": "せいり",
+      "meaning": "整理",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "コピー",
+      "reading": "コピー",
+      "meaning": "复印",
+      "pos": "动词（サ变·カ变）"
+    },
+    {
+      "term": "暗い",
+      "reading": "くらい",
+      "meaning": "黑暗，昏暗",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "大変",
+      "reading": "たいへん",
+      "meaning": "够受的，不得了",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "なかなか",
+      "reading": "なかなか",
+      "meaning": "相当，很，非常",
+      "pos": "副词"
+    },
+    {
+      "term": "こう",
+      "reading": "こう",
+      "meaning": "这样，如此",
+      "pos": "副词"
+    },
+    {
+      "term": "そう／ああ",
+      "reading": "そう／ああ",
+      "meaning": "那样",
+      "pos": "副词"
+    },
+    {
+      "term": "後で",
+      "reading": "あとで",
+      "meaning": "过会儿",
+      "pos": "副词"
+    },
+    {
+      "term": "それから",
+      "reading": "それから",
+      "meaning": "然后；另外",
+      "pos": "接续词"
+    },
+    {
+      "term": "すみませんが",
+      "reading": "すみませんが",
+      "meaning": "对不起……，劳驾……"
+    }
+  ]
+}

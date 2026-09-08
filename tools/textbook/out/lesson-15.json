@@ -1,0 +1,262 @@
+{
+  "planName": "标日初级上 第15课",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "ボート",
+      "reading": "ボート",
+      "meaning": "小船，小艇",
+      "pos": "名词"
+    },
+    {
+      "term": "ベンチ",
+      "reading": "ベンチ",
+      "meaning": "长椅，长凳",
+      "pos": "名词"
+    },
+    {
+      "term": "市役所",
+      "reading": "しやくしょ",
+      "meaning": "市政府",
+      "pos": "名词"
+    },
+    {
+      "term": "携帯電話",
+      "reading": "けいたいでんわ",
+      "meaning": "手机",
+      "pos": "名词"
+    },
+    {
+      "term": "禁煙",
+      "reading": "きんえん",
+      "meaning": "禁止吸烟",
+      "pos": "名词"
+    },
+    {
+      "term": "風邪",
+      "reading": "かぜ",
+      "meaning": "感冒",
+      "pos": "名词"
+    },
+    {
+      "term": "熱",
+      "reading": "ねつ",
+      "meaning": "发烧，体温",
+      "pos": "名词"
+    },
+    {
+      "term": "睡眠",
+      "reading": "すいみん",
+      "meaning": "睡眠",
+      "pos": "名词"
+    },
+    {
+      "term": "お風呂",
+      "reading": "おふろ",
+      "meaning": "澡堂，浴室",
+      "pos": "名词"
+    },
+    {
+      "term": "薬局",
+      "reading": "やっきょく",
+      "meaning": "药店",
+      "pos": "名词"
+    },
+    {
+      "term": "クーラー",
+      "reading": "クーラー",
+      "meaning": "空调",
+      "pos": "名词"
+    },
+    {
+      "term": "火",
+      "reading": "ひ",
+      "meaning": "火",
+      "pos": "名词"
+    },
+    {
+      "term": "気",
+      "reading": "き",
+      "meaning": "精神，意识",
+      "pos": "名词"
+    },
+    {
+      "term": "打ち合わせ",
+      "reading": "うちあわせ",
+      "meaning": "事先商量，碰头，商洽",
+      "pos": "名词"
+    },
+    {
+      "term": "無理",
+      "reading": "むり",
+      "meaning": "勉强，难以办到",
+      "pos": "名词"
+    },
+    {
+      "term": "駐車禁止",
+      "reading": "ちゅうしゃきんし",
+      "meaning": "禁止停车",
+      "pos": "名词"
+    },
+    {
+      "term": "立入禁止",
+      "reading": "たちいりきんし",
+      "meaning": "禁止进入",
+      "pos": "名词"
+    },
+    {
+      "term": "火気厳禁",
+      "reading": "かきげんきん",
+      "meaning": "严禁烟火",
+      "pos": "名词"
+    },
+    {
+      "term": "撮影禁止",
+      "reading": "さつえいきんし",
+      "meaning": "禁止拍照",
+      "pos": "名词"
+    },
+    {
+      "term": "乗る",
+      "reading": "のる",
+      "meaning": "乘坐，乘",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "使う",
+      "reading": "つかう",
+      "meaning": "用，使用",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "座る",
+      "reading": "すわる",
+      "meaning": "坐，落座",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "入る",
+      "reading": "はいる",
+      "meaning": "进入，加入",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "申す",
+      "reading": "もうす",
+      "meaning": "是，说，讲，告诉",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "とる",
+      "reading": "とる",
+      "meaning": "取，取得",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "歌う",
+      "reading": "うたう",
+      "meaning": "唱，歌唱",
+      "pos": "动词（五段）"
+    },
+    {
+      "term": "伝える",
+      "reading": "つたえる",
+      "meaning": "说，传达，转告",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "止める",
+      "reading": "とめる",
+      "meaning": "停，制止",
+      "pos": "动词（一段）"
+    },
+    {
+      "term": "温かい",
+      "reading": "あたたかい",
+      "meaning": "热乎，温暖",
+      "pos": "一类形容词"
+    },
+    {
+      "term": "大丈夫",
+      "reading": "だいじょうぶ",
+      "meaning": "没关系，放心",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "だめ",
+      "reading": "だめ",
+      "meaning": "不行，不可以",
+      "pos": "二类形容词"
+    },
+    {
+      "term": "十分",
+      "reading": "じゅうぶん",
+      "meaning": "好好地，充足地",
+      "pos": "副词"
+    },
+    {
+      "term": "もちろん",
+      "reading": "もちろん",
+      "meaning": "当然，不用说",
+      "pos": "副词"
+    },
+    {
+      "term": "ゆっくり",
+      "reading": "ゆっくり",
+      "meaning": "好好地，安静地",
+      "pos": "副词"
+    },
+    {
+      "term": "もしもし",
+      "reading": "もしもし",
+      "meaning": "喂",
+      "pos": "叹词"
+    },
+    {
+      "term": "いえ",
+      "reading": "いえ",
+      "meaning": "不，不是",
+      "pos": "叹词"
+    },
+    {
+      "term": "お大事に",
+      "reading": "おだいじに",
+      "meaning": "请多保重"
+    },
+    {
+      "term": "いけません",
+      "reading": "いけません",
+      "meaning": "不行，不可以"
+    },
+    {
+      "term": "かまいません",
+      "reading": "かまいません",
+      "meaning": "没关系，不要紧"
+    },
+    {
+      "term": "まだです",
+      "reading": "まだです",
+      "meaning": "还没有，仍然……没有"
+    },
+    {
+      "term": "気をつけます",
+      "reading": "きをつけます",
+      "meaning": "注意"
+    },
+    {
+      "term": "無理をします",
+      "reading": "むりをします",
+      "meaning": "勉强"
+    },
+    {
+      "term": "睡眠をとります",
+      "reading": "すいみんをとります",
+      "meaning": "睡觉"
+    },
+    {
+      "term": "お風呂に入ります",
+      "reading": "おふろにはいります",
+      "meaning": "洗澡"
+    }
+  ]
+}
