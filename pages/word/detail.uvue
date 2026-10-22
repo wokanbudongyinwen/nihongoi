@@ -10,6 +10,9 @@
         <view class="header-actions" v-if="!editMode">
           <view class="header-button pressable-soft" hover-class="press-soft" @click="playWord"><text class="header-button-text">发音</text></view>
           <view class="header-button pressable-soft" hover-class="press-soft" @click="startEdit"><text class="header-button-text">编辑</text></view>
+          <view class="header-button pressable-soft" hover-class="press-soft" @click="toggleBadAudio">
+            <text class="header-button-text" :class="badAudio ? 'bad-on' : ''">{{ badAudio ? '语音✗已标' : '语音✗' }}</text>
+          </view>
         </view>
         <text class="edit-caption" v-if="editMode">编辑词条</text>
       </view>
@@ -191,7 +194,7 @@
   import { getStateRepo } from '../../repos/sqlite/stateRepoImpl.uts'
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
   import { awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
-  import { manualPlay } from '../../services/audio.uts'
+  import { manualPlay, autoPlayForWord, isWordAudioBad, markWordAudioBad, unmarkWordAudioBad, speakWordTts, getTtsStatus } from '../../services/audio.uts'
 
   // 背词会话评分模式（study 页带 rate=1 进入时显示底部评分条）
   const rateMode = ref(false)
@@ -213,6 +216,8 @@
     updatedAt: 0
   }
   const word = ref<Word>(emptyWord)
+  // 语音无效标记状态（loadWord 引用，须先声明——坑④）
+  const badAudio = ref(false)
   const forms = ref<ConjugationForms>(getConjugation(emptyWord))
   const sentences = ref<Array<Sentence>>([])
   const notes = ref<Array<Note>>([])
@@ -314,6 +319,9 @@
           showMasterBtn.value = false
         }
       }
+      // 语音：进入详情自动播（有缓存即播；无缓存静默下载；已标记无效的词跳过）
+      badAudio.value = isWordAudioBad(id)
+      autoPlayForWord(word.value)
     } catch (e) {
       console.error('词卡加载失败', e)
     }
@@ -630,11 +638,57 @@
 
   // ---------- 导航与评分 ----------
 
-  // 喇叭：播放本词真人音频（无缓存时先下载再播）
+  const toggleBadAudio = () => {
+    if (badAudio.value) {
+      uni.showModal({
+        title: '恢复语音',
+        content: '取消「语音无效」标记并重新尝试下载该词语音？',
+        success: (res) => {
+          if (res.confirm) {
+            unmarkWordAudioBad(curWordId)
+            badAudio.value = false
+            uni.showToast({ title: '已恢复，点「发音」重试', icon: 'none' })
+          }
+        }
+      })
+      return
+    }
+    uni.showModal({
+      title: '标记语音无效',
+      content: '确认该词的真人语音不对（如英文提示音）？标记后将删除本地缓存并不再自动播放',
+      success: (res) => {
+        if (res.confirm) {
+          markWordAudioBad(curWordId)
+          badAudio.value = true
+          uni.showToast({ title: '已标记为语音无效', icon: 'none' })
+        }
+      }
+    })
+  }
+
+  // 喇叭：播放本词真人音频（无缓存时先下载再播；标记无效的词 TTS 兜底合成）
   const playWord = async () => {
+    if (badAudio.value) {
+      const spoken = speakWordTts(word.value)
+      if (!spoken) {
+        const st = getTtsStatus()
+        if (st == 'no-ja') {
+          uni.showToast({ title: 'TTS 缺日语语音：系统设置→文字转语音输出→安装日语语音', icon: 'none' })
+        } else {
+          uni.showToast({ title: 'TTS 初始化中，稍后再试', icon: 'none' })
+        }
+      }
+      return
+    }
     const ok = await manualPlay(word.value)
     if (!ok) {
-      uni.showToast({ title: '暂无音频（下载失败或无网络）', icon: 'none' })
+      if (isWordAudioBad(curWordId)) {
+        // 下载命中坏音频指纹被自动标记
+        badAudio.value = true
+        uni.showToast({ title: '该词源无语音，已自动标记', icon: 'none' })
+      } else {
+        uni.showToast({ title: '暂无音频（下载失败或无网络）', icon: 'none' })
+      }
     }
   }
 
@@ -700,6 +754,7 @@
     justify-content: center;
   }
   .header-button-text { font-size: 26rpx; color: $n-ink; }
+  .bad-on { color: #a05252; }
   .edit-caption { font-size: 26rpx; color: $n-text2; padding: 22rpx 0; }
   .word-heading { margin-bottom: 24rpx; }
   .term { font-size: 68rpx; line-height: 90rpx; font-family: serif; font-weight: 500; color: $n-ink; }

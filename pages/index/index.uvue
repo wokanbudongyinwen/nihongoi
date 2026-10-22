@@ -211,7 +211,8 @@
   }
 
   const restCount = (): number => {
-    const rest = totalCount.value - learnedCount.value
+    // 未学 = 总词数 - 在学 - 已掌握（三段互斥，与进度条/图例一致）
+    const rest = totalCount.value - learningCount.value - masteredCount.value
     return rest > 0 ? rest : 0
   }
 

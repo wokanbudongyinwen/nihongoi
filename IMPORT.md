@@ -58,6 +58,7 @@
 | sentences | array | 否 | 例句列表，见下 |
 | notes | array | 否 | 笔记列表（字符串数组），见下 |
 | relations | array | 否 | 自由关联列表，见下 |
+| state | object | 否 | **学习进度快照还原**（AI 模板回灌用）：{ "status": "learning", "stage": 1, "familiarity": 60, "dueDate": 0, "streak": 1, "lapses": 0, "lastReviewedAt": -1 }。status 须为 new/learning/reviewing/mastered，非法则忽略。**新建计划模式**：有 state 的词按快照原样写入 word_state（到期时间/熟练度等全部还原，不写 review_log）；**追加模式**：已在计划中的词保留现有状态不覆盖，仅对新增词还原 |
 
 ### 例句 sentences
 

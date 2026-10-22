@@ -355,8 +355,8 @@ class SqlitePlanRepo implements PlanRepo {
         ' WHERE rl.plan_id = ' + sqlNum(planId) + ' AND rl.is_first = 0 AND rl.reviewed_at >= ' + sqlNum(dayStart) + kw
     }
     if (type == 'learning' || type == 'learned') {
-      // 在学（learning+reviewing）/ 已学（有 state 行且 status != new）
-      const cond = type == 'learning' ? " IN ('learning','reviewing')" : " != 'new'"
+      // 在学（learning+reviewing）/ 已学（=已掌握，全局定稿 2026-09-02，与首页统计条一致）
+      const cond = type == 'learning' ? " IN ('learning','reviewing')" : " = 'mastered'"
       return ' FROM plan_item pi JOIN word w ON w.id = pi.word_id' +
         ' JOIN word_state ws ON ws.plan_id = pi.plan_id AND ws.word_id = pi.word_id' +
         ' WHERE pi.plan_id = ' + sqlNum(planId) + ' AND ws.status' + cond + kw

@@ -16,6 +16,61 @@ import HttpURLConnection from 'java.net.HttpURLConnection'
 import URLEncoder from 'java.net.URLEncoder'
 import MediaPlayer from 'android.media.MediaPlayer'
 // #endif
+import { setStoredString, getStoredString } from './storage.uts'
+
+// 坏音频标记（LanguagePod101 对无语音的词返回 200 + 一段英文男声提示音，
+// 无法按响应码识别，只能听过后手动标记）：KV bad_audio_ids = 逗号串 wordId
+const BAD_AUDIO_KEY = 'bad_audio_ids'
+
+export function isBadAudio(wordId: number): boolean {
+  const raw = getStoredString(BAD_AUDIO_KEY)
+  if (raw.length == 0) {
+    return false
+  }
+  const parts = raw.split(',')
+  const target = wordId.toString()
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] == target) {
+      return true
+    }
+  }
+  return false
+}
+
+// 标记该词语音无效：记入 KV 并删除本地缓存（自动/手动播均跳过；后续可换备用源重新下载）
+export function markBadAudio(wordId: number) {
+  if (isBadAudio(wordId)) {
+    return
+  }
+  const raw = getStoredString(BAD_AUDIO_KEY)
+  setStoredString(BAD_AUDIO_KEY, raw.length == 0 ? wordId.toString() : raw + ',' + wordId.toString())
+  // #ifdef APP-ANDROID
+  const p = audioPath(wordId)
+  if (p.length > 0) {
+    const f = new File(p)
+    if (f.exists()) {
+      f.delete()
+    }
+  }
+  // #endif
+}
+
+// 取消标记（重试下载用）：从 KV 移除（缓存已删，下次播放会重新下载）
+export function unmarkBadAudio(wordId: number) {
+  const raw = getStoredString(BAD_AUDIO_KEY)
+  if (raw.length == 0) {
+    return
+  }
+  const parts = raw.split(',')
+  const target = wordId.toString()
+  const kept: Array<string> = []
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] != target) {
+      kept.push(parts[i])
+    }
+  }
+  setStoredString(BAD_AUDIO_KEY, kept.join(','))
+}
 
 // 音频目录（外部私有目录 /audio）
 export function audioDir(): string {
@@ -110,9 +165,14 @@ export function playAudio(wordId: number): boolean {
 
 // ---- 下载 ----
 
+// 坏音频指纹：LanguagePod101 对无语音的词返回 HTTP 200 + 一段固定的英文男声提示音
+// （2026-09-02 实测：任意假词响应恒为 52288 字节且内容相同；真词录音 2~30KB）
+// 下载后按大小校验，命中即删缓存，由上层在主线程自动标记该词
+const BAD_AUDIO_SIZE = 52288
+
 // #ifdef APP-ANDROID
-// 阻塞式下载（须在 io 线程调用）：成功返回 true
-function downloadBlocking(wordId: number, term: string, reading: string): boolean {
+// 阻塞式下载（须在 io 线程调用）：'ok'=成功 'bad'=坏音频指纹（已删缓存） 'fail'=网络/服务失败
+function downloadBlocking(wordId: number, term: string, reading: string): string {
   try {
     const kanji = URLEncoder.encode(term, 'UTF-8')
     const kana = reading.length > 0 ? URLEncoder.encode(reading, 'UTF-8') : kanji
@@ -123,13 +183,13 @@ function downloadBlocking(wordId: number, term: string, reading: string): boolea
     const code = conn.getResponseCode()
     if (code != 200) {
       conn.disconnect()
-      return false
+      return 'fail'
     }
     const type = conn.getContentType()
     if (type.indexOf('audio') < 0) {
       // 非音频响应（如错误页）
       conn.disconnect()
-      return false
+      return 'fail'
     }
     const input: InputStream = conn.getInputStream()
     const output = new FileOutputStream(new File(audioPath(wordId)))
@@ -143,27 +203,33 @@ function downloadBlocking(wordId: number, term: string, reading: string): boolea
     output.close()
     input.close()
     conn.disconnect()
-    return true
+    // 坏音频指纹校验：提示音文件恒定大小，命中即删（上层主线程自动标记）
+    const f = new File(audioPath(wordId))
+    if (f.length() == BAD_AUDIO_SIZE) {
+      f.delete()
+      return 'bad'
+    }
+    return 'ok'
   } catch (e) {
     console.error('音频下载失败 wordId=' + wordId, e)
-    return false
+    return 'fail'
   }
 }
 // #endif
 
-// 异步下载（io 线程执行，主线程回调 resolve）
-export function downloadAudioAsync(wordId: number, term: string, reading: string): Promise<boolean> {
-  return new Promise<boolean>((resolve, _reject) => {
+// 异步下载（io 线程执行，主线程回调 resolve）：'ok' / 'bad'（坏音频，已删缓存待标记）/ 'fail'
+export function downloadAudioAsync(wordId: number, term: string, reading: string): Promise<string> {
+  return new Promise<string>((resolve, _reject) => {
     // #ifdef APP-ANDROID
     UTSAndroid.getDispatcher('io').async(function (_: any | null) {
-      const ok = downloadBlocking(wordId, term, reading)
+      const r = downloadBlocking(wordId, term, reading)
       UTSAndroid.getDispatcher('main').async(function (_2: any | null) {
-        resolve(ok)
+        resolve(r)
       }, null)
     }, null)
     // #endif
     // #ifndef APP-ANDROID
-    resolve(false)
+    resolve('fail')
     // #endif
   })
 }

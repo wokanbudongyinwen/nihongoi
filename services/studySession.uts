@@ -3,7 +3,8 @@
  *
  * 三档评分（忘记/模糊/记得）与通过规则（新词/复习统一）：
  *  - 记得：直接通过
- *  - 模糊/忘记：放回队尾；此后需**连续两次**记得才通过（中途再点模糊/忘记则连对清零重计）
+ *  - 模糊/忘记：插到当前词后第 RETRY_INTERVAL(10) 位再出现（后面不足 10 词则队尾）；
+ *    此后需**连续两次**记得才通过（中途再点模糊/忘记则连对清零重计）
  *  - 落库记账：从未失败 → 按「记得」记；失败过 → 按**最严重的失败评分**（忘记 > 模糊）记
  *
  * 档位（plan_item.priority）：记账时按词所属计划的档位放宽掌握判定（1档一次记得即掌握 / 2档两次）
@@ -23,6 +24,9 @@ import { setStoredString, getStoredString, removeStored } from '../repos/native/
 
 // 会话草稿在本地存储中的 key
 export const SESSION_DRAFT_KEY = 'session_draft'
+
+// 失败词重插间隔：答错（模糊/忘记）的词插到当前词后第 10 位再出现（不足 10 词则队尾）
+export const RETRY_INTERVAL = 10
 
 export type SessionMode = string // 'new' | 'review'
 export const MODE_NEW = 'new'
@@ -74,7 +78,7 @@ export function createSession(mode: SessionMode, queue: Array<Word>): SessionSta
 
 /**
  * 提交一题评分（纯内存操作，返回更新后的会话状态）。
- * 记得→通过（失败过的词需连对 2 次）；模糊/忘记→放回队尾。
+ * 记得→通过（失败过的词需连对 2 次）；模糊/忘记→插到当前位置后第 10 位（后面不足 10 词则队尾）。
  */
 export function answer(s: SessionState, rating: number, now: number): SessionState {
   const w = s.queue[s.index]
@@ -92,7 +96,7 @@ export function answer(s: SessionState, rating: number, now: number): SessionSta
     prog.consec = prog.consec + 1
     passed = !prog.failed || prog.consec >= 2
   } else {
-    // 模糊 / 忘记：连对清零，记录最严重失败评分，放回队尾
+    // 模糊 / 忘记：连对清零，记录最严重失败评分，隔 10 词再插入
     prog.consec = 0
     prog.failed = true
     if (prog.worst == -1 || rating < prog.worst) {
@@ -102,7 +106,13 @@ export function answer(s: SessionState, rating: number, now: number): SessionSta
 
   s.flipped = false
   if (!passed) {
-    s.queue.push(w)
+    // 插到当前词后第 10 位（间隔复习，避免同词短时间连现）；队列剩余不足 10 词则插到队尾
+    const insertAt = s.index + RETRY_INTERVAL
+    if (insertAt >= s.queue.length) {
+      s.queue.push(w)
+    } else {
+      s.queue.splice(insertAt, 0, w)
+    }
   }
   const nextIndex = s.index + 1
   if (nextIndex >= s.queue.length) {

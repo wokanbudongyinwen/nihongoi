@@ -70,6 +70,28 @@ export function getBackupDir(): string {
   // #endif
 }
 
+// AI 模板目录（应用外部私有目录 /templates，存放导出的计划生成提示词）
+export function getTemplateDir(): string {
+  // #ifdef APP-ANDROID
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return ''
+  }
+  const ext = context.getExternalFilesDir(null)
+  if (ext == null) {
+    return ''
+  }
+  const dir = new File(ext.getAbsolutePath() + '/templates')
+  if (!dir.exists()) {
+    dir.mkdirs()
+  }
+  return dir.getAbsolutePath()
+  // #endif
+  // #ifndef APP-ANDROID
+  return ''
+  // #endif
+}
+
 // 写文本文件（UTF-8；父目录须已存在）
 export function writeTextFile(absolutePath: string, content: string): boolean {
   // #ifdef APP-ANDROID

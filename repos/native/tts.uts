@@ -1,0 +1,108 @@
+/**
+ * Android 系统 TTS（ja-JP）：机械合成语音，作坏音频/无缓存词的兜底朗读。
+ *
+ * 状态机：not-init（未创建）→ initing（已创建等回调）→ ready / no-ja（日语语音缺失）。
+ * 预热：App onLaunch 调 warmupTts()（init 回调异步，提前创建避免首次播放静默）。
+ * 朗读文本用读音假名（reading）优先——多音字表记交给 TTS 可能读错，假名可控。
+ */
+// #ifdef APP-ANDROID
+import TextToSpeech from 'android.speech.tts.TextToSpeech'
+import Locale from 'java.util.Locale'
+// #endif
+import { Word } from '../../domain/types.uts'
+
+// #ifdef APP-ANDROID
+let tts: TextToSpeech | null = null
+let ttsState = 'not-init' // not-init / initing / ready / no-ja
+
+class TtsInitListener implements TextToSpeech.OnInitListener {
+  override onInit(status: Int) {
+    if (status == TextToSpeech.SUCCESS) {
+      const cur = tts
+      if (cur != null) {
+        const r = cur.setLanguage(Locale.JAPAN)
+        if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+          ttsState = 'no-ja'
+          console.error('TTS 日语语音不可用（setLanguage=' + r + '）：请在系统「设置 → 语言和输入 → 文字转语音输出」选择支持日语的引擎并安装日语语音')
+        } else {
+          ttsState = 'ready'
+          console.log('TTS 就绪（ja-JP，setLanguage=' + r + '）')
+        }
+      }
+    } else {
+      ttsState = 'no-ja'
+      console.error('TTS 引擎初始化失败（status=' + status + '）')
+    }
+  }
+}
+
+// 惰性初始化：状态机推进，幂等（App 启动预热 warmupTts 也会走到这里）
+function ensureTts(): boolean {
+  if (ttsState == 'ready') {
+    return true
+  }
+  if (tts != null) {
+    return false // initing / no-ja
+  }
+  const context = UTSAndroid.getAppContext()
+  if (context == null) {
+    return false
+  }
+  ttsState = 'initing'
+  tts = new TextToSpeech(context, new TtsInitListener())
+  return false
+}
+// #endif
+
+// 预热：App 启动时创建 TTS 实例，init 回调就绪后首个词卡即可用（无首次静默）
+export function warmupTts() {
+  // #ifdef APP-ANDROID
+  ensureTts()
+  // #endif
+}
+
+// 状态查询（诊断用）：'not-init' / 'initing' / 'ready' / 'no-ja' / 'unsupported'（非安卓）
+export function ttsStatus(): string {
+  // #ifdef APP-ANDROID
+  return ttsState
+  // #endif
+  // #ifndef APP-ANDROID
+  return 'unsupported'
+  // #endif
+}
+
+// TTS 朗读：读音假名优先，回退表记；未就绪/无文本返回 false
+export function speakTts(w: Word): boolean {
+  // #ifdef APP-ANDROID
+  if (!ensureTts()) {
+    return false
+  }
+  const cur = tts
+  if (cur == null) {
+    return false
+  }
+  const text = w.reading.length > 0 ? w.reading : w.term
+  if (text.length == 0) {
+    return false
+  }
+  const r = cur.speak(text, TextToSpeech.QUEUE_FLUSH, null, 'word_' + w.id.toString())
+  if (r != TextToSpeech.SUCCESS) {
+    console.error('TTS speak 失败（r=' + r + '）')
+    return false
+  }
+  return true
+  // #endif
+  // #ifndef APP-ANDROID
+  return false
+  // #endif
+}
+
+// 停止当前 TTS 朗读（播放真人音频前可调用避免重叠）
+export function stopTts() {
+  // #ifdef APP-ANDROID
+  const cur = tts
+  if (cur != null) {
+    cur.stop()
+  }
+  // #endif
+}

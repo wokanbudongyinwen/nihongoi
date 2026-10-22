@@ -62,6 +62,12 @@
 			}
 		},
 		{
+			"path": "pages/plan/create",
+			"style": {
+				"navigationBarTitleText": "从词库选词建计划"
+			}
+		},
+		{
 			"path": "pages/library/library",
 			"style": {
 				"navigationBarTitleText": "词库"

@@ -1,0 +1,367 @@
+<template>
+  <view class="page">
+    <image class="aurora-bg" src="/static/aurora-bg.png" mode="aspectFill"></image>
+
+    <!-- 参数 -->
+    <view class="neo-card meta">
+      <view class="meta-row">
+        <text class="meta-label">计划名</text>
+        <input class="meta-input" :value="planName" @input="onName" placeholder="词库选词计划" />
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">新词/日</text>
+        <input class="meta-input num" type="number" :value="dailyNewText" @input="onDaily" />
+      </view>
+      <text class="pr-hint">搜索词库点选加入，已选顺序即背词顺序；行尾 ✓ 表示已选，再点可移除</text>
+    </view>
+
+    <!-- 已选词（横向滚动，点 chip 移除） -->
+    <scroll-view class="picked-bar" scroll-x="true" show-scrollbar="false" v-if="selectedWords.length > 0">
+      <view class="picked-row">
+        <view class="picked-chip" v-for="(w, i) in selectedWords" :key="w.id" @click="togglePick(w)">
+          <text class="picked-no">{{ i + 1 }}</text>
+          <text class="picked-term">{{ w.term }}</text>
+          <text class="picked-x">✕</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 搜索与结果 -->
+    <view class="neo-card search-bar">
+      <input class="search-input" placeholder="搜索表记 / 读音 / 罗马音 / 释义" :value="keyword" @input="onInput" />
+      <text class="count">已选 {{ selectedWords.length }} 词</text>
+    </view>
+
+    <scroll-view class="list" scroll-y="true" show-scrollbar="false">
+      <view class="neo-card-sm word-row pressable-soft" :class="isSelected(w.id) ? 'row-on' : ''"
+        hover-class="press-soft" v-for="(w, i) in results" :key="w.id" @click="togglePick(w)">
+        <view class="word-main">
+          <view class="word-line">
+            <text class="word-term">{{ w.term }}</text>
+            <text class="word-reading">{{ w.reading }}</text>
+          </view>
+          <text class="word-meaning">{{ w.meaning }}</text>
+        </view>
+        <text class="pick-mark" v-if="isSelected(w.id)">✓</text>
+        <text class="word-pos" v-else>{{ w.pos }}</text>
+      </view>
+      <view class="cands-hint" v-if="keyword.length == 0">
+        <text class="hint-text">输入关键词搜索词库（约 2 万词），点选加入计划</text>
+      </view>
+      <view class="cands-hint" v-if="keyword.length > 0 && results.length == 0 && !loading">
+        <text class="hint-text">无匹配词条</text>
+      </view>
+      <view class="bottom-space"></view>
+    </scroll-view>
+
+    <!-- 创建 -->
+    <view class="footer">
+      <view class="neo-card-sm btn pressable" hover-class="press" @click="doCreate">
+        <text class="btn-text">创建计划（{{ selectedWords.length }} 词）</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import { Word, Plan } from '../../domain/types.uts'
+  import { searchWords } from '../../services/wordEditor.uts'
+  import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+
+  const planName = ref('')
+  const dailyNewText = ref('10')
+  const keyword = ref('')
+  const results = ref<Array<Word>>([])
+  const selectedWords = ref<Array<Word>>([]) // 选择顺序 = 背词顺序
+  const loading = ref(false)
+  const creating = ref(false)
+  let settledKeyword = ''
+
+  const onName = (e: InputEvent) => {
+    planName.value = e.detail.value
+  }
+
+  const onDaily = (e: InputEvent) => {
+    dailyNewText.value = e.detail.value
+  }
+
+  const isSelected = (id: number): boolean => {
+    for (let i = 0; i < selectedWords.value.length; i++) {
+      if (selectedWords.value[i].id == id) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const indexOfSelected = (id: number): number => {
+    for (let i = 0; i < selectedWords.value.length; i++) {
+      if (selectedWords.value[i].id == id) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  // 点选 / 取消（已选区与结果行共用；indexOfSelected 须先声明——坑④）
+  const togglePick = (w: Word) => {
+    const idx = indexOfSelected(w.id)
+    if (idx >= 0) {
+      selectedWords.value.splice(idx, 1)
+    } else {
+      selectedWords.value.push(w)
+    }
+  }
+
+  const doSearch = async () => {
+    const kw = keyword.value
+    settledKeyword = kw
+    loading.value = true
+    try {
+      const list = await searchWords(kw, 50)
+      if (settledKeyword == kw) {
+        results.value = list
+      }
+    } catch (e) {
+      console.error('词库搜索失败', e)
+    }
+    loading.value = false
+  }
+
+  const onInput = (e: InputEvent) => {
+    keyword.value = e.detail.value
+    doSearch()
+  }
+
+  const doCreate = async () => {
+    if (creating.value) {
+      return
+    }
+    if (selectedWords.value.length == 0) {
+      uni.showToast({ title: '请先选择单词', icon: 'none' })
+      return
+    }
+    const dn = parseInt(dailyNewText.value)
+    if (isNaN(dn) || dn <= 0) {
+      uni.showToast({ title: '每日新词须为正整数', icon: 'none' })
+      return
+    }
+    const name = planName.value.length > 0 ? planName.value : '词库选词计划'
+    const ids: Array<number> = []
+    const priorities: Array<number> = []
+    for (let i = 0; i < selectedWords.value.length; i++) {
+      ids.push(selectedWords.value[i].id)
+      priorities.push(3)
+    }
+    const p: Plan = {
+      id: 0,
+      name: name,
+      isActive: false,
+      dailyNew: dn,
+      dailyReviewCap: 200,
+      cycleJson: '[1,2,4]',
+      createdAt: Date.now()
+    }
+    creating.value = true
+    try {
+      const planId = await getPlanRepo().createPlan(p, ids, priorities)
+      if (planId > 0) {
+        uni.showToast({ title: '计划已创建（' + ids.length + ' 词）', icon: 'success' })
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 600)
+      } else {
+        creating.value = false
+        uni.showToast({ title: '创建失败', icon: 'none' })
+      }
+    } catch (e) {
+      creating.value = false
+      console.error('计划创建失败', e)
+      uni.showToast({ title: '创建失败', icon: 'none' })
+    }
+  }
+</script>
+
+<style lang="scss">
+  @import '../../uni.scss';
+
+  .page {
+    flex: 1;
+    background-color: $n-bg;
+    background-image: linear-gradient(180deg, #f1e4dc 0%, #f8f4ed 32%, #e8eef4 100%);
+  }
+  .meta {
+    padding: 24rpx;
+    margin: 24rpx 28rpx 0;
+  }
+  .meta-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 12rpx 0;
+  }
+  .meta-label {
+    width: 140rpx;
+    font-size: 28rpx;
+    color: $n-text2;
+    font-family: monospace;
+    letter-spacing: 1rpx;
+  }
+  .meta-input {
+    flex: 1;
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: $n-r-sm;
+    padding: 12rpx 20rpx;
+    font-size: 28rpx;
+  }
+  .num {
+    width: 160rpx;
+  }
+  .pr-hint {
+    font-size: 22rpx;
+    color: $n-text2;
+    padding: 4rpx 0 8rpx;
+  }
+  .picked-bar {
+    background-color: $n-cream;
+    padding: 12rpx 24rpx;
+    margin-top: 16rpx;
+    border-bottom-width: 1rpx;
+    border-bottom-style: solid;
+    border-bottom-color: $a-line;
+  }
+  .picked-row {
+    flex-direction: row;
+    align-items: center;
+  }
+  .picked-chip {
+    flex-direction: row;
+    align-items: center;
+    background-color: $n-card;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: 999rpx;
+    padding: 6rpx 18rpx;
+    margin-right: 12rpx;
+  }
+  .picked-no {
+    font-size: 20rpx;
+    color: $n-text3;
+    font-family: monospace;
+    margin-right: 8rpx;
+  }
+  .picked-term {
+    font-size: 24rpx;
+    color: $n-ink;
+  }
+  .picked-x {
+    font-size: 20rpx;
+    color: $n-text3;
+    margin-left: 10rpx;
+  }
+  .search-bar {
+    padding: 24rpx;
+    margin: 16rpx 28rpx 20rpx;
+    background-color: rgba(255, 253, 249, 0.92);
+  }
+  .search-input {
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: $n-r-sm;
+    padding: 18rpx 22rpx;
+    font-size: 28rpx;
+    color: $n-ink;
+  }
+  .count {
+    font-size: 24rpx;
+    color: $n-text2;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+    margin-top: 14rpx;
+  }
+  .list {
+    flex: 1;
+    padding: 0 28rpx;
+  }
+  .word-row {
+    padding: 24rpx;
+    margin: 0 4rpx 18rpx 0;
+    flex-direction: row;
+    align-items: center;
+  }
+  .row-on {
+    background-color: $n-yellow;
+    border-width: 0rpx;
+  }
+  .word-main {
+    flex: 1;
+  }
+  .word-line {
+    flex-direction: row;
+    align-items: center;
+  }
+  .word-term {
+    font-size: 32rpx;
+    font-family: serif;
+    font-weight: 500;
+    color: $n-ink;
+  }
+  .word-reading {
+    font-size: 24rpx;
+    color: $a-blue-ink;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .word-meaning {
+    font-size: 26rpx;
+    color: $n-text2;
+    margin-top: 8rpx;
+  }
+  .pick-mark {
+    font-size: 30rpx;
+    color: $n-ink;
+    font-weight: bold;
+    margin-left: 16rpx;
+  }
+  .word-pos {
+    font-size: 22rpx;
+    color: $n-ink;
+    background-color: $n-cream;
+    border-width: 1rpx;
+    border-style: solid;
+    border-color: $a-line;
+    border-radius: 999rpx;
+    padding: 4rpx 12rpx;
+    margin-left: 16rpx;
+  }
+  .cands-hint {
+    padding: 60rpx 0;
+    align-items: center;
+  }
+  .hint-text {
+    font-size: 24rpx;
+    color: $n-text3;
+  }
+  .bottom-space {
+    height: 40rpx;
+  }
+  .footer {
+    padding: 24rpx 28rpx;
+  }
+  .btn {
+    background-color: $n-green;
+    border-width: 0rpx;
+    padding: 24rpx 0;
+    align-items: center;
+  }
+  .btn-text {
+    color: $n-ink;
+    font-size: 28rpx;
+    font-weight: bold;
+  }
+</style>

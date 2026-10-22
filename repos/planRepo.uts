@@ -54,7 +54,7 @@ export interface PlanRepo {
   removePlanItems(planId: number, wordIds: Array<number>): Promise<boolean>,
 
   // 首页统计条下钻词列表（关键词 + 分页；口径与 buildTodaySummary 一致）
-  // type: 'learning' 在学(learning+reviewing) / 'learned' 已学(有 state 行) / 'all' 计划全部 / 'todayReview' 今日已复习(去重，按最近复习倒序)
+  // type: 'learning' 在学(learning+reviewing) / 'learned' 已学(=已掌握，全局定稿 2026-09-02) / 'all' 计划全部 / 'todayReview' 今日已复习(去重，按最近复习倒序)
   // dayStart 仅 todayReview 使用（其余类型传 0 即可）
   listStatsWords(planId: number, type: string, dayStart: number, keyword: string, limit: number, offset: number): Promise<Array<Word>>,
   countStatsWords(planId: number, type: string, dayStart: number, keyword: string): Promise<number>

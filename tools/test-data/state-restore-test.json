@@ -1,0 +1,52 @@
+{
+  "planName": "状态还原测试",
+  "dailyNew": 10,
+  "words": [
+    {
+      "term": "食べる",
+      "reading": "たべる",
+      "priority": 3,
+      "state": { "status": "learning", "stage": 1, "familiarity": 40, "dueDate": 1788000000000, "streak": 1, "lapses": 0, "lastReviewedAt": 1787900000000 }
+    },
+    {
+      "term": "飲む",
+      "reading": "のむ",
+      "priority": 2,
+      "state": { "status": "reviewing", "stage": 2, "familiarity": 60, "dueDate": 1788700000000, "streak": 2, "lapses": 1, "lastReviewedAt": 1787800000000 }
+    },
+    {
+      "term": "行く",
+      "reading": "いく",
+      "priority": 1,
+      "state": { "status": "mastered", "stage": 2, "familiarity": 100, "dueDate": 1893456000000, "streak": 3, "lapses": 0, "lastReviewedAt": 1787700000000 }
+    },
+    {
+      "term": "勉強",
+      "reading": "べんきょう",
+      "priority": 3,
+      "state": { "status": "learning", "stage": 0, "familiarity": 10, "dueDate": 1788100000000, "streak": 0, "lapses": 2, "lastReviewedAt": 1787600000000 }
+    },
+    {
+      "term": "先生",
+      "reading": "せんせい",
+      "priority": 3
+    },
+    {
+      "term": "学生",
+      "reading": "がくせい",
+      "priority": 3,
+      "state": { "status": "reviewing", "stage": 1, "familiarity": 80, "dueDate": 1788600000000, "streak": 1, "lapses": 0, "lastReviewedAt": 1787500000000 }
+    },
+    {
+      "term": "本",
+      "reading": "ほん",
+      "priority": 2
+    },
+    {
+      "term": "テスト",
+      "reading": "テスト",
+      "priority": 3,
+      "state": { "status": "bad-status-should-be-ignored", "stage": 9, "familiarity": 999 }
+    }
+  ]
+}

@@ -2,8 +2,8 @@
 	"name": "NihonGoi",
 	"appid": "__UNI__A4A160A",
 	"description": "个人日语背词应用，完全本地离线",
-	"versionName": "1.02",
-	"versionCode": "102",
+	"versionName": "1.04",
+	"versionCode": "104",
 	"uni-app-x": {
 		"styleIsolationVersion": "2"
 	},

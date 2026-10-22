@@ -6,39 +6,96 @@
  * 批量预取：计划详情「预下载本计划音频」
  */
 import { Word } from '../domain/types.uts'
-import { hasAudio, playAudio, downloadAudioAsync } from '../repos/native/audio.uts'
+import { hasAudio, playAudio, downloadAudioAsync, isBadAudio, markBadAudio, unmarkBadAudio } from '../repos/native/audio.uts'
+import { speakTts, ttsStatus } from '../repos/native/tts.uts'
 
-// 自动播：有缓存就播，没有就后台下载（不打扰）
+// TTS 状态查询（诊断用）：'not-init' / 'initing' / 'ready' / 'no-ja'
+export function getTtsStatus(): string {
+  return ttsStatus()
+}
+
+// 已标记语音无效的词（坏源提示音）：查询 / 标记 / 取消（供 UI 用）
+export function isWordAudioBad(wordId: number): boolean {
+  return isBadAudio(wordId)
+}
+export function markWordAudioBad(wordId: number) {
+  markBadAudio(wordId)
+}
+export function unmarkWordAudioBad(wordId: number) {
+  unmarkBadAudio(wordId)
+}
+
+// 出词静默预下载（不播）：背词出词时触发，为进词卡详情页的自动播准备缓存；
+// 已有缓存/已标记无效的词跳过；坏音频指纹自动标记
+export function prefetchAudioForWord(w: Word) {
+  if (isBadAudio(w.id) || hasAudio(w.id)) {
+    return
+  }
+  downloadAudioAsync(w.id, w.term, w.reading).then((r: string) => {
+    if (r == 'bad') {
+      markBadAudio(w.id)
+    }
+  })
+}
+
+// TTS 兜底朗读（手动发音等 UI 场景用；返回是否成功发声）
+export function speakWordTts(w: Word): boolean {
+  return speakTts(w)
+}
+
+// 自动播（词卡详情页进入时）：真人缓存优先，无缓存/坏音频词用 Android TTS 兜底合成；
+// 无缓存词同时后台下载真人音频（下次进入切回真人）
 export function autoPlayForWord(w: Word) {
+  if (isBadAudio(w.id)) {
+    speakTts(w)
+    return
+  }
   if (hasAudio(w.id)) {
     playAudio(w.id)
     return
   }
-  downloadAudioAsync(w.id, w.term, w.reading).then((_ok: boolean) => {
-    // 首次下载成功也不追播（词已翻过），下次出现即有缓存
+  // 无缓存：TTS 即时兜底 + 静默下载真人音频（坏指纹自动标记，下次仍 TTS）
+  speakTts(w)
+  downloadAudioAsync(w.id, w.term, w.reading).then((r: string) => {
+    if (r == 'bad') {
+      markBadAudio(w.id)
+    }
   })
 }
 
-// 手动播：无缓存时下载完再播；返回是否最终有声音
+// 手动播：无缓存时下载完再播；返回是否最终有声音（标记无效的词返回 false）
 export async function manualPlay(w: Word): Promise<boolean> {
+  if (isBadAudio(w.id)) {
+    return false
+  }
   if (hasAudio(w.id)) {
     return playAudio(w.id)
   }
-  const ok = await downloadAudioAsync(w.id, w.term, w.reading)
-  if (ok) {
+  const r = await downloadAudioAsync(w.id, w.term, w.reading)
+  if (r == 'bad') {
+    // 坏音频指纹：自动标记（本次不播，词卡按钮会显示已标记态）
+    markBadAudio(w.id)
+    return false
+  }
+  if (r == 'ok') {
     return playAudio(w.id)
   }
   return false
 }
 
-// 批量预取：跳过已有缓存，逐词下载；onProgress(已处理数, 总数, 本词成功)
+// 批量预取：跳过已有缓存与已标记无效的词，逐词下载；onProgress(已处理数, 总数, 本词成功)
+// 坏音频指纹同样自动标记（不重试）
 export async function prefetchAudio(words: Array<Word>, onProgress: (done: number, total: number, ok: boolean) => void): Promise<void> {
   let done = 0
   for (let i = 0; i < words.length; i++) {
     const w = words[i]
     let ok = true
-    if (!hasAudio(w.id)) {
-      ok = await downloadAudioAsync(w.id, w.term, w.reading)
+    if (!hasAudio(w.id) && !isBadAudio(w.id)) {
+      const r = await downloadAudioAsync(w.id, w.term, w.reading)
+      if (r == 'bad') {
+        markBadAudio(w.id)
+      }
+      ok = r == 'ok'
     }
     done++
     onProgress(done, words.length, ok)

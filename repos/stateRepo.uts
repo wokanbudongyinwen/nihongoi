@@ -18,6 +18,11 @@ export interface StateRepo {
   countByStatus(planId: number): Promise<Map<string, number>>,
   listRecentLogs(wordId: number, limit: number): Promise<Array<ReviewLog>>,
 
+  // 计划全部学习状态（AI 模板导出用：拼 state 块）
+  listStatesOfPlan(planId: number): Promise<Array<WordState>>,
+  // 导入还原学习状态：UPSERT word_state（快照原样写入，不写 review_log）
+  restoreStates(planId: number, states: Array<WordState>): Promise<boolean>,
+
   // 计划词单状态管理（手动批量调整）
   // 批量置为已掌握：UPSERT word_state（status=mastered / familiarity=100），不写 review_log
   markMastered(planId: number, wordIds: Array<number>, now: number): Promise<boolean>,

@@ -63,7 +63,7 @@
 <script setup lang="uts">
   import { Word } from '../../domain/types.uts'
   import { accentsDisplay } from '../../domain/format.uts'
-  import { autoPlayForWord, manualPlay } from '../../services/audio.uts'
+  import { manualPlay, prefetchAudioForWord } from '../../services/audio.uts'
   import { SessionState, MODE_NEW, MODE_REVIEW, createSession, answer, answerMastered, snapshotDraft, hasDraft, restoreDraft, commitSession, consumeDetailRating, consumeDetailMastered } from '../../services/studySession.uts'
   import { buildReviewQueue, pickNewWordQueue } from '../../services/today.uts'
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
@@ -127,7 +127,7 @@
     return 'prio-text-3'
   }
 
-  // 当前词上屏（A 面含音调展示 + 自动朗读 + 档位徽章）
+  // 当前词上屏（A 面含音调展示 + 档位徽章；朗读改到进入词卡详情页时触发）
   const showCurrent = (s: SessionState) => {
     if (s.index >= s.queue.length) {
       return
@@ -145,7 +145,8 @@
       }
     }
     currentPriority.value = p
-    autoPlayForWord(w)
+    // 出词静默预下载语音（不播）：点进词卡详情页时大概率已有缓存可直接自动播
+    prefetchAudioForWord(w)
   }
 
   // 手动喇叭：当前词（无缓存时先下载再播）

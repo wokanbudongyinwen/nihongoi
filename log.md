@@ -1,5 +1,94 @@
 # 文件修改日志
 
+## stats 下钻「已学」统一为已掌握口径（2026-09-02）
+
+- `repos/planRepo.uts` + `repos/sqlite/planRepoImpl.uts`：listStatsWords/countStatsWords 的 'learned' 条件由「有 state 行（status != new）」改为 `status = 'mastered'`——全局定义「已学 = 已掌握」（首页统计条、stats 下钻、词库筛选口径统一）。
+- `pages/index/stats.uvue`：已学空态文案改「还没有已掌握的词」。
+- `AGENTS.md`：词库筛选条目注明口径已全局统一（范围差异保留：stats 为激活计划、词库为全局）。
+
+## 首页「已学」改为已掌握口径（2026-09-02）
+
+- `services/today.uts`：buildTodaySummary 的 learnedCount 由「在学+已掌握」改为**仅已掌握**（用户定稿：已学不含在学中的词）；类型注释同步。
+- `pages/index/index.uvue`：restCount 未学计算联动改为「总词数 − 在学 − 已掌握」（三段互斥，与三色进度条/图例一致，避免在学词被重复算进未学段）。
+- `AGENTS.md`：首页统计条口径更新。
+
+## state 块解析编译修复（坑⑭）（2026-09-02）
+
+- `services/importer.uts`：parseStateBlock 的 `item.getJSONObject('state')` 在 uts 不存在（error18，连坐 getString/getNumber 报错）——改 `item.get('state')` 取 any 后 `as UTSJSONObject` 强转。此编译错也解释了上一轮「导入后全部未学习」：手机上跑的是旧包。DESIGN.md 踩坑清单新增坑⑭。
+
+## 学习状态导出/还原闭环（2026-09-02）
+
+- `repos/stateRepo.uts` + `repos/sqlite/stateRepoImpl.uts`：新增 listStatesOfPlan（计划全部 word_state）与 restoreStates（快照原样 UPSERT，不写 review_log）。
+- `services/importer.uts`：词行新增可选 `state` 块解析（parseStateBlock：status 须为合法枚举，非法/缺失忽略——防 AI 自造数据）；resolveSelections 收集带 state 的行（collectState 绑 wordId）；**新建计划**模式建词单后 restoreStates 全量还原；**追加**模式仅对新增词还原（已在计划中的词由 OR IGNORE 跳过、保留现有状态）。ImportRow/ResolvedSelection 结构同步。
+- `services/planTemplate.uts`：含词单模式每行附完整 state 块（listStatesOfPlan 按 wordId 拼 JSON）；字段表加 state 行；输出要求第 5 条「state 原样保留回传，新增词不带」。
+- `IMPORT.md`：词行字段表新增 state（示例 + 两模式还原语义说明）。
+- `AGENTS.md`：新增「学习状态导出/还原闭环」条目，模板条目补 state 快照。
+
+## create 页 indexOfSelected 声明顺序编译修复（2026-09-02）
+
+- `pages/plan/create.uvue`：indexOfSelected 上移到 togglePick 之前（坑④先声明后引用）。
+
+## 模板导出移至计划列表 + 从词库选词建计划（2026-09-02）
+
+- `pages/plan/list.uvue`：新增三个操作按钮——「从词库选词，新建计划」（绿，跳 create 页）、「导入 JSON 词表」（原有）、「导出 AI 计划模板」（紫，导入下方）；模板导出 ActionSheet 两模式，「含计划词单」二级 ActionSheet 选计划（计划名列表）；样式补 create-btn/template-btn。
+- `pages/plan/create.uvue`（新增）：从词库选词建计划——计划名/每日新词参数卡 + 搜索（searchWords 50 条）结果多选（行选中 ✓ 黄底高亮）+ 已选区横向 chips（带序号、点选移除），**选择顺序即背词顺序**；确认走 createPlan（优先级全 3，不自动激活）。
+- `services/planTemplate.uts`：exportPlanTemplate 空模板模式不再要求有效 planId（仅含词单时查计划），文件名 plan-template-blank / plan-template-<id>-with-words。
+- `pages/plan/detail.uvue`：移除模板导出按钮/函数/样式（入口迁至计划列表）。
+- `pages.json`：注册 pages/plan/create。
+- `AGENTS.md`：导出模板条目入口更新 + 新增词库选词建计划条目。
+
+## 导出 AI 计划模板（2026-09-02）
+
+- `services/planTemplate.uts`（新增）：exportPlanTemplate(planId, withWords)——组装 Markdown 提示词（任务指令 + IMPORT.md 格式规范摘要/字段表/示例/匹配规则 + 输出要求；含词单模式另附 planName/dailyNew/全词单 JSON 供 AI 重排调档补例句，空模板带「学习目标」占位）写外部私有目录 templates/；多行文本用数组 join 拼（规避 uts 模板字符串风险）。
+- `repos/native/fileText.uts`：新增 getTemplateDir（/templates，同 backups 模式）。
+- `pages/plan/detail.uvue`：参数卡新增紫色「导出 AI 计划模板」按钮（音频按钮与删除计划之间），ActionSheet 选空模板/含词单，导出后弹窗显示路径与使用说明（复制给 AI → AI 输出 JSON → 存 .json 走计划导入回灌）。
+- `AGENTS.md`：UI 交互新增导出 AI 计划模板条目。
+
+## TTS 启动预热与诊断（2026-09-02）
+
+- `repos/native/tts.uts`：状态机化（not-init/initing/ready/no-ja）+ warmupTts/ttsStatus 导出；init 回调与 speak 失败均打详细日志（setLanguage 返回值、status）。
+- `App.uvue`：onLaunch 调 warmupTts 预热——修复惰性初始化导致首次进词卡 TTS 必静默的问题（init 回调异步，冷启动后早已就绪）。
+- `services/audio.uts` + `pages/word/detail.uvue`：手动「发音」TTS 失败提示按状态区分（no-ja → 指引安装日语语音；否则初始化中）；getTtsStatus 服务透传。
+- 真机排查指引：日志过滤「TTS」看状态；手机「设置 → 语言和输入 → 文字转语音输出」确认引擎与日语语音包。
+
+## Android TTS 兜底朗读（2026-09-02）
+
+- `repos/native/tts.uts`（新增）：Android 系统 TextToSpeech 封装——ja-JP、惰性初始化（init 回调异步，首调未就绪本次跳过）、朗读文本读音假名优先（多音字表记可能读错）、speakTts/stopTts；日语语音缺失打日志提示。注：嵌套接口 TextToSpeech.OnInitListener 的 uts 实现为首次尝试，待编译验证。
+- `services/audio.uts`：autoPlayForWord 改为「真人缓存优先，坏音频/无缓存词 TTS 即时兜底」——无缓存词同时后台下载真人音频（成功后下次进入自动切回真人，坏指纹自动标记后持续 TTS）；新增 speakWordTts 供手动场景。
+- `pages/word/detail.uvue`：手动「发音」对已标记坏音频词改为 TTS 播放（TTS 未就绪时提示），与自动播行为一致。
+- `AGENTS.md`：真人音频部分新增 TTS 兜底条目。
+
+## 出词恢复语音静默预下载（2026-09-02）
+
+- `services/audio.uts`：新增 prefetchAudioForWord（单词静默预下载不播，已有缓存/已标记无效跳过，坏音频指纹自动标记）——与 autoPlayForWord（详情页进入时播放）职责分离。
+- `pages/study/study.uvue`：showCurrent 出词上屏时调 prefetchAudioForWord（修复上一轮改动副作用：无缓存词点进词卡时才开始下载导致首次进详情听不到；现出词即预下载，思考间隙通常足够完成）。
+- `AGENTS.md`：真人音频触发条目补「背词出词静默预下载」。
+
+## 失败词由回队尾改为间隔重插（2026-09-02）
+
+- `services/studySession.uts`：answer() 中模糊/忘记的词不再 push 队尾，改为插到当前词后第 RETRY_INTERVAL(10) 位（splice 插入；insertAt 越界则 push 队尾）——答错的词约隔 10 个词再出现，避免短队列时同一词连现；「连续两次记得才通过」「最严重失败评分落库」规则不变；草稿快照存完整队列顺序，恢复逻辑无需改。
+- `AGENTS.md`：会话通过规则条目更新为间隔重插。
+
+## 词卡页 badAudio 声明顺序编译修复（2026-09-02）
+
+- `pages/word/detail.uvue`：badAudio ref 声明由「导航与评分」区上移至 word ref 旁（loadWord 引用它，坑④先声明后引用）。
+
+## 坏音频指纹自动识别（2026-09-02）
+
+- 实测发现：LanguagePod101 对无语音词返回的英文男声提示音为**固定文件（恒定 52288 字节，与查询词无关；真词录音 2~30KB）**，可按大小指纹自动识别。
+- `repos/native/audio.uts`：downloadBlocking/downloadAudioAsync 返回值改为 'ok'/'bad'/'fail'——io 线程下载完成后校验文件大小 == BAD_AUDIO_SIZE(52288)，命中即删缓存返回 'bad'（坏文件永不落地）；KV 标记留在主线程（resolve 后）执行，规避 io 线程调 uni API。
+- `services/audio.uts`：autoPlayForWord/manualPlay/prefetchAudio 收到 'bad' 即自动 markBadAudio（该词此后不再尝试下载）；手动标记按钮保留作兜底（指纹变化时可人工干预）。
+- `pages/word/detail.uvue`：playWord 播放失败时区分「坏音频自动标记」（按钮同步变已标态 + toast「该词源无语音，已自动标记」）与「网络失败」。
+- 方案讨论结论（本次会话）：Forvo API 公开申请已停不采用；后续可选 yomidevs Local Audio Collection（25 万词 MP3 4.9GB）筛子集 adb 推 audio/ 目录（零 App 改动），或 Android TTS 兜底。
+
+## 朗读时机改至词卡详情 + 坏音频标记（2026-09-02）
+
+- `pages/study/study.uvue`：出词上屏不再自动播（移除 autoPlayForWord 调用与 import），背词页手动喇叭保留。
+- `pages/word/detail.uvue`：loadWord 完成后进入详情即自动播（有缓存即播、无缓存静默下载、标记词跳过）；头部新增「语音✗」按钮——未标记时确认后标记（删缓存 + 不再自动/手动播），已标记显示「语音✗已标」点击可取消并重下；「发音」按钮对已标记词给出恢复提示。
+- `repos/native/audio.uts`：新增 isBadAudio / markBadAudio / unmarkBadAudio（KV `bad_audio_ids` 逗号串；标记时删除本地 mp3 缓存）——LanguagePod101 对无语音词返回 200+英文男声提示音，无法按响应码自动识别，只能听后手动标记；备用音源待接。
+- `services/audio.uts`：autoPlayForWord / manualPlay 开头拦截已标记词；导出 isWordAudioBad / markWordAudioBad / unmarkWordAudioBad 供 UI 用；prefetchAudio 不变（预下载标记词会重下——后续可加跳过）。
+- `AGENTS.md`：真人音频触发条目与坏音频标记机制更新。
+
 ## 链路径改横向 + 链条单词列表页（2026-09-02）
 
 - `pages/word/chainList.uvue`（新增）：链条单词列表页——URL ids 逗号串传参，逐 id 查库，按链顺序（旧→新）以词库同款行样式展示（序号/表记/读音/释义/词性），最后一行紫色高亮 +「当前主词」标，点行进词卡；pages.json 注册。

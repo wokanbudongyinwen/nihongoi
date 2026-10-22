@@ -13,8 +13,16 @@
       <text class="empty-text">暂无计划，从下方导入 JSON 词表开始</text>
     </view>
 
+    <view class="neo-card create-btn pressable" hover-class="press" @click="goCreate">
+      <text class="create-text">从词库选词，新建计划</text>
+    </view>
+
     <view class="neo-card import-btn pressable" hover-class="press" @click="doImport">
       <text class="import-text">导入 JSON 词表，新建计划</text>
+    </view>
+
+    <view class="neo-card template-btn pressable" hover-class="press" @click="doExportTemplate">
+      <text class="template-text">导出 AI 计划模板（喂给 AI 生成词表）</text>
     </view>
   </view>
 </template>
@@ -24,6 +32,7 @@
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
   import { parseAndMatch, setPendingImport } from '../../services/importer.uts'
   import { readTextFile } from '../../repos/native/fileText.uts'
+  import { exportPlanTemplate } from '../../services/planTemplate.uts'
 
   const plans = ref<Array<Plan>>([])
 
@@ -37,6 +46,62 @@
 
   const goDetail = (p: Plan) => {
     uni.navigateTo({ url: '/pages/plan/detail?id=' + p.id })
+  }
+
+  // 从词库选词新建计划
+  const goCreate = () => {
+    uni.navigateTo({ url: '/pages/plan/create' })
+  }
+
+  // 导出 AI 计划模板（空模板 / 选一个计划附带词单）
+  const doExportTemplateRun = async (planId: number, withWords: boolean) => {
+    try {
+      const path = await exportPlanTemplate(planId, withWords)
+      uni.showModal({
+        title: '模板已导出',
+        content: path + '\n\n用文件管理器打开该 .md，复制全部内容发给 AI；AI 输出的 JSON 保存为 .json 后用「导入 JSON 词表」回灌。',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    } catch (e) {
+      console.error('模板导出失败', e)
+      uni.showToast({ title: '导出失败', icon: 'none' })
+    }
+  }
+
+  const pickPlanForTemplate = () => {
+    const items: Array<string> = []
+    for (let i = 0; i < plans.value.length; i++) {
+      items.push(plans.value[i].name)
+    }
+    uni.showActionSheet({
+      itemList: items,
+      success: (res) => {
+        if (res.tapIndex < plans.value.length) {
+          doExportTemplateRun(plans.value[res.tapIndex].id, true)
+        }
+      },
+      fail: (_err) => {
+        // 用户取消，静默
+      }
+    })
+  }
+
+  const doExportTemplate = () => {
+    uni.showActionSheet({
+      itemList: ['格式模板（空，AI 按目标生成）', '含计划词单（AI 基于现状调整）'],
+      success: (res) => {
+        if (res.tapIndex == 0) {
+          doExportTemplateRun(0, false)
+        } else {
+          if (plans.value.length == 0) {
+            uni.showToast({ title: '暂无计划，请先选择空模板', icon: 'none' })
+            return
+          }
+          pickPlanForTemplate()
+        }
+      }
+    })
   }
 
   // 解析匹配并跳预览页（须先于 doImport 声明：uts 要求先声明后引用）
@@ -151,6 +216,32 @@
     align-items: center;
   }
   .import-text {
+    font-size: 28rpx;
+    color: $n-ink;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+  }
+  .neo-card.create-btn {
+    padding: 28rpx 32rpx;
+    margin-bottom: 20rpx;
+    background-color: $n-green;
+    border-width: 0rpx;
+    align-items: center;
+  }
+  .create-text {
+    font-size: 28rpx;
+    color: $n-ink;
+    font-family: monospace;
+    letter-spacing: 2rpx;
+  }
+  .neo-card.template-btn {
+    padding: 28rpx 32rpx;
+    margin-top: 20rpx;
+    background-color: $n-purple;
+    border-width: 0rpx;
+    align-items: center;
+  }
+  .template-text {
     font-size: 28rpx;
     color: $n-ink;
     font-family: monospace;

@@ -1,0 +1,159 @@
+/**
+ * PlanTemplateService：导出「AI 学习计划生成」提示词模板
+ *
+ * 产物为 Markdown 文件（外部私有目录 templates/，文件管理器可见）：
+ *   任务指令 + 导入 JSON 格式规范（IMPORT.md 摘要）+（可选）当前计划词单上下文。
+ * 用户把文件内容粘贴给 AI（ChatGPT / Claude 等），AI 按规范输出 JSON，
+ * 保存为 .json 后走 App「计划导入」回灌（新词自动匹配词库，未命中新建）。
+ */
+import { getPlanRepo } from '../repos/sqlite/planRepoImpl.uts'
+import { getStateRepo } from '../repos/sqlite/stateRepoImpl.uts'
+import { getTemplateDir, writeTextFile } from '../repos/native/fileText.uts'
+
+const SPEC_LINES: Array<string> = [
+  '## 输出格式规范（严格遵守）',
+  '',
+  '顶层字段：',
+  '',
+  '- planName：计划名（string，可省略）',
+  '- dailyNew：每日新词数（number，建议 5~20，可省略，默认 10）',
+  '- words：词数组（**行序即背词顺序**，按由易到难 / 使用频率排）',
+  '',
+  '词行字段（除 term 外均可省略）：',
+  '',
+  '| 字段 | 类型 | 说明 |',
+  '|------|------|------|',
+  '| term | string | **必填**。日语表记（辞书形），如 食べる |',
+  '| reading | string | 假名读音，如 たべる（参与词条匹配，强烈建议提供） |',
+  '| romaji | string | 罗马音 |',
+  '| meaning | string | 中文释义 |',
+  '| pos | string | 词性 |',
+  '| priority | number | 掌握档位 1/2/3，缺省 3：1=一次即会（已认识的词）/ 2=两次即会（约 3 天）/ 3=常规（约一周） |',
+  '| sentences | array | 例句 [{ "text": 日文, "translation": 中文 }] |',
+  '| notes | array | 笔记（字符串数组） |',
+  '| relations | array | 自由关联 [{ "term": 目标词, "reading": 读音, "note": 关联理由 }] |',
+  '| state | object | 学习进度快照（status/stage/familiarity/dueDate/streak/lapses/lastReviewedAt）。**调整现有计划时原样保留回传，不要修改**；你新增的词不要带此字段 |',
+  '',
+  '## 输出示例（最小可用）',
+  '',
+  '```json',
+  '{',
+  '  "planName": "示例计划",',
+  '  "dailyNew": 10,',
+  '  "words": [',
+  '    { "term": "食べる", "reading": "たべる", "meaning": "吃", "priority": 3,',
+  '      "sentences": [{ "text": "リンゴを食べる。", "translation": "吃苹果。" }],',
+  '      "notes": ["和 飲む 一起记"],',
+  '      "relations": [{ "term": "飲む", "reading": "のむ", "note": "同类对比" }] },',
+  '    { "term": "行く", "reading": "いく", "priority": 2 }',
+  '  ]',
+  '}',
+  '```',
+  '',
+  '## 匹配规则（供了解）',
+  '',
+  '- 导入时每行与本地词库分层匹配：term+reading 精确 → 仅 term → 仅 reading，命中的直接引用既有词条（含释义/音调/真人音频/活用形）；全部未命中则新建词条',
+  '- 动词请用辞书形（行く 而非 行きます）',
+  '- 同一文件重复词自动去重；例句/笔记/关联按内容去重合并，不覆盖已有数据'
+]
+const SPEC_MD: string = SPEC_LINES.join('\n')
+
+const OUTPUT_RULES: string = [
+  '## 你的输出要求',
+  '',
+  '1. 只输出一个 json 代码块（从 { 到 } 的完整 JSON，可直接保存为 .json 文件导入 App）',
+  '2. 严格遵循上述字段规范；动词用辞书形；reading 尽量给出（提高词条匹配率）',
+  '3. priority 按我对词的熟悉度分配（已认识=1，见过=2，生词=3）',
+  '4. 例句优先使用 N5~N4 基础语法，长度一句话',
+  '5. 词行若带 state 块，重排/调整时**原样保留**（不改动数值、不删除）——这是我的学习进度，导回后需保持不变；你新增的词不要带 state'
+].join('\n')
+
+/**
+ * 导出计划模板；withWords=true 时附带 planId 对应计划的词单作上下文（空模板不需要有效 planId）。
+ * 返回写入的文件绝对路径（失败抛异常）。
+ */
+export async function exportPlanTemplate(planId: number, withWords: boolean): Promise<string> {
+  const repo = getPlanRepo()
+
+  let md = ''
+  const head: Array<string> = []
+  head.push('# 日语背词 App · AI 学习计划生成任务')
+  head.push('')
+  head.push('你是一个专业的日语学习规划助手。请按下面的格式规范输出**一份完整的 JSON**'
+    + (withWords
+      ? '（基于「我当前的计划数据」调整：可重排背词顺序、调整档位 priority、补充例句/笔记/关联，也可增删词）'
+      : '（根据我在对话中的学习目标、水平描述选词生成，如教材课次、JLPT 级别、主题场景等）')
+    + '。只输出一个 json 代码块，不要额外解释。')
+  head.push('')
+
+  md = head.join('\n') + '\n' + SPEC_MD + '\n'
+
+  let fileName = 'plan-template-blank'
+  if (withWords) {
+    const plan = await repo.getPlan(planId)
+    if (plan == null) {
+      throw new Error('计划不存在')
+    }
+    fileName = 'plan-template-' + plan.id + '-with-words'
+    const entries = await repo.listPlanWordsWithStatus(planId)
+    const data: Array<string> = []
+    data.push('')
+    data.push('## 我当前的计划数据')
+    data.push('')
+    data.push('- 计划名：' + plan.name)
+    data.push('- 每日新词：' + plan.dailyNew)
+    data.push('- 词数：' + entries.length)
+    data.push('')
+    data.push('词单（status：new=未学习 / learning|reviewing=学习中 / mastered=已掌握；state 为学习进度快照，**输出时原样保留回传、不要修改或删除**，我导回 App 后学习进度保持不变）：')
+    data.push('')
+    data.push('```json')
+    data.push('{ "planName": ' + jsonStr(plan.name) + ', "dailyNew": ' + plan.dailyNew + ', "words": [')
+    // 学习状态按 wordId 索引（未学词无行）
+    const stateMap = new Map<number, string>()
+    const states = await getStateRepo().listStatesOfPlan(planId)
+    for (let s = 0; s < states.length; s++) {
+      const st = states[s]
+      stateMap.set(st.wordId,
+        '{ "status": ' + jsonStr(st.status) + ', "stage": ' + st.stage +
+        ', "familiarity": ' + st.familiarity + ', "dueDate": ' + st.dueDate +
+        ', "streak": ' + st.streak + ', "lapses": ' + st.lapses +
+        ', "lastReviewedAt": ' + st.lastReviewedAt + ' }')
+    }
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i]
+      const stateStr = stateMap.get(e.word.id)
+      data.push('  { "term": ' + jsonStr(e.word.term) + ', "reading": ' + jsonStr(e.word.reading) +
+        ', "meaning": ' + jsonStr(e.word.meaning) + ', "priority": ' + e.priority +
+        ', "status": ' + jsonStr(e.status) +
+        (stateStr == null ? '' : ', "state": ' + stateStr) +
+        ' }' + (i < entries.length - 1 ? ',' : ''))
+    }
+    data.push('] }')
+    data.push('```')
+    data.push('')
+    data.push('提示：词单较长时请分批处理（如每次 100 词），保持输出 JSON 结构完整。')
+    md += data.join('\n') + '\n'
+  } else {
+    md += '\n## 我的学习目标\n\n（在此填写：教材进度 / JLPT 目标级别 / 想攻克的场景或主题 / 每日可投入时间等）\n'
+  }
+
+  md += '\n' + OUTPUT_RULES + '\n'
+
+  const dir = getTemplateDir()
+  if (dir.length == 0) {
+    throw new Error('模板目录创建失败')
+  }
+  const path = dir + '/' + fileName + '.md'
+  const ok = writeTextFile(path, md)
+  if (!ok) {
+    throw new Error('模板文件写入失败')
+  }
+  return path
+}
+
+// JSON 字符串字面量（转义反斜杠/引号/换行）
+function jsonStr(s: string): string {
+  const escaped = s.split('\\').join('\\\\').split('"').join('\\"')
+    .split('\n').join('\\n').split('\r').join('\\r')
+  return '"' + escaped + '"'
+}

@@ -81,7 +81,7 @@
       return '还没有在学的词'
     }
     if (statsType == TYPE_LEARNED) {
-      return '还没有学过的词'
+      return '还没有已掌握的词'
     }
     if (statsType == TYPE_TODAY_REVIEW) {
       return '今天还没有复习记录'

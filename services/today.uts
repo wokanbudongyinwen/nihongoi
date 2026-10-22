@@ -12,7 +12,7 @@ export type TodaySummary = {
   planName: string,     // 激活计划名，无激活计划时为空
   dueCount: number,     // 当前到期复习词数（合并后，复习入口提示）
   learningCount: number,  // 在学（learning + reviewing）
-  learnedCount: number,   // 已学（status != new）
+  learnedCount: number,   // 已学（= 已掌握，不含在学）
   masteredCount: number,  // 已掌握（备用：进度条）
   totalCount: number,     // 计划总词数（备用：进度条）
   todayNewCount: number,  // 今日已学新词数
@@ -53,7 +53,7 @@ export async function buildTodaySummary(): Promise<TodaySummary> {
     const lr = (learning == null ? 0 : learning) + (reviewing == null ? 0 : reviewing)
     s.masteredCount = m
     s.learningCount = lr
-    s.learnedCount = lr + m
+    s.learnedCount = m // 已学 = 已掌握（2026-09-02 用户定稿：不再包含在学中的词）
     const items = await planRepo.listPlanItems(plan.id)
     s.totalCount = items.length
   }

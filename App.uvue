@@ -1,5 +1,6 @@
 <script setup lang="uts">
 	import { initDatabase } from './repos/sqlite/bootstrap.uts'
+	import { warmupTts } from './repos/native/tts.uts'
 
 	// #ifdef APP-ANDROID || APP-HARMONY
 	let firstBackTime = 0
@@ -16,6 +17,8 @@
 		}).catch((e) => {
 			console.error('数据库初始化异常: ' + e)
 		})
+		// TTS 预热：init 回调异步，启动即创建实例（词卡兜底朗读首次即可用）
+		warmupTts()
 	})
 
 	onAppShow(() => {

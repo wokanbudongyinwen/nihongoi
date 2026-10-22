@@ -106,6 +106,33 @@ class SqliteStateRepo implements StateRepo {
     return map
   }
 
+  // 计划全部学习状态（AI 模板导出用）
+  async listStatesOfPlan(planId: number): Promise<Array<WordState>> {
+    const rows = await this.client().select(DB_NAME,
+      'SELECT ' + STATE_COLS + ' FROM word_state WHERE plan_id = ' + sqlNum(planId))
+    const list: Array<WordState> = []
+    for (let i = 0; i < rows.length; i++) {
+      list.push(rowToState(rows[i]))
+    }
+    return list
+  }
+
+  // 导入还原学习状态：快照原样 UPSERT（不写 review_log）
+  async restoreStates(planId: number, states: Array<WordState>): Promise<boolean> {
+    if (states.length == 0) {
+      return true
+    }
+    const sqls: Array<string> = []
+    for (let i = 0; i < states.length; i++) {
+      const s = states[i]
+      sqls.push('INSERT OR REPLACE INTO word_state (' + STATE_COLS + ') VALUES (' +
+        sqlNum(planId) + ', ' + sqlNum(s.wordId) + ", '" + s.status + "', " + sqlNum(s.stage) + ', ' +
+        sqlNum(s.familiarity) + ', ' + sqlNum(s.dueDate) + ', ' + sqlNum(s.streak) + ', ' + sqlNum(s.lapses) + ', ' +
+        sqlNum(s.lastReviewedAt) + ')')
+    }
+    return await this.client().transaction(DB_NAME, sqls)
+  }
+
   async listRecentLogs(wordId: number, limit: number): Promise<Array<ReviewLog>> {
     const rows = await this.client().select(DB_NAME,
       'SELECT id, plan_id, word_id, reviewed_at, rating, is_first, prev_stage, new_stage, due_date' +
