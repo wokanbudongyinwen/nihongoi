@@ -1,6 +1,10 @@
 <template>
   <view class="page">
     <image class="aurora-bg study-wash" src="/static/aurora-bg.png" mode="aspectFill"></image>
+    <view class="save-notice" v-if="saveFailed">
+      <text class="save-notice-text">本词保存失败，进度草稿已保留。请重试保存后继续。</text>
+      <view class="save-retry pressable-soft" hover-class="press-soft" @click="saveProgress"><text class="save-notice-text">{{ saving ? '正在保存…' : '重试保存' }}</text></view>
+    </view>
     <!-- 顶部：模式胶囊 + 计数 + 喇叭 -->
     <view class="top" v-if="!finished">
       <view class="mode-chip" :class="modeChipClass()">
@@ -29,7 +33,7 @@
         </view>
       </view>
       <view class="card-foot">
-        <text class="card-hint">轻触词卡，查看释义并评分</text>
+        <text class="card-hint">{{ saving ? '正在保存本词进度…' : '轻触词卡，查看释义并评分' }}</text>
         <text class="card-foot-mark">→</text>
       </view>
     </view>
@@ -40,7 +44,7 @@
         <text class="done-badge-icon">✓</text>
       </view>
       <text class="done-title">本场完成</text>
-      <text class="done-text">{{ saved ? '学习记录已保存' : '评分将在结束时统一落库' }}</text>
+      <text class="done-text">{{ saved ? '每个完成词的学习记录均已保存' : '正在保存学习记录…' }}</text>
       <view class="done-btn pressable-soft" hover-class="press-soft" @click="goBack">
         <text class="done-btn-text">返回</text>
       </view>
@@ -64,9 +68,10 @@
   import { Word } from '../../domain/types.uts'
   import { accentsDisplay } from '../../domain/format.uts'
   import { manualPlay, prefetchAudioForWord } from '../../services/audio.uts'
-  import { SessionState, MODE_NEW, MODE_REVIEW, createSession, answer, answerMastered, snapshotDraft, hasDraft, restoreDraft, commitSession, consumeDetailRating, consumeDetailMastered } from '../../services/studySession.uts'
+  import { SessionState, MODE_NEW, MODE_REVIEW, createSession, answer, answerMastered, snapshotDraft, hasDraft, restoreDraft, clearDraft, commitSession, consumeDetailRating, consumeDetailMastered } from '../../services/studySession.uts'
   import { buildReviewQueue, pickNewWordQueue } from '../../services/today.uts'
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
+  import { awaitDatabase } from '../../repos/sqlite/bootstrap.uts'
 
   let session: SessionState | null = null
   let studyMode = MODE_REVIEW
@@ -76,6 +81,8 @@
   const finished = ref(false)
   const empty = ref(false)
   const saved = ref(false)
+  const saving = ref(false)
+  const saveFailed = ref(false)
   const index = ref(0)
   const total = ref(0)
   const modeText = ref('复习')
@@ -168,28 +175,56 @@
     showCurrent(s)
   }
 
-  // 新会话：按模式取真实队列
+  // 每题先存草稿；通过的词写库成功后再展示下一题，失败时保留原题并提供重试。
+  const saveProgress = async () => {
+    const cur = session
+    if (cur == null || saving.value) {
+      return
+    }
+    saving.value = true
+    saveFailed.value = false
+    try {
+      snapshotDraft(cur)
+      const ok = await commitSession(cur)
+      if (!ok) {
+        saveFailed.value = true
+        uni.showToast({ title: '本词保存失败，请重试', icon: 'none' })
+        return
+      }
+      saved.value = cur.finished
+      syncRefs(cur)
+    } catch (e) {
+      saveFailed.value = true
+      console.error('本词进度保存失败', e)
+      uni.showToast({ title: '本词保存失败，请重试', icon: 'none' })
+    } finally {
+      saving.value = false
+    }
+  }
+
+  // 新会话：按模式取真实队列。
   const startFresh = async (mode: string) => {
+    const plan = await getPlanRepo().getActivePlan()
     let queue: Array<Word> = [] as Array<Word>
     if (mode == MODE_NEW) {
-      // 配额扣减在 pickNewWordQueue 内完成（学满返回空）
+      // 每批 dailyNew 个，完成词即时落库后，下一批自动跳过它们。
       queue = await pickNewWordQueue()
     } else {
-      const planRepo = getPlanRepo()
-      const plan = await planRepo.getActivePlan()
       const cap = plan == null ? 200 : plan.dailyReviewCap
       const items = await buildReviewQueue(cap)
       for (let i = 0; i < items.length; i++) {
         queue.push(items[i].word)
       }
     }
+    clearDraft()
     if (queue.length == 0) {
       empty.value = true
       finished.value = true
       return
     }
-    const s = createSession(mode, queue)
+    const s = createSession(mode, queue, plan == null ? -1 : plan.id)
     session = s
+    snapshotDraft(s)
     syncRefs(s)
   }
 
@@ -201,11 +236,17 @@
       return
     }
     session = d
-    syncRefs(d)
+    // 旧草稿或上次在事务/快照之间退出：先补存已完成词，再恢复剩余题目。
+    await saveProgress()
   }
 
   // 入口：加载档位映射，有草稿先询问
   const start = async (mode: string) => {
+    const ready = await awaitDatabase()
+    if (!ready) {
+      uni.showToast({ title: '本地数据库尚未就绪', icon: 'none' })
+      return
+    }
     try {
       prioMap = await getPlanRepo().listWordPriorities()
     } catch (e) {
@@ -233,56 +274,30 @@
     }
   }
 
-  // 会话结束统一落库（须先于 rate 声明）
-  const doCommit = async () => {
-    const cur = session
-    if (cur == null) {
-      return
-    }
-    try {
-      const ok = await commitSession(cur)
-      saved.value = ok
-      if (!ok) {
-        uni.showToast({ title: '落库失败，草稿已保留', icon: 'none' })
-      }
-    } catch (e) {
-      console.error('会话落库失败', e)
-      uni.showToast({ title: '落库失败，草稿已保留', icon: 'none' })
-    }
-  }
-
   const rate = (rating: number) => {
     const cur = session
-    if (cur == null || cur.finished) {
+    if (cur == null || cur.finished || saving.value || saveFailed.value) {
       return
     }
     const s = answer(cur, rating, Date.now())
     session = s
-    snapshotDraft(s)
-    syncRefs(s)
-    if (s.finished) {
-      doCommit()
-    }
+    saveProgress()
   }
 
   // 「已掌握」快捷入口：当前词直接通过出列（1/2 档词，详情页底部按钮触发）
   const mastered = () => {
     const cur = session
-    if (cur == null || cur.finished) {
+    if (cur == null || cur.finished || saving.value || saveFailed.value) {
       return
     }
-    const s = answerMastered(cur)
+    const s = answerMastered(cur, Date.now())
     session = s
-    snapshotDraft(s)
-    syncRefs(s)
-    if (s.finished) {
-      doCommit()
-    }
+    saveProgress()
   }
 
   const goDetail = () => {
     const w = currentWord
-    if (w == null) {
+    if (w == null || saving.value || saveFailed.value) {
       return
     }
     // rate=1：详情页底部显示三档评分
@@ -298,6 +313,14 @@
     studyMode = mode
     modeText.value = mode == MODE_NEW ? '学新词' : '复习'
     start(mode)
+  })
+
+  onBackPress(() => {
+    if (saving.value) {
+      uni.showToast({ title: '正在保存本词，请稍候', icon: 'none' })
+      return true
+    }
+    return false
   })
 
   // 从详情页返回：消费详情页底部提交的评分/「已掌握」，出下一词
@@ -325,6 +348,9 @@
     background-color: $n-bg;
   }
   .study-wash { opacity: 0.58; }
+  .save-notice { padding: 24rpx; margin-bottom: 20rpx; border-radius: 22rpx; background-color: #f8e4dc; }
+  .save-notice-text { font-size: 26rpx; line-height: 40rpx; color: $a-red-ink; }
+  .save-retry { align-items: center; padding: 16rpx; margin-top: 12rpx; border-radius: 18rpx; background-color: $n-card; }
 
   /* ---------- 顶部 ---------- */
   .top {

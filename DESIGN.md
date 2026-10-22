@@ -2,7 +2,7 @@
 
 > 本文档是完整版设计记忆：产品构想、全部决策及其取舍理由、当前进度、后续路线图。
 > 供后续开发会话快速恢复上下文；精简版结论见 AGENTS.md，两处冲突时以本文为详注、AGENTS.md 为准绳同步更新。
-> 最后更新：2026-08-28
+> 最后更新：2026-10-22
 
 ## 一、产品构想（用户原始愿景）
 
@@ -27,7 +27,7 @@
 | 7 | 学习状态 | **按计划隔离**：word_state PK(plan_id, word_id) | 用户明确选择（否决全局共享），支持"同一批词用不同计划反复背" |
 | 8 | 复习取词 | **全局到期词**（跨计划并集）；同词多计划到期**合并展示 + 答题后同步记账**（更新该词所有到期计划的 state） | 记忆本体是同一个，计划只是记账本；否决不去重（重复背）与只记最急（进度感知差） |
 | 9 | 评分 | **三档（2026-08-28 由四档简化）：忘记 / 模糊 / 记得**。忘记→重置 0/×0.5；模糊→不升/×0.7；记得→+1；模糊/忘记的词回队尾，需**连续两次记得**才通过，落库按最严重失败评分记账 | 四档（忘记/困难/良好/简单）曾用后简化，EASY 档预留 |
-| 10 | 落库时机 | **会话结束统一落库** + session_draft 本地草稿快照 | 用户要"整场可撤销"语义；草稿机制对冲异常退出丢账风险；主动放弃不落账 |
+| 10 | 落库时机 | **逐词完成即时落库（2026-10-22）** + session_draft 保留未完成队列 | 大队列无需整场完成；首次记得、失败后连对达标或手动已掌握时，以事务更新该词 state + log，成功才出下一词；退出/放弃仅影响未完成词，已保存成果保留；取代旧版整场可撤销语义 |
 | 11 | 会话组织 | 新词/复习**两个独立会话**，交互**完全同构**：正面表记词卡 → 点卡片进词卡详情页（揭示答案且可编辑）→ **详情页底部悬浮三档评分**，评分即返回出下一词（回传机制：studySession 模块级暂存 + study 页 onShow 消费） | 用户选首考式；2026-08-28 定稿此交互（编辑即时保存天然满足）；同构使 study 页一套组件复用 |
 | 12 | 激活计划 | 同一时间仅一个激活，新词只从激活计划按 sort 取 | 否决多计划并行（首页与统计复杂） |
 | 12b | 每日新词语义 | **不限制每日次数**：每次进「学新词」取下一批 dailyNew 个新词，学完可立即再取下一批；dailyNew 只是批量大小（可中途改，即时生效）。~~每日配额方案~~（曾实现后按用户要求移除；countTodayFirstReviewed 保留用于首页「今日已学」统计） | 用户拍板（2026-08-28 二次确认） |
@@ -63,7 +63,7 @@
 - repos/native：fileText.uts（content:// 文件读取）
 - wordRepo / planRepo SQLite 实现完成（精确匹配、今日新词取词、激活切换、建计划事务）
 - 导入链路完成：chooseFile 选 JSON → readTextFile → parseAndMatch 分层匹配 → 预览页逐条确认（多候选点选/将新建/参数可改）→ 建计划（无激活计划时自动激活）
-- 背词闭环代码完成：stateRepo SQLite 实现、studySession 草稿（快照/恢复/清除）+ commitSession 统一落库（每词取末次评分、首考对激活计划初始化、复习跨计划同步记账、单事务）、today 组装、study 页真队列、首页真计数
+- 背词闭环代码完成：stateRepo SQLite 实现、studySession 草稿（快照/恢复/清除）+ commitSession（2026-10-22 改为仅提交已通过词，逐词事务保存；首次学习固定来源计划，复习跨到期计划同步记账）、today 组装、study 页真队列、首页真计数
 - 词库页、词卡详情页、计划列表页、计划详情页（词单/参数编辑）、导入预览页、背词会话页、今日总览已接真数据
 - services：wordEditor / importer / studySession（含落库）/ today 全部可用；backup 骨架
 
@@ -84,7 +84,7 @@
 2. ~~wordRepo SQLite 实现 → 词库页搜索、词卡详情接真数据~~（完成）
 3. ~~base.db 生成 + 首启复制~~（链路完成；**真实数据源仍待选型**，当前 8 种子词）
 4. ~~planRepo + 导入链路~~（完成，真机验证通过）
-5. ~~stateRepo + studySession 落库：草稿快照/会话恢复/结束事务（同步记账）→ 首页今日任务接数据~~（完成，真机验证通过）
+5. ~~stateRepo + studySession 落库：草稿快照/会话恢复/逐词完成事务（同步记账）→ 首页今日任务接数据~~（主体完成；2026-10-22 增量保存改造见下节）
 6. ~~词卡编辑完整闭环：例句/笔记 CRUD、自由关联（搜索+理由）、关联词下钻~~（完成）
 7. ~~BackupService 导出/恢复~~（代码完成，待真机验证；导出全量 JSON 至 Android/data/<pkg>/files/backups/，恢复为单事务清库重灌）
 7b. ~~词库数据源管线（tools/build-db）~~（完成，2026-08-31：JMdict 常用 2 万 + Kanjium 音调 + 派生罗马音 + 近义/反义系统关联；base.db 已复制到 static/assets，待真机验证）
@@ -94,6 +94,13 @@
 11. ~~导入附加数据合并（例句/笔记/自由关联追加式合并）~~（代码完成 2026-08-31，待真机验证：命中词去重合并、关联目标自动匹配/新建、预览页附加数据摘要）
 12. ~~追加导入到已有计划（分课多次导入同一计划）~~（代码完成 2026-08-31，待真机验证：模式切换、计划 chips 选择、追加后 sort 接续/重复词跳过/附加数据仍合并、追加后新词队列继续往后取）
 13. ~~链式记忆（孤单词串联建关联工作台）~~（代码完成 2026-08-31，待真机验证：首页入口、孤单词随机起点、搜索候选标记、建关联后主单词切换链生长、快捷笔记、跳过/完成、无孤单词空态）
+
+### 完成词即时保存（2026-10-22）
+
+- 新词/复习共用：首次点「记得」直接通过；失败后仍按当前实现连续两次「记得」通过（本次未改为三次）；「已掌握」直接通过。通过时立即保存状态与流水，未通过的词只留草稿。完成本场某词不等于直接 mastered，仍按词所属计划档位和调度规则判定。
+- 背词页在每题后先快照，再调用 commitSession 仅处理 completedWordIds；事务成功后才展示下一词并清掉该词暂存评分。保存期间阻止继续评分/打开详情及返回；失败保留草稿、展示重试入口。退出或重新开始不会撤销已保存词，整场完成只负责清理草稿。
+- 草稿 v2 保存启动时 planId、待提交完成词、稳定完成时间及未完成队列。恢复先补存已通过词，最后一词尚未提交的草稿也可恢复；数据库 lastReviewedAt/新词已有状态用于判重，避免事务成功但快照前进程终止后重复记账。旧草稿从原通过进度推断完成词；旧新词草稿未存来源计划，仅兼容回退至恢复时激活计划。
+- 测试：tools/tests/study-session.test.cjs 转译实际 UTS 会话/调度/SQLite DAO，在独立内存 SQLite 上覆盖即时保存、两次连对、手动掌握、跨计划复习、回滚重试、事务与快照间退出恢复、旧草稿及来源计划固定等 13 场景。Android 编译通过；本次无连接设备，未进行真机运行验证。
 
 ### 首页双页手札（2026-09-02）
 
@@ -128,7 +135,7 @@
 
 - 所有文件修改必须记录 log.md（按文件分组、同文件倒序）；重要结构变更同步 AGENTS.md 与本文档
 - uts 强类型：慎用 TS 特性（解构、字面量联合类型等）；domain 层改动需真机编译验证
-- 已趟平的 uts→kotlin 编译坑：①被闭包捕获/模块级的可变变量判空后不能 smart cast，一律先存 const 局部副本；②页面生命周期回调（onLoad 等）不支持 async（error17），异步逻辑放到独立 async 函数中调用；③java 原生数组（如 AssetManager.list 返回 String[]）在 uts 中无 .length/join、下标须 Int、需判空——用 `names.size` + `for (let i: Int = 0; ...)` 遍历；④setup 内 const 箭头函数必须**先声明后引用**（同 Kotlin 词法顺序），互相调用的函数注意排列顺序；⑤冷启动竞态：首页 onLoad 早于 onLaunch 异步 initDatabase 完成，访问数据库前须 `await awaitDatabase()`；⑥模板插值不能直接调用**模块导入**的函数（仅 setup 本地函数可调），导入函数须包一层本地无参函数；⑦`UTSAndroid.getDispatcher(...).async` 的回调参数须为可空类型（`any | null`），非空 `any` 报 Function1 参数不匹配；⑧**uni-app x 不自动注入 uni.scss 的 scss 变量**（与 vue2/3 不同），页面 `<style lang="scss">` 顶部须显式 `@import '相对路径/uni.scss';`，否则 vite:css 报 Undefined variable；⑨**uts 对象字面量必须显式标注类型**（`const out: MyType = {...}`），无注解会被编译为 UTSJSONObject——赋给/返回给具体 type 时编译不报错但**运行时 ClassCastException**，且会被上层 catch 吞成误导性报错（2026-08-31 案例：导入报「JSON 解析失败」，真凶是 parseExtras 返回值漏注解）；⑩**uvue 样式不支持 @keyframes 与 animation-\* 属性**（app-uvue-css 报 ERROR: Selector `0%` is not supported / animation-name not standard），动画实现 = transition-property(duration/timing-function) + JS 定时器切换状态类（开屏页范式：logo 弹入/标题上浮/三色点轮换）；⑪**模板表达式里函数必须显式调用**（`accentText() != ''`），裸函数名与字符串比较报 kotlin `Operator '!=' cannot be applied to 'Function0<String>' and 'String'`；⑫**App-Android 上带模糊半径的 box-shadow 会把阴影外扩区计入视图的触控边界**——后置兄弟卡片的外扩帧会盖住前一张卡片底部条带、吃掉贴底按钮的点击（2026-09-01 案例：Aurora 柔影 0/16/44rpx 致词卡「+ 添加例句 / + 添加笔记」与链式记忆「+ 笔记」完全无响应，而同页卡片顶部/中部的「编辑 / 修改 / 筛选 chips」正常；旧版 2rpx 硬影外扩可忽略故无此问题）；约束=阴影偏移+模糊半径须小于卡片间 margin（token 已收敛为 $n-shadow 6/18rpx、$n-shadow-sm 4/12rpx，见 uni.scss 注释）；⑬**picker 组件的 @change 事件类型名（PickerChangeEvent 等）在 uts→kotlin 编译不存在**（2026-09-02 案例：计划详情筛选下拉报「找不到名称 PickerChangeEvent/detail」，error18）——下拉选择改用「胶囊按钮 + uni.showActionSheet(itemList, success.res.tapIndex)」实现，类型全部可用；⑭**UTSJSONObject 没有 getJSONObject 方法**（error18 找不到名称，连坐报 getString/getNumber）——取嵌套对象用 `item.get(key)` 拿 any 后 `as UTSJSONObject` 强转（2026-09-02 案例：导入 state 块解析）
+- 已趟平的 uts→kotlin 编译坑：①被闭包捕获/模块级的可变变量判空后不能 smart cast，一律先存 const 局部副本；②页面生命周期回调（onLoad 等）不支持 async（error17），异步逻辑放到独立 async 函数中调用；③java 原生数组（如 AssetManager.list 返回 String[]）在 uts 中无 .length/join、下标须 Int、需判空——用 `names.size` + `for (let i: Int = 0; ...)` 遍历；④setup 内 const 箭头函数必须**先声明后引用**（同 Kotlin 词法顺序），互相调用的函数注意排列顺序；⑤冷启动竞态：首页 onLoad 早于 onLaunch 异步 initDatabase 完成，访问数据库前须 `await awaitDatabase()`；⑥模板插值不能直接调用**模块导入**的函数（仅 setup 本地函数可调），导入函数须包一层本地无参函数；⑦`UTSAndroid.getDispatcher(...).async` 的回调参数须为可空类型（`any | null`），非空 `any` 报 Function1 参数不匹配；⑧**uni-app x 不自动注入 uni.scss 的 scss 变量**（与 vue2/3 不同），页面 `<style lang="scss">` 顶部须显式 `@import '相对路径/uni.scss';`，否则 vite:css 报 Undefined variable；⑨**uts 对象字面量必须显式标注类型**（`const out: MyType = {...}`），无注解会被编译为 UTSJSONObject——赋给/返回给具体 type 时编译不报错但**运行时 ClassCastException**，且会被上层 catch 吞成误导性报错（2026-08-31 案例：导入报「JSON 解析失败」，真凶是 parseExtras 返回值漏注解）；⑩**uvue 样式不支持 @keyframes 与 animation-\* 属性**（app-uvue-css 报 ERROR: Selector `0%` is not supported / animation-name not standard），动画实现 = transition-property(duration/timing-function) + JS 定时器切换状态类（开屏页范式：logo 弹入/标题上浮/三色点轮换）；⑪**模板表达式里函数必须显式调用**（`accentText() != ''`），裸函数名与字符串比较报 kotlin `Operator '!=' cannot be applied to 'Function0<String>' and 'String'`；⑫**App-Android 上带模糊半径的 box-shadow 会把阴影外扩区计入视图的触控边界**——后置兄弟卡片的外扩帧会盖住前一张卡片底部条带、吃掉贴底按钮的点击（2026-09-01 案例：Aurora 柔影 0/16/44rpx 致词卡「+ 添加例句 / + 添加笔记」与链式记忆「+ 笔记」完全无响应，而同页卡片顶部/中部的「编辑 / 修改 / 筛选 chips」正常；旧版 2rpx 硬影外扩可忽略故无此问题）；约束=阴影偏移+模糊半径须小于卡片间 margin（token 已收敛为 $n-shadow 6/18rpx、$n-shadow-sm 4/12rpx，见 uni.scss 注释）；⑬**picker 组件的 @change 事件类型名（PickerChangeEvent 等）在 uts→kotlin 编译不存在**（2026-09-02 案例：计划详情筛选下拉报「找不到名称 PickerChangeEvent/detail」，error18）——下拉选择改用「胶囊按钮 + uni.showActionSheet(itemList, success.res.tapIndex)」实现，类型全部可用；⑭**UTSJSONObject 没有 getJSONObject 方法**（error18 找不到名称，连坐报 getString/getNumber）——取嵌套对象用 `item.get(key)` 拿 any 后 `as UTSJSONObject` 强转（2026-09-02 案例：导入 state 块解析）；⑮**调试基座与正式云打包的 AndroidManifest 权限差异——Android 11+ 包可见性（queries）**：TextToSpeech 等 bind 外部应用服务的能力，在标准基座正常（基座预置全量 queries）、正式包失效（按项目配置生成 manifest 无声明），bindService 看不见引擎静默失败（2026-09-03 案例：TTS 真机调试正常、打包安装后不启用）；修复 = 项目根目录自定义 AndroidManifest.xml 声明 `<queries><intent><action android:name="android.intent.action.TTS_SERVICE"/></intent></queries>`（云打包时合并，注意 package 属性填实际打包包名）
 - pages.json 的 path 与 navigateTo URL **不带 .uvue 后缀**（本工程模板约定）
 - meibao-Sqlite 无参数绑定：SQL 拼接必须走 meibaoClient 的 sqlStr/sqlNum；行值取数用 toNum；**executeSql 的 insertId 恒为 -1**，取新行 id 用插入后 `SELECT last_insert_rowid()`（同连接顺序 await，安全）
 - 首启底库复制机制（assetCopy.uts）：dev 标准基座运行时 static 资源由 HBuilderX 同步到**设备文件系统**（用官方 `UTSAndroid.getResourcePath('/static/...')` 解析，不在 APK assets）；正式打包后在 APK `assets/apps/<appid>/www/static/...`。三层定位 + 失败诊断

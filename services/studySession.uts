@@ -12,7 +12,7 @@
  * 「已掌握」快捷入口（1/2档词）：answerMastered 直接通过，落库按 mastered + EASY 评分记账
  *
  * 草稿：每题后快照到本地存储 session_draft，异常退出重进可恢复或丢弃。
- * 落库：会话结束统一提交（单事务）；主动放弃（不调 commitSession）不落账。
+ * 落库：每个词通过即提交 state + log（单事务），成功后再展示下一词；未通过的词只存草稿。
  * 记账：一次评分 = 更新该词所有到期计划的 word_state + 逐计划写 review_log。
  */
 import { Word, ReviewLog, WordState, RATING_GOOD, RATING_EASY, WORD_STATUS_MASTERED } from '../domain/types.uts'
@@ -48,12 +48,14 @@ export type WordProgress = {
 
 export type SessionState = {
   mode: SessionMode,
+  planId: number, // 新词固定归属启动时的计划，恢复时不随激活计划切换
   queue: Array<Word>,
   index: number,
   flipped: boolean,
   pending: Array<PendingAnswer>,
   progress: Map<number, WordProgress>,
   manualMastered: Array<number>, // 本场手动标「已掌握」的 wordId（1/2 档快捷入口）
+  completedWordIds: Array<number>, // 已通过、等待落库的词；成功后移除
   finished: boolean
 }
 
@@ -62,15 +64,17 @@ function newProgress(): WordProgress {
   return p
 }
 
-export function createSession(mode: SessionMode, queue: Array<Word>): SessionState {
+export function createSession(mode: SessionMode, queue: Array<Word>, planId: number): SessionState {
   const s: SessionState = {
     mode: mode,
+    planId: planId,
     queue: queue,
     index: 0,
     flipped: false,
     pending: [],
     progress: new Map<number, WordProgress>(),
     manualMastered: [] as Array<number>,
+    completedWordIds: [] as Array<number>,
     finished: queue.length == 0
   }
   return s
@@ -105,7 +109,9 @@ export function answer(s: SessionState, rating: number, now: number): SessionSta
   }
 
   s.flipped = false
-  if (!passed) {
+  if (passed) {
+    s.completedWordIds.push(w.id)
+  } else {
     // 插到当前词后第 10 位（间隔复习，避免同词短时间连现）；队列剩余不足 10 词则插到队尾
     const insertAt = s.index + RETRY_INTERVAL
     if (insertAt >= s.queue.length) {
@@ -124,11 +130,20 @@ export function answer(s: SessionState, rating: number, now: number): SessionSta
 
 /**
  * 「已掌握」快捷入口（1/2 档词）：当前词直接通过出列，落库按 mastered 记账。
- * 与普通评分互斥：点此按钮不产生评分记录（记 EASY 预留档），优先级高于之前的失败评分。
+ * 记录稳定的完成时间（EASY 预留档），优先级高于之前的失败评分。
  */
-export function answerMastered(s: SessionState): SessionState {
+export function answerMastered(s: SessionState, now: number): SessionState {
   const w = s.queue[s.index]
+  const p: PendingAnswer = { wordId: w.id, rating: RATING_EASY, isFirst: s.mode == MODE_NEW, answeredAt: now }
+  s.pending.push(p)
   s.manualMastered.push(w.id)
+  s.completedWordIds.push(w.id)
+  // 去掉之前失败重插的同词，已掌握后不再在本场重复出现。
+  for (let i = s.queue.length - 1; i > s.index; i--) {
+    if (s.queue[i].id == w.id) {
+      s.queue.splice(i, 1)
+    }
+  }
   s.flipped = false
   const nextIndex = s.index + 1
   if (nextIndex >= s.queue.length) {
@@ -140,7 +155,7 @@ export function answerMastered(s: SessionState): SessionState {
 
 // ---------- 草稿 ----------
 
-// 草稿 JSON 结构：{mode, wordIds, index, pending, progress, manualMastered}
+// v2 草稿包含来源计划和待提交完成词，数据库成功/快照前被杀时可幂等恢复。
 function draftToJson(s: SessionState): string {
   let ids = '['
   for (let i = 0; i < s.queue.length; i++) {
@@ -184,8 +199,9 @@ function draftToJson(s: SessionState): string {
     manual += s.manualMastered[i].toString()
   }
   manual += ']'
-  return '{"mode":"' + s.mode + '","wordIds":' + ids + ',"index":' + s.index +
-    ',"pending":' + pending + ',"progress":' + progress + ',"manualMastered":' + manual + '}'
+  return '{"version":2,"mode":"' + s.mode + '","planId":' + s.planId + ',"wordIds":' + ids + ',"index":' + s.index +
+    ',"pending":' + pending + ',"progress":' + progress + ',"manualMastered":' + manual +
+    ',"completedWordIds":[' + s.completedWordIds.join(',') + ']}'
 }
 
 // Map 无 keys() 遍历保障，从 pending 里收集出现过/在队列中的 wordId
@@ -222,7 +238,7 @@ export function hasDraft(mode: SessionMode): boolean {
   return m == mode
 }
 
-// 恢复草稿为会话（按 wordIds 回查词条；已结束或词条缺失返回 null）
+// 恢复草稿（含最后一词待提交的已结束草稿）；缺失词条按原位置调整游标。
 export async function restoreDraft(mode: SessionMode): Promise<SessionState | null> {
   const raw = getStoredString(SESSION_DRAFT_KEY)
   if (raw.length == 0) {
@@ -244,11 +260,15 @@ export async function restoreDraft(mode: SessionMode): Promise<SessionState | nu
   }
   const repo = getWordRepo()
   const queue: Array<Word> = []
+  let restoredIndex = 0
   for (let i = 0; i < idsArr.length; i++) {
     const wid = idsArr[i]
     const w = await repo.getById(parseFloat(wid.toString()))
     if (w != null) {
       queue.push(w)
+      if (i < idx) {
+        restoredIndex++
+      }
     }
   }
   if (queue.length == 0) {
@@ -296,15 +316,53 @@ export async function restoreDraft(mode: SessionMode): Promise<SessionState | nu
       }
     }
   }
+  const completed: Array<number> = []
+  const completedArr = obj.getArray('completedWordIds')
+  if (completedArr != null) {
+    for (let i = 0; i < completedArr.length; i++) {
+      const id = parseFloat(completedArr[i].toString())
+      if (!isNaN(id) && completed.indexOf(id) < 0) {
+        completed.push(id)
+      }
+    }
+  } else {
+    // 兼容旧版整场草稿：只提交已经通过的词，未通过的失败词继续留在队列。
+    for (let i = 0; i < pending.length; i++) {
+      const id = pending[i].wordId
+      const p = progress.get(id)
+      if (p != null && p.consec > 0 && (!p.failed || p.consec >= 2) && completed.indexOf(id) < 0) {
+        completed.push(id)
+      }
+    }
+    for (let i = 0; i < manual.length; i++) {
+      const id = manual[i]
+      if (completed.indexOf(id) < 0) {
+        completed.push(id)
+      }
+      // 旧版手动掌握没有完成时间，迁移时补一次，并在提交前存入 v2 草稿。
+      const p: PendingAnswer = { wordId: id, rating: RATING_EASY, isFirst: mode == MODE_NEW, answeredAt: Date.now() }
+      pending.push(p)
+    }
+  }
+  const storedPlanId = obj.getNumber('planId')
+  let planId = storedPlanId == null ? -1 : storedPlanId
+  if (mode == MODE_NEW && storedPlanId == null) {
+    const active = await getPlanRepo().getActivePlan()
+    if (active != null) {
+      planId = active.id
+    }
+  }
   const s: SessionState = {
     mode: mode,
+    planId: planId,
     queue: queue,
-    index: idx >= queue.length ? queue.length : idx,
+    index: restoredIndex,
     flipped: false,
     pending: pending,
     progress: progress,
     manualMastered: manual,
-    finished: idx >= queue.length
+    completedWordIds: completed,
+    finished: restoredIndex >= queue.length
   }
   return s
 }
@@ -341,7 +399,7 @@ export function consumeDetailMastered(): boolean {
   return v
 }
 
-// ---------- 会话结束统一落库 ----------
+// ---------- 已通过词即时落库 ----------
 
 function parseCycle(cycleJson: string): Array<number> {
   const parsed = JSON.parse(cycleJson)
@@ -400,12 +458,13 @@ function pushMastered(states: Array<WordState>, logs: Array<ReviewLog>, planId: 
 }
 
 /**
- * 会话结束统一落库（单事务）：
+ * 只提交已经通过的词（通常一次一个词，state + log 单事务）：
  * - 每词取最后一次作答时间；记账评分 = 从未失败→记得；失败过→最严重失败评分（忘记 > 模糊）
  * - 首考：对激活计划写初始 state + log；复习：对该词所有到期计划逐个更新 state + log（同步记账）
  * - 档位：按 plan_item.priority 放宽掌握判定（1档一次记得即掌握 / 2档两次）
  * - 手动「已掌握」：新词→激活计划；复习→该词所有到期计划；state=mastered，log 记 EASY
- * 成功后清除草稿。
+ * 成功后移除这些词的暂存评分；整场结束才清草稿，否则保留剩余队列。
+ * 以稳定的完成时间和数据库 lastReviewedAt 判重，防止事务成功但快照前退出后重复记账。
  */
 export async function commitSession(s: SessionState): Promise<boolean> {
   // 去重：每词保留最后一次作答，保持首次出现顺序
@@ -413,6 +472,9 @@ export async function commitSession(s: SessionState): Promise<boolean> {
   const wordOrder: Array<number> = []
   for (let i = 0; i < s.pending.length; i++) {
     const p = s.pending[i]
+    if (s.completedWordIds.indexOf(p.wordId) < 0) {
+      continue
+    }
     if (!lastByWord.has(p.wordId)) {
       wordOrder.push(p.wordId)
     }
@@ -424,8 +486,8 @@ export async function commitSession(s: SessionState): Promise<boolean> {
   const states: Array<WordState> = []
   const logs: Array<ReviewLog> = []
 
-  // 首考需要激活计划及其周期（懒加载一次）
-  let activePlanId = -1
+  // 新词始终归属会话启动时的计划，不随草稿恢复时的激活计划切换。
+  const activePlanId = s.planId
   let activeCycle: Array<number> = [1, 2, 4]
   let activeLoaded = false
 
@@ -435,9 +497,6 @@ export async function commitSession(s: SessionState): Promise<boolean> {
 
   for (let i = 0; i < wordOrder.length; i++) {
     const wordId = wordOrder[i]
-    if (isManualMastered(s, wordId)) {
-      continue // 手动掌握的词不走评分记账，下方统一处理
-    }
     const p = lastByWord.get(wordId)
     if (p == null) {
       continue
@@ -451,15 +510,32 @@ export async function commitSession(s: SessionState): Promise<boolean> {
 
     if (p.isFirst) {
       if (!activeLoaded) {
-        const active = await planRepo.getActivePlan()
+        const active = await planRepo.getPlan(activePlanId)
         if (active != null) {
-          activePlanId = active.id
           activeCycle = parseCycle(active.cycleJson)
+        } else {
+          return false
         }
         activeLoaded = true
       }
       if (activePlanId <= 0) {
-        continue // 无激活计划，无法记账（正常不会发生）
+        return false
+      }
+      // 新词已经保存（含事务成功、草稿还没更新的恢复），不再次初始化或写重复流水。
+      const existing = await stateRepo.getStatesOfWord(wordId)
+      let alreadySaved = false
+      for (let j = 0; j < existing.length; j++) {
+        if (existing[j].planId == activePlanId && (existing[j].lastReviewedAt >= p.answeredAt || existing[j].status != 'new')) {
+          alreadySaved = true
+          break
+        }
+      }
+      if (alreadySaved) {
+        continue
+      }
+      if (isManualMastered(s, wordId)) {
+        pushMastered(states, logs, activePlanId, wordId, true, -1, p.answeredAt)
+        continue
       }
       let prios = prioCache.get(activePlanId)
       if (prios == null) {
@@ -498,6 +574,13 @@ export async function commitSession(s: SessionState): Promise<boolean> {
       const dueStates = await stateRepo.listDueStatesOfWord(wordId, p.answeredAt)
       for (let j = 0; j < dueStates.length; j++) {
         const ds = dueStates[j]
+        if (ds.status == WORD_STATUS_MASTERED || ds.lastReviewedAt >= p.answeredAt) {
+          continue
+        }
+        if (isManualMastered(s, wordId)) {
+          pushMastered(states, logs, ds.planId, wordId, false, ds.stage, p.answeredAt)
+          continue
+        }
         let cycle = cycleCache.get(ds.planId)
         if (cycle == null) {
           const plan = await planRepo.getPlan(ds.planId)
@@ -540,36 +623,27 @@ export async function commitSession(s: SessionState): Promise<boolean> {
     }
   }
 
-  // 手动「已掌握」记账：新词会话→激活计划；复习会话→该词所有到期计划
-  if (s.manualMastered.length > 0) {
-    const now = Date.now()
-    for (let i = 0; i < s.manualMastered.length; i++) {
-      const wordId = s.manualMastered[i]
-      if (s.mode == MODE_NEW) {
-        if (!activeLoaded) {
-          const active = await planRepo.getActivePlan()
-          if (active != null) {
-            activePlanId = active.id
-            activeCycle = parseCycle(active.cycleJson)
-          }
-          activeLoaded = true
-        }
-        if (activePlanId <= 0) {
-          continue
-        }
-        pushMastered(states, logs, activePlanId, wordId, true, -1, now)
-      } else {
-        const dueStates = await stateRepo.listDueStatesOfWord(wordId, now)
-        for (let j = 0; j < dueStates.length; j++) {
-          pushMastered(states, logs, dueStates[j].planId, wordId, false, dueStates[j].stage, now)
-        }
-      }
-    }
-  }
+  // 未通过的词只存草稿，不提前写入学习状态。
 
   const ok = await stateRepo.commitRatings(states, logs)
   if (ok) {
-    clearDraft()
+    const remaining: Array<PendingAnswer> = []
+    for (let i = 0; i < s.pending.length; i++) {
+      if (s.completedWordIds.indexOf(s.pending[i].wordId) < 0) {
+        remaining.push(s.pending[i])
+      }
+    }
+    for (let i = 0; i < s.completedWordIds.length; i++) {
+      s.progress.delete(s.completedWordIds[i])
+    }
+    s.pending = remaining
+    s.completedWordIds = [] as Array<number>
+    s.manualMastered = [] as Array<number>
+    if (s.finished) {
+      clearDraft()
+    } else {
+      snapshotDraft(s)
+    }
   }
   return ok
 }

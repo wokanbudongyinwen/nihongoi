@@ -1,5 +1,23 @@
 # 文件修改日志
 
+## 背词/复习逐词完成即时保存（2026-10-22）
+
+- `services/studySession.uts`：新增会话来源 planId 与待提交完成词 completedWordIds；通过评分或手动掌握时记录稳定完成时间，commitSession 仅提交已完成词，成功后清理该词暂存数据并保存剩余队列，结束才清草稿。恢复兼容旧整场草稿、补提交完成词，数据库状态/完成时间判重避免重复流水与重复熟练度推进；保留失败后连续两次记得与最严重失败评分记账规则。
+- `pages/study/study.uvue`：每次评分后先快照、保存完成词再出下一题；加入保存中防连点/返回保护、失败重试入口，恢复草稿先补保存；新会话固定来源计划并立即快照，完成页文案改为逐词保存结果。
+- `tools/tests/study-session.test.cjs`（新增）：使用实际 UTS 会话/调度/SQLite DAO 与独立内存 SQLite，13 个场景覆盖未结束队列即时保存、失败词暂存、两次连对、手动掌握、跨计划复习、事务回滚重试、数据库成功但快照前退出的幂等恢复、旧草稿、切换计划/缺失词与最后一词恢复、丢弃草稿保留已完成成果。运行需 Node 22.13+ 与 TypeScript 编译器路径参数（本机使用 HBuilderX 内置 TypeScript）。
+- `AGENTS.md`、`DESIGN.md`：更新逐词事务与退出保留已完成成果的规则，明确当前连对要求为两次、普通本场通过与长期已掌握不同。
+- 验证：13 个独立 SQLite 回归场景全通过；HBuilderX 5.24 Android（13 页面）编译成功。本次无连接设备，未操作用户学习数据库或进行真机运行；此前版本信息/TTS 打包等未提交改动保留，未创建 Git 提交。
+
+## 设置页版本信息区（2026-09-03）
+
+- `domain/changelog.uts`（新增）：版本更新日志纯数据（ChangelogEntry[]，新版本在前，含 1.05/1.04 两条）；发版流程注释 = manifest 升版本号后在此追加。
+- `pages/settings/settings.uvue`：数据区与调试区之间新增「版本」卡片——当前版本行（changelog 首条 version + 运行时 appVersionCode）+ 本次更新内容条目列表（紫点 bullets）。
+
+## 正式包 TTS 失效修复（坑⑮ Android 包可见性）（2026-09-03）
+
+- `AndroidManifest.xml`（新增，项目根目录）：声明 `<queries>` TTS_SERVICE 包可见性——调试基座预置全量 queries 故真机运行正常，正式云打包无声明则 bindService 看不见 TTS 引擎、初始化静默失败；package 属性暂填默认 `uni.UNI_A4A160A`（若打包界面用自定义包名需同步改）。
+- `DESIGN.md`：踩坑清单追加坑⑮（调试基座 vs 正式包的 manifest 差异）。
+
 ## stats 下钻「已学」统一为已掌握口径（2026-09-02）
 
 - `repos/planRepo.uts` + `repos/sqlite/planRepoImpl.uts`：listStatsWords/countStatsWords 的 'learned' 条件由「有 state 行（status != new）」改为 `status = 'mastered'`——全局定义「已学 = 已掌握」（首页统计条、stats 下钻、词库筛选口径统一）。

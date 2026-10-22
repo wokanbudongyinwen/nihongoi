@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+  package="uni.UNI_A4A160A">
+
+  <!-- Android 11+ 包可见性声明：TextToSpeech 需要发现其他应用的 TTS 引擎服务。
+       调试基座自带全量 queries 所以真机运行正常；正式云打包必须在此声明，
+       否则 TTS 初始化失败（bindService 找不到引擎），App 内 TTS 兜底静默不生效。 -->
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.TTS_SERVICE" />
+    </intent>
+  </queries>
+</manifest>

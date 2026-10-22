@@ -23,6 +23,19 @@
       </view>
     </view>
 
+    <view class="neo-card section">
+      <text class="title">版本</text>
+      <view class="row">
+        <text class="label">当前版本</text>
+        <text class="value">v{{ currentEntry.version }}（build {{ appVersionCode }}）</text>
+      </view>
+      <text class="log-date">{{ currentEntry.date }} 更新内容</text>
+      <view class="log-item" v-for="(it, li) in currentEntry.items" :key="li">
+        <text class="log-dot">·</text>
+        <text class="log-text">{{ it }}</text>
+      </view>
+    </view>
+
     <!-- 调试工具（验证复习链路用，正式版可删） -->
     <view class="neo-card section section-debug">
       <text class="title">调试工具</text>
@@ -42,6 +55,11 @@
   import { getPlanRepo } from '../../repos/sqlite/planRepoImpl.uts'
   import { readTextFile } from '../../repos/native/fileText.uts'
   import { exportAll, restoreAll } from '../../services/backup.uts'
+  import { CHANGELOG } from '../../domain/changelog.uts'
+
+  // 版本信息：运行时读 manifest 的 versionCode，更新内容取 changelog 首条
+  const appVersionCode = uni.getAppBaseInfo().appVersionCode
+  const currentEntry = CHANGELOG[0]
 
   // 导出：全量 JSON 写入应用外部私有目录 backups/
   const exportBackup = async () => {
@@ -246,5 +264,31 @@
     color: $n-ink;
     font-weight: 500;
     letter-spacing: 1rpx;
+  }
+  .log-date {
+    font-size: 22rpx;
+    color: $n-text2;
+    font-family: monospace;
+    letter-spacing: 1rpx;
+    margin-top: 14rpx;
+    margin-bottom: 6rpx;
+  }
+  .log-item {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 8rpx 0;
+  }
+  .log-dot {
+    width: 30rpx;
+    font-size: 26rpx;
+    line-height: 38rpx;
+    color: $n-purple;
+    font-weight: bold;
+  }
+  .log-text {
+    flex: 1;
+    font-size: 24rpx;
+    line-height: 38rpx;
+    color: $n-ink;
   }
 </style>
